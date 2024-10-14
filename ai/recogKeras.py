@@ -8,8 +8,9 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 from tensorflow.keras.models import load_model
 import time
+from gestureLabel import gesture
 
-model = load_model('models/csv_nn_25_dist_15_try.keras')
+model = load_model('model/csv_nn_25_dist_15_try.keras')
 # 미디어파이프 손 랜드마크 초기화
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(
@@ -19,24 +20,6 @@ hands = mp_hands.Hands(
 )
 
 # 제스처 딕셔너리
-gesture = {
-    0: 'middle_finger',
-    1: 'heart',
-    2: 'heart_twohands',
-    3: 'thumb_up',
-    4: 'v',
-    5: 'ok',
-    6: 'call',
-    7: 'alien',
-    8: 'baby',
-    9: 'four',
-    10: 'mandoo',
-    11: 'one',
-    12: 'rabbit',
-    13: 'rock',
-    14: 'three',
-    15: 'two'
-}
 def calculate_angle(joint):
     # 관절 사이 벡터 계산 (부모-자식 관계)
     v1 = joint[[0, 1, 2, 3, 0, 5, 6, 7, 0, 9, 10, 11, 0, 13, 14, 15, 0, 17, 18, 19], :]  
@@ -51,7 +34,8 @@ def calculate_angle(joint):
     angle = np.degrees(angle)  # 각도를 도 단위로 변환
 
 
-    palm_center = joint[0, :]  # 손바닥 중심
+    #palm_center = joint[0, :]  # 손바닥 중심
+    palm_center = joint[[2,6,10,14,18],]
     finger_tips = joint[[4, 8, 12, 16, 20], :]  # 손가락 끝
     pv = finger_tips - palm_center
     pv = pv / np.linalg.norm(pv, axis=1)[:, np.newaxis]
@@ -78,7 +62,7 @@ def calculate_distances(joint):
             dist = np.linalg.norm(finger_tips[i] - finger_tips[j])
             distances.append(dist)
     
-    return np.array(distances)*200
+    return np.array(distances)*130
 
 # 실시간 웹캠 피드로 손 제스처 인식
 cap = cv2.VideoCapture(0)
@@ -99,14 +83,7 @@ while True:
             joint = np.zeros((21, 3))
             for j, lm in enumerate(hand_landmarks.landmark):
                 joint[j] = [lm.x, lm.y, lm.z]
-                       #rock(13)/thumb up(3) 하드코딩
-            #thumb up에서 dist 평균 = 0.1917
-            #rock에서 dist 평균 = 0.078
-            #전체 평균 = 0.1373
             
-            #thumb up(3)인 경우 보정
-            
-
             angle = calculate_angle(joint)
             dist = calculate_distances(joint)
             print("mp: %fms"%(time.time()-start),end=' ')

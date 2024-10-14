@@ -16,7 +16,6 @@ hands = mp_hands.Hands(
     min_tracking_confidence=0.5
 )
 
-
 def calculate_direction(joint):
     direction = []
 
@@ -74,7 +73,7 @@ def calculate_distances(joint):
             dist = np.linalg.norm(finger_tips[i] - finger_tips[j])
             distances.append(dist)
     
-    return np.array(distances)
+    return np.array(distances)*130
 
 
 
@@ -119,7 +118,8 @@ while True:
             direction = calculate_direction(joint)
             dist = calculate_distances(joint)
 
-            features = np.hstack((angle,dist))  # 각도와 거리 데이터를 결합
+            #features = np.hstack((angle,dist))  # 각도와 거리 데이터를 결합
+            features = np.hstack((angle))
             predicted_label = knn_model.predict([features])[0]
             print("time: ",time.time()-start)
 

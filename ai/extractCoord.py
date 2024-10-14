@@ -2,31 +2,12 @@ import cv2
 import mediapipe as mp
 import numpy as np
 import os
+from gestureLabel import gesture
 
 cv2.ocl.setUseOpenCL(True)
 
 # Settings for MediaPipe hands
 max_num_hands = 2  # Number of hands to detect
-
-# Gesture label dictionary
-gesture = {
-    0: 'middle_finger',
-    1: 'heart',
-    2: 'heart_twohands',
-    3: 'thumb_up',
-    4: 'v',
-    5: 'ok',
-    6: 'call',
-    7: 'alien',
-    8: 'baby',
-    9: 'four',
-    10: 'mandoo',
-    11: 'one',
-    12: 'rabbit',
-    13: 'rock',
-    14: 'three',
-    15: 'two'
-}
 
 # Gesture labels
 gesture_labels = list(gesture.keys())
