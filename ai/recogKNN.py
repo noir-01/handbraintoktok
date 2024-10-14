@@ -6,6 +6,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.metrics import accuracy_score
 import time
+from gestureLabel import gesture
+
 # 미디어파이프 손 랜드마크 초기화
 mp_hands = mp.solutions.hands
 hands = mp_hands.Hands(
@@ -14,25 +16,7 @@ hands = mp_hands.Hands(
     min_tracking_confidence=0.5
 )
 
-# 제스처 딕셔너리
-gesture = {
-    0: 'middle_finger',
-    1: 'heart',
-    2: 'heart_twohands',
-    3: 'thumb_up',
-    4: 'v',
-    5: 'ok',
-    6: 'call',
-    7: 'alien',
-    8: 'baby',
-    9: 'four',
-    10: 'mandoo',
-    11: 'one',
-    12: 'rabbit',
-    13: 'rock',
-    14: 'three',
-    15: 'two'
-}
+
 def calculate_direction(joint):
     direction = []
 
@@ -64,7 +48,7 @@ def calculate_angle(joint):
     angle = np.degrees(angle)  # 각도를 도 단위로 변환
 
 
-    palm_center = joint[0, :]  # 손바닥 중심
+    palm_center = joint[[2, 6, 10, 14, 18], :]
     finger_tips = joint[[4, 8, 12, 16, 20], :]  # 손가락 끝
     pv = finger_tips - palm_center
     pv = pv / np.linalg.norm(pv, axis=1)[:, np.newaxis]
@@ -72,8 +56,7 @@ def calculate_angle(joint):
                                   pv[[0, 0, 0, 0, 1, 1, 1, 2, 2, 3], :], 
                                   pv[[1, 2, 3, 4, 2, 3, 4, 3, 4, 4], :]))
     finger_angle = np.degrees(finger_angle)
-    # 두 배열을 결합
-    #return angle
+
     return np.concatenate((angle, finger_angle))
 
 def calculate_distances(joint):
@@ -96,7 +79,7 @@ def calculate_distances(joint):
 
 
 # CSV 데이터 로드
-data = pd.read_csv('data/gesture_25_dist_15.csv', header=None)
+data = pd.read_csv('data/gesture_25.csv', header=None)
 X = data.iloc[:, :-1].values  # 특징 데이터 (관절 각도 + 거리)
 y = data.iloc[:, -1].values    # 레이블 데이터(제스처)
 
