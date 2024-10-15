@@ -1,28 +1,86 @@
 package com.example.handbrainserver.model;
 
 import com.example.handbrainserver.util.Gesture;
+import com.example.handbrainserver.util.GesturePair;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Random;
 
+@Setter
+@Getter
 public class GameSession {
 
     private String userId;
     private String sessionId;
     private long startTime;
     private boolean isRandomGame;
+
+    private int questionCounter;
+    private GesturePair question;
+    private GesturePair correctAnswer;
+    private int questionType;
+    private int calcQuestion;
+    
     Random random = new Random();
 
     public GameSession(String sessionId) {
         this.sessionId = sessionId;
         this.startTime = System.currentTimeMillis();
+
+        //10문제 카운트
+        this.questionCounter = 10;
+        question = new GesturePair();
+        correctAnswer = new GesturePair();
     }
-    public void setUserId(String userId){
-        this.userId=userId;
+    //출제 전 확인해야 함.
+    public boolean isEnd(){
+        return questionCounter<0;
+    }
+    public void nextProblem() {
+        Gesture[] rspGestures = {Gesture.ROCK, Gesture.TWO, Gesture.FIVE};
+
+        //기본 따라하기 - 랜덤으로 따라할 동작 2개 뽑아서 반환
+        if(!isRandomGame){
+            questionType = 0;
+            question.setFirst(Gesture.fromCode(random.nextInt(Gesture.values().length)));
+            question.setSecond(Gesture.fromCode(random.nextInt(Gesture.values().length)));
+            correctAnswer.setFirst(question.getFirst());
+            correctAnswer.setSecond(question.getSecond());
+
+        }else{
+            //따라하기, 지는/이기는 가위바위보, 숫자 계산
+            questionType = random.nextInt(4);
+            switch(questionType){
+                case 0: //따라하기
+                    question.setFirst(Gesture.fromCode(random.nextInt(Gesture.values().length)));
+                    question.setSecond(Gesture.fromCode(random.nextInt(Gesture.values().length)));
+                    correctAnswer.setFirst(question.getFirst());
+                    correctAnswer.setSecond(question.getSecond());
+                    break;
+
+                case 1: //지는/이기는 가위바위보
+                case 2:
+                    question.setFirst(rspGestures[random.nextInt(rspGestures.length)]);
+                    question.setSecond(rspGestures[random.nextInt(rspGestures.length)]);
+                    break;
+                    
+                case 3: //숫자 계산
+                    calcQuestion = random.nextInt(11);
+                    break;
+            }
+        }
+        questionCounter-=1;
     }
 
-    public void nextProblem() {
-        this.startTime = System.currentTimeMillis();  // 새로운 문제 시작 시 시간 기록
-        // 문제 출제 로직 (예: 무작위 문제 생성)
+    public boolean isAnswer(GesturePair userAnswer){
+        return switch(questionType){
+            case 0 -> (question.getFirst()==userAnswer.getFirst() && question.getSecond()==userAnswer.getSecond());
+            case 1 -> Gesture.rspWin(question,userAnswer);
+            case 2 -> Gesture.rspLose(question,userAnswer);
+            case 3 -> Gesture.calcHand(calcQuestion,userAnswer);
+            default -> false;
+        };
     }
 
     public void calculateReactionTime() {
