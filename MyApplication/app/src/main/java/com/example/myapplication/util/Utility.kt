@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.example.myapplication.R
 
 object SettingUtil{
 
@@ -48,4 +49,31 @@ object SettingsLiveData{
         _textSize.value = textSize
         _soundVolume.value = soundVolume
     }
+}
+
+object ResourceUtils {
+    val handImages = arrayOf(
+        R.drawable.hand_0,
+        R.drawable.hand_1,
+        R.drawable.hand_2,
+        R.drawable.hand_3,
+        R.drawable.hand_4,
+        R.drawable.hand_5,
+        R.drawable.hand_6,
+        R.drawable.hand_7,
+        R.drawable.hand_8,
+        R.drawable.hand_9,
+        R.drawable.hand_10,
+        R.drawable.hand_11,
+        R.drawable.hand_12,
+        R.drawable.hand_13,
+        R.drawable.hand_14,
+        R.drawable.hand_15,
+        R.drawable.hand_16,
+        R.drawable.hand_17,
+        R.drawable.hand_18,
+        R.drawable.hand_19,
+        R.drawable.hand_20,
+        R.drawable.hand_21
+    )
 }
