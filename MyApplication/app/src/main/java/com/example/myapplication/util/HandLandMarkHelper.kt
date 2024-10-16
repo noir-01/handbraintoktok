@@ -107,7 +107,7 @@ class HandLandMarkHelper(
                     .setMinHandPresenceConfidence(minHandPresenceConfidence)
                     .setNumHands(maxNumHands)
                     .setRunningMode(runningMode)
-
+            Log.d("HandSock","SetNumHands: $maxNumHands")
             // The ResultListener and ErrorListener only use for LIVE_STREAM mode.
             if (runningMode == RunningMode.LIVE_STREAM) {
                 optionsBuilder
@@ -229,7 +229,6 @@ class HandLandMarkHelper(
         result: HandLandmarkerResult,
         input: MPImage
     ) {
-
         val finishTimeMs = SystemClock.uptimeMillis()
         val inferenceTime = finishTimeMs - result.timestampMs()
 
@@ -255,11 +254,11 @@ class HandLandMarkHelper(
         const val TAG = "HandLandmarkerHelper"
         private const val MP_HAND_LANDMARKER_TASK = "hand_landmarker.task"
 
-        const val DELEGATE_CPU = 0
-        const val DELEGATE_GPU = 1
-        const val DEFAULT_HAND_DETECTION_CONFIDENCE = 0.7F
-        const val DEFAULT_HAND_TRACKING_CONFIDENCE = 0.7F
-        const val DEFAULT_HAND_PRESENCE_CONFIDENCE = 0.7F
+        const val DELEGATE_CPU = 1
+        const val DELEGATE_GPU = 0
+        const val DEFAULT_HAND_DETECTION_CONFIDENCE = 0.5F
+        const val DEFAULT_HAND_TRACKING_CONFIDENCE = 0.5F
+        const val DEFAULT_HAND_PRESENCE_CONFIDENCE = 0.5F
         const val DEFAULT_NUM_HANDS = 2
         const val OTHER_ERROR = 0
         const val GPU_ERROR = 1

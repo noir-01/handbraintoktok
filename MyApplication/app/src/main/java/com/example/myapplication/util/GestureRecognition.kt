@@ -79,24 +79,26 @@ class GestureRecognition(private val context: Context, private val numNeighbors:
         return predictions[0]
     }
 
-    fun predictByResult(result: HandLandmarkerResult): Int{
-        val joint = Array(21) { FloatArray(3) }
-        for (res in result.landmarks()) {
-            for (i in res.indices) {
-                // Store x, y, z coordinates for each landmark in the joint array
-                joint[i][0] = res[i].x()
-                joint[i][1] = res[i].y()
-                joint[i][2] = res[i].z()
-            }
+    fun predictByResult(result: HandLandmarkerResult, handIndex: Int = 0): Int {
+        // 손 랜드마크의 개수 확인
+        if (result.landmarks().isEmpty() || handIndex >= result.landmarks().size) {
+            return -1
         }
+        // 특정 손의 랜드마크 선택
+        val selectedHandLandmarks = result.landmarks()[handIndex]
+        val joint = Array(21) { FloatArray(3) }
+
+        for (i in selectedHandLandmarks.indices) {
+            joint[i][0] = selectedHandLandmarks[i].x()
+            joint[i][1] = selectedHandLandmarks[i].y()
+            joint[i][2] = selectedHandLandmarks[i].z()
+        }
+
         val angles = calculateAngles(joint)
-        // Calculate distances between palm center and finger tips (optional, if needed)
-        //val distances = calculateDistances(joint)
-        // Combine angles and distances into a single array (if necessary)
-        //val combinedData = angles + distances
+
+        // KNN 모델을 사용하여 예측
         val predictions = knnModel.predict(arrayOf(angles.map { it.toDouble() }.toDoubleArray()))
-        Log.d("MyLog","$predictions[0]")
-        return predictions[0]
+        return predictions[0] // 예측된 인덱스를 반환
     }
 
     fun calcAngles(result: HandLandmarkerResult): FloatArray {
