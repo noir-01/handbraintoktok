@@ -81,6 +81,12 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
     implementation("androidx.camera:camera-view:$cameraxVersion")
     implementation("androidx.camera:camera-extensions:$cameraxVersion")
+
+    //mediapipe
+    implementation("com.google.mediapipe:tasks-vision:0.10.14")
+    //KNN
+    implementation("com.github.haifengl:smile-core:2.5.3")
+
     implementation("commons-io:commons-io:2.4")
 
 }
