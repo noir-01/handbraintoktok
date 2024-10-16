@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -22,6 +24,18 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+        val secretPropsFile = file("secret.properties")
+        val secretProps = Properties()
+        if (secretPropsFile.exists()) {
+            secretPropsFile.inputStream().use { stream ->
+                secretProps.load(stream)
+            }
+        }
+        val serverDomain = secretProps.getProperty("SERVER_DOMAIN")
+            ?: throw IllegalArgumentException("SERVER_DOMAIN is not defined in secret.properties")
+
+        resValue("string", "server_domain", serverDomain)
+
     }
 
     buildTypes {
@@ -86,6 +100,8 @@ dependencies {
     implementation("com.google.mediapipe:tasks-vision:0.10.14")
     //KNN
     implementation("com.github.haifengl:smile-core:2.5.3")
+    //http
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
 
     implementation("commons-io:commons-io:2.4")
 
