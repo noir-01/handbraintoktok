@@ -22,39 +22,15 @@ import android.view.View
 import android.widget.Button
 
 import android.util.Size
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.camera.core.ImageAnalysis
-
-import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.viewinterop.AndroidView
 
 import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.util.GestureRecognition
 import com.example.myapplication.util.HandLandMarkHelper
 import com.google.mediapipe.tasks.vision.core.RunningMode
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
 import com.example.myapplication.R
 import com.example.myapplication.util.gestureLabels
@@ -89,7 +65,7 @@ class GameStartActivity : BaseActivity() {
         val gameName = intent.getStringExtra("GAME_NAME") ?: "Unknown Game"
 
         // 게임 이미지 처리
-        val gameImageView = findViewById<ImageView>(R.id.gameImageView)
+        val gameImageView = findViewById<ImageView>(R.id.gameImageRightView)
         val imageResource = when (gameName) {
             "mimic" -> R.drawable.mimic
             "rps" -> R.drawable.rps
@@ -119,11 +95,12 @@ class GameStartActivity : BaseActivity() {
                     Log.e("HandActivity", "Hand Landmarker error: $error")
                 }
 
+
                 override fun onResults(resultBundle: HandLandMarkHelper.ResultBundle) {
                     val inferenceTime = resultBundle.inferenceTime
                     val height = resultBundle.inputImageHeight
                     val width = resultBundle.inputImageWidth
-                    Log.d("HandActivity","time: $inferenceTime")
+                    Log.d("HandActivity","time: $inferenceTime, resol: $width*$height")
                     for (result in resultBundle.results) {
                         if (result.landmarks().isNotEmpty()) {
                             val predictedIndex = gestureRecognition.predictByResult(result)
@@ -233,11 +210,22 @@ class GameStartActivity : BaseActivity() {
                 .also { it.setSurfaceProvider(previewView.surfaceProvider) }
 
             val cameraSelector = CameraSelector.DEFAULT_FRONT_CAMERA
+            val imageAnalyzer = ImageAnalysis.Builder()
+                .setTargetResolution(Size(640, 480))
+                .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                .build()
+
+            imageAnalyzer.setAnalyzer(ContextCompat.getMainExecutor(this)) { imageProxy ->
+                handLandmarkerHelper.detectLiveStream(
+                    imageProxy = imageProxy,
+                    isFrontCamera = true
+                )
+            }
 
             try {
                 cameraProvider.unbindAll()
                 cameraProvider.bindToLifecycle(
-                    this, cameraSelector, preview
+                    this, cameraSelector, preview, imageAnalyzer
                 )
             } catch (exc: Exception) {
                 Toast.makeText(this, "카메라 초기화에 실패했습니다.", Toast.LENGTH_SHORT).show()

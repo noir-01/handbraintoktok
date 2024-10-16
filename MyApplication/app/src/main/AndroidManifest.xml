@@ -31,10 +31,7 @@
             android:name=".activity.VariousGameActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.RecordsActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.RecordsActivity"
+            android:name=".activity.RecordActivity"
             android:exported="false" />
         <activity
             android:name=".activity.SettingsActivity"

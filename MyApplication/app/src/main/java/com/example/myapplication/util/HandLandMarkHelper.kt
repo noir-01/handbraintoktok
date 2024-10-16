@@ -69,7 +69,6 @@ class HandLandMarkHelper(
     fun setupHandLandmarker() {
         // Set general hand landmarker options
         val baseOptionBuilder = BaseOptions.builder()
-
         // Use the specified hardware for running the model. Default to CPU
         when (currentDelegate) {
             DELEGATE_CPU -> {
@@ -178,7 +177,6 @@ class HandLandMarkHelper(
 
         // Convert the input Bitmap object to an MPImage object to run inference
         val mpImage = BitmapImageBuilder(rotatedBitmap).build()
-
         detectAsync(mpImage, frameTime)
     }
 

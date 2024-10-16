@@ -42,14 +42,30 @@
             android:textStyle="bold"
             android:layout_marginBottom="8dp"/>
 
-        <!-- 게임 이미지 -->
-        <ImageView
-            android:id="@+id/gameImageView"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:src="@drawable/logo"/>
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <!-- 왼쪽 게임 이미지 -->
+            <ImageView
+                android:id="@+id/gameImageLeftView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/logo"/>
+
+            <!-- 오른쪽 게임 이미지 -->
+            <ImageView
+                android:id="@+id/gameImageRightView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:src="@drawable/logo"/>
+        </LinearLayout>
     </LinearLayout>
-    
+
     <ImageView
         android:id="@+id/countdownImageView"
         android:layout_width="wrap_content"
@@ -60,7 +76,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:contentDescription="Countdown Image"/>
-    
+
     <ImageView
         android:id="@+id/startImageView"
         android:layout_width="wrap_content"

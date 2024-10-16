@@ -37,7 +37,7 @@ class MainActivity : BaseActivity() {
         val recordsButton = findViewById<Button>(R.id.button_records)
         val methodButton = findViewById<Button>(R.id.button_method)
         val settingsButton = findViewById<Button>(R.id.button_settings)
-        val exitButton = findViewById<Button>(R.id.button_exit)
+        //val exitButton = findViewById<Button>(R.id.button_exit)
 
         startGameButton.setOnClickListener{
             val intent = Intent(this, GameStartActivity::class.java) //GameActivity로 이동
@@ -67,7 +67,7 @@ class MainActivity : BaseActivity() {
         }
 
         recordsButton.setOnClickListener{
-            val intent = Intent(this, RecordsActivity::class.java)
+            val intent = Intent(this, RecordActivity::class.java)
             startActivity(intent)
         }
 
@@ -80,11 +80,12 @@ class MainActivity : BaseActivity() {
             val intent = Intent(this, SettingsActivity::class.java)
             startActivity(intent)
         }
-
-        exitButton.setOnClickListener{
+        /*
+        xitButton.setOnClickListener{
             finish()    //현재 액티비티 종료
             System.exit(0)  //완전 종료
         }
+         */
     }
 
 

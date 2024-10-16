@@ -8,7 +8,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
-import com.example.myapplication.SettingsLiveData
+import com.example.myapplication.util.SettingsLiveData
 
 open class BaseActivity : AppCompatActivity(){
     protected lateinit var sharedPreferences:SharedPreferences

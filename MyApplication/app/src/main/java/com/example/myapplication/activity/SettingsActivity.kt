@@ -9,7 +9,7 @@ import android.widget.Button
 import android.widget.SeekBar
 import android.widget.TextView
 import com.example.myapplication.R
-import com.example.myapplication.SettingUtil
+import com.example.myapplication.util.SettingUtil
 
 
 class SettingsActivity : AppCompatActivity() {
