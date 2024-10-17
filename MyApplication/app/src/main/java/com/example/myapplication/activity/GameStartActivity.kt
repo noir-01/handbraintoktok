@@ -208,12 +208,22 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
 
                         for (result in resultBundle.results) {
                             if (result.landmarks().isNotEmpty()) {
+                                var leftHandIndex: Int? = null
+                                var rightHandIndex: Int? = null
+
                                 for(idx in result.landmarks().indices){
+                                    val handedness = result.handedness()[idx][0]
                                     val predictedIndex = gestureRecognition.predictByResult(result, idx)
                                     // predictedIndex가 유효한 경우에만 로그 출력
                                     if (predictedIndex >= 0 && predictedIndex <= gestureLabels.size) {
                                         Log.d("HandActivity", "Predicted index: " + gestureLabels[predictedIndex])
-                                        predictedIndices.add(predictedIndex)
+                                        if (handedness.categoryName() == "Left") {
+                                            leftHandIndex = predictedIndex
+                                        } else if (handedness.categoryName() == "Right") {
+                                            rightHandIndex = predictedIndex
+                                        }
+                                        leftHandIndex?.let { predictedIndices.add(it) }
+                                        rightHandIndex?.let { predictedIndices.add(it) }
                                     }
                                 }
                             } else {
