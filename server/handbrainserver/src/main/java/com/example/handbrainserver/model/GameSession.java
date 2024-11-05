@@ -43,20 +43,14 @@ public class GameSession {
         //기본 따라하기 - 랜덤으로 따라할 동작 2개 뽑아서 반환
         if(!isRandomGame){
             questionType = 0;
-            question.setFirst(Gesture.fromCode(random.nextInt(Gesture.values().length)));
-            question.setSecond(Gesture.fromCode(random.nextInt(Gesture.values().length)));
-            correctAnswer.setFirst(question.getFirst());
-            correctAnswer.setSecond(question.getSecond());
+            getCopyQuestion();
 
         }else{
             //따라하기, 지는/이기는 가위바위보, 숫자 계산
             questionType = random.nextInt(4);
             switch(questionType){
                 case 0: //따라하기
-                    question.setFirst(Gesture.fromCode(random.nextInt(Gesture.values().length)));
-                    question.setSecond(Gesture.fromCode(random.nextInt(Gesture.values().length)));
-                    correctAnswer.setFirst(question.getFirst());
-                    correctAnswer.setSecond(question.getSecond());
+                    getCopyQuestion();
                     break;
 
                 case 1: //지는/이기는 가위바위보
@@ -81,6 +75,22 @@ public class GameSession {
             case 3 -> Gesture.calcHand(calcQuestion,userAnswer);
             default -> false;
         };
+    }
+
+    private void getCopyQuestion(){
+        int firstValue = random.nextInt(Gesture.values().length);
+        int secondValue = random.nextInt(Gesture.values().length);
+
+        if (firstValue == Gesture.HEART_TWO_HANDS.getGestureCode() || secondValue == Gesture.HEART_TWO_HANDS.getGestureCode()) {
+          question.setFirst(Gesture.HEART_TWO_HANDS);
+          question.setSecond(null);
+        } else {
+            // 둘 다 2가 아닌 경우
+            question.setFirst(Gesture.fromCode(firstValue));
+            question.setSecond(Gesture.fromCode(secondValue));
+        }
+        correctAnswer.setFirst(question.getFirst());
+        correctAnswer.setSecond(question.getSecond());
     }
 
     public void calculateReactionTime() {
