@@ -1,4 +1,4 @@
-package com.example.handbrainserver.websocket;
+package com.example.handbrainserver.game.websocket;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.WebSocketHandler;

@@ -1,7 +1,7 @@
-package com.example.handbrainserver.model;
+package com.example.handbrainserver.game.model;
 
-import com.example.handbrainserver.util.Gesture;
-import com.example.handbrainserver.util.GesturePair;
+import com.example.handbrainserver.game.util.Gesture;
+import com.example.handbrainserver.game.util.GesturePair;
 import lombok.Getter;
 import lombok.Setter;
 

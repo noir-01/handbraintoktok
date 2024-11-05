@@ -1,4 +1,4 @@
-package com.example.handbrainserver.util;
+package com.example.handbrainserver.game.util;
 
 public enum Gesture {
     MIDDLE_FINGER(0),
