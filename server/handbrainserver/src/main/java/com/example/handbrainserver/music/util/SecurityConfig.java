@@ -1,6 +1,7 @@
 package com.example.handbrainserver.music.util;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,31 +24,31 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.multipart.support.MultipartFilter;
 
 import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig{
-//    @Autowired
-//    private CustomAuthenticationProvider authenticationProvider;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                //.csrf(csrf -> csrf.enable())
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/api/auth/**", "/api/public/**",
-                                "/login","/register"
+                        .requestMatchers(
+                                "/login","/register", "/admin/upload",
+                                "/music/getAllMusic", "/music/download/**", "/admin"
                         ).permitAll()
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
                 )
-                .addFilterBefore(new TokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new TokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+
+        ;
                 //.authenticationProvider(authenticationProvider);
 
         return http.build();
@@ -63,4 +64,14 @@ public class SecurityConfig{
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+    //파일 업로드 Filter을 사전에 적용
+    @Bean
+    public FilterRegistrationBean<MultipartFilter> multipartFilter() {
+        FilterRegistrationBean<MultipartFilter> registrationBean = new FilterRegistrationBean<>();
+        registrationBean.setFilter(new MultipartFilter());
+        registrationBean.addUrlPatterns("/admin/upload");
+        registrationBean.setOrder(-100);
+        return registrationBean;
+    }
 }
+

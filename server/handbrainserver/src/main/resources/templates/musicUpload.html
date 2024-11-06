@@ -6,11 +6,12 @@
 </head>
 <body>
 <h1 th:text="${message}"></h1>
-<form action="/admin/music/upload" method="post" enctype="multipart/form-data">
+<form th:action="@{/admin/upload}" method="post" enctype="multipart/form-data">
     <input type="text" name="title" placeholder="Title" required />
     <input type="text" name="artist" placeholder="Artist" required />
     <input type="text" name="duration" placeholder="Duration" required />
     <input type="file" name="file" accept=".mp3" required />
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
     <button type="submit">Upload Music</button>
 </form>
 </body>
