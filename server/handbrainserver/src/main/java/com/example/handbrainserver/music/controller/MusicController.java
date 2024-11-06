@@ -9,6 +9,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +21,7 @@ import java.nio.file.StandardCopyOption;
 import java.time.LocalTime;
 import java.util.List;
 
-@RestController
+@Controller
 public class MusicController {
     @Value("${file.upload-dir}")
     private String uploadDir;
@@ -30,32 +31,12 @@ public class MusicController {
         this.musicService = musicService;
     }
 
-    @GetMapping("/music/getAllMusic")
-    public List<MusicDto> getMusicList(){
-        return musicService.getAllMusic();
+    @GetMapping("/admin/upload")
+    public String uploadMusic(){
+        return "musicUpload";
     }
 
-    @GetMapping("/music/download/{musicId}")
-    public ResponseEntity<Resource> downloadMusicById(@PathVariable Long musicId){
-        String filePath = musicService.getFilePathById(musicId);
-        if (filePath == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
-        File file = new File(filePath);
-        if (!file.exists()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-        }
-
-        Resource resource = new FileSystemResource(file);
-        HttpHeaders headers = new HttpHeaders();
-        headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + file.getName());
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(resource);
-    }
-
+    @CrossOrigin(origins = "http://localhost:8080")
     @PostMapping("/admin/upload")
     public ResponseEntity<String> uploadMusic(@RequestParam("title") String title,
                                               @RequestParam("artist") String artist,
@@ -68,13 +49,14 @@ public class MusicController {
             }
 
             // 파일 저장 경로 설정
-            String fileName = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            String fileName = file.getOriginalFilename();
             Path filePath = Paths.get(uploadDir + File.separator + fileName);
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
 
             //음악 메타데이터 저장
-            MusicDto musicDto = new MusicDto(title,artist,LocalTime.parse(duration),filePath.toString());
-            musicService.saveMusic(musicDto);
+            MusicDto musicDto = new MusicDto(title,artist,LocalTime.parse(duration),uploadDir+"/"+fileName);
+            Long id = musicService.saveMusic(musicDto);
+
 
             return ResponseEntity.ok("Music uploaded successfully.");
 
