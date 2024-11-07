@@ -39,4 +39,9 @@ public class MusicService {
         Music music = musicRepository.save(musicWithBeatListDto.to());
         return music.getId();
     }
+
+    public List<Float> getBeatListById(Long musicId){
+        Optional<Music> music = musicRepository.findById(musicId);
+        return music.map(Music::getBeatTime).orElse(null);
+    }
 }

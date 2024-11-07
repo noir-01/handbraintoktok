@@ -1,5 +1,6 @@
 package com.example.handbrainserver.music.entity;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.*;
@@ -30,7 +31,8 @@ public class Music {
     public List<Float> getBeatTime() {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.readValue(this.beatList, List.class);
+            // List<Float>로 변환하기 위해 TypeReference를 사용
+            return objectMapper.readValue(this.beatList, new TypeReference<List<Float>>() {});
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }

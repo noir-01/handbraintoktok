@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.File;
 import java.util.List;
@@ -31,7 +32,7 @@ public class RestController {
     }
 
     @GetMapping("/music/download/{musicId}")
-    public ResponseEntity<Resource> downloadMusicById(@PathVariable Long musicId){
+    public ResponseEntity<Resource> downloadMusicById(@PathVariable("musicId") Long musicId){
         String filePath = musicService.getFilePathById(musicId);
         if (filePath == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
@@ -49,6 +50,10 @@ public class RestController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(resource);
+    }
+    @GetMapping("/music/{musicId}/getBeatList")
+    public List<Float> getBeatList(@PathVariable("musicId") Long musicId){
+        return musicService.getBeatListById(musicId);
     }
 
 }
