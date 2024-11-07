@@ -36,7 +36,7 @@ public class MusicController {
         return "musicUpload";
     }
 
-    @CrossOrigin(origins = "http://localhost:8080")
+    @CrossOrigin(origins = "https://handbraintoktok.duckdns.org:8080")
     @PostMapping("/admin/upload")
     public ResponseEntity<String> uploadMusic(@RequestParam("title") String title,
                                               @RequestParam("artist") String artist,
