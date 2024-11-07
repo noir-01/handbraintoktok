@@ -11,7 +11,7 @@ import static org.junit.Assert.*;
 public class BeatExtractorTest {
     @Test
     public void testExtractBeat(){
-        String testFilePath = "C:/Users/blanc/Documents/Programming/projects/capstone/game/ETA.mp3";
+        String testFilePath = "/home/ubuntu/ETA.mp3";
 
         // BeatExtractor 클래스의 extractBeat 메소드 호출
         String result = BeatExtractor.extractBeat(testFilePath);
