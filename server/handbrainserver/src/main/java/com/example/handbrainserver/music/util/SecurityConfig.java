@@ -39,7 +39,7 @@ public class SecurityConfig{
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(
                                 "/login","/register", "/admin/upload",
-                                "/music/getAllMusic", "/music/download/**", "/admin"
+                                "/music/getMusicList", "/music/download/**", "/admin"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
