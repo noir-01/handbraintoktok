@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="40dp" />
+
+    <TextView
+        android:layout_gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="손 뇌 톡 톡"
+        android:textSize="50dp"
+        android:textStyle="bold"
+        android:textColor="@color/black"
+        />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="50dp" />
+
+    <EditText
+
+        android:id="@+id/emailEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="전화번호"
+        android:textStyle="bold"
+        android:textSize="30dp"
+        android:inputType="textEmailAddress" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="20dp"
+        />
+
+    <EditText
+        android:id="@+id/passwordEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="30dp"
+        android:hint="비밀번호"
+        android:inputType="textPassword" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        />
+
+    <ImageButton
+        android:layout_gravity="center"
+        android:id="@+id/loginButton"
+        android:layout_width="320dp"
+        android:layout_height="100dp"
+        android:background="@drawable/login" />
+
+
+    <ImageButton
+        android:layout_gravity="center"
+        android:id="@+id/registerButton"
+        android:layout_width="320dp"
+        android:layout_height="100dp"
+        android:background="@drawable/register" />
+</LinearLayout>
