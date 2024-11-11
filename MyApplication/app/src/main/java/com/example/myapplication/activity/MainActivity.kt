@@ -10,6 +10,7 @@ import android.os.Bundle
 import android.widget.Button
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.myapplication.R
+import com.example.myapplication.multiUi.LoginActivity
 
 class MainActivity : BaseActivity() {
 
@@ -55,6 +56,8 @@ class MainActivity : BaseActivity() {
                 4 -> "random"
                 else -> "Unknown Button"
             }
+            /*
+            잠시 실험하기 위해 주석처리
 
             if(allPermissionGranted()){
                 val intent = Intent(this, RhythmGameActivity::class.java) //GameActivity로 이동
@@ -64,6 +67,11 @@ class MainActivity : BaseActivity() {
             else{
                 requestCameraPermission()
             }
+             */
+
+            //테스트 코드
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
         }
 
         recordsButton.setOnClickListener{

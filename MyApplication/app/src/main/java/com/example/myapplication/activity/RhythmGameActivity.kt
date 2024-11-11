@@ -1,58 +1,23 @@
 package com.example.myapplication.activity
 
-import android.app.AlertDialog
-import android.content.DialogInterface
-import android.view.Gravity
-import android.widget.LinearLayout
-import android.Manifest
-import android.content.pm.PackageManager
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
-import android.widget.ImageView
-import android.widget.Toast
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.Preview
-import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import android.util.Log
-import android.view.View
-import android.widget.Button
 
 
-import android.util.Size
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.resolutionselector.AspectRatioStrategy
-import androidx.camera.core.resolutionselector.ResolutionSelector
-import androidx.camera.core.resolutionselector.ResolutionStrategy
-
-import androidx.lifecycle.lifecycleScope
-import com.google.mediapipe.tasks.vision.core.RunningMode
-
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 import com.example.myapplication.R
-import com.example.myapplication.adapter.MusicAdapter
+import com.example.myapplication.adapters.MusicAdapter
 import com.example.myapplication.util.ApiService
-import com.example.myapplication.util.gestureLabels
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
-import com.example.myapplication.util.WebSocketClient
 import com.example.myapplication.util.GestureRecognition
 import com.example.myapplication.util.HandLandMarkHelper
-import com.example.myapplication.util.Music
 import com.example.myapplication.util.MusicRepository
-import com.example.myapplication.util.ResourceUtils.handImages
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

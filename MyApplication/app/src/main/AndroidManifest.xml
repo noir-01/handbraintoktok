@@ -3,9 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.myapplication">
     <!-- 권한 그룹 -->
-    <uses-permission
-        android:name="android.permission.CAMERA"
-        android:required="true" />
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -14,6 +11,13 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"/>
+    <uses-permission android:name="android.permission.RECORD_AUDIO"/>
+    <uses-permission android:name="android.permission.CAMERA"/>
+    <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT"
+        tools:ignore="ProtectedPermissions" />
 
     <application
         android:allowBackup="true"
@@ -21,6 +25,7 @@
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
+        android:name=".util.webrtc.MyApplication"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
@@ -57,6 +62,17 @@
         <activity
             android:name=".activity.MainActivity"
             android:exported="true" />
+        <activity android:name=".multiUi.LoginActivity"
+            android:exported="true"/>
+        <activity android:name=".multiUi.MultiActivity"
+            android:exported="true"/>
+        <activity android:name=".multiUi.CallActivity"
+            android:exported="true"/>
+        <activity android:name=".multiUi.CloseActivity"
+            android:exported="true"/>
+        <receiver android:name=".service.MainServiceReceiver"/>
+        <service android:name=".service.MainService"
+            android:foregroundServiceType="mediaProjection"/>
 
         <provider
             android:name="androidx.core.content.FileProvider"
