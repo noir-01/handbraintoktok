@@ -57,8 +57,8 @@ class MainActivity : BaseActivity() {
             }
 
             if(allPermissionGranted()){
-                val intent = Intent(this, GameStartActivity::class.java) //GameActivity로 이동
-                intent.putExtra("GAME_NAME", selectedGameName)
+                val intent = Intent(this, RhythmGameActivity::class.java) //GameActivity로 이동
+                //intent.putExtra("GAME_NAME", selectedGameName)
                 startActivity(intent)
             }
             else{

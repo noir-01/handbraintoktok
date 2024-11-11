@@ -42,6 +42,9 @@
             android:name=".activity.GameStartActivity"
             android:exported="true" />
         <activity
+            android:name=".activity.RhythmGameActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.SplashActivity"
             android:exported="true"
             android:theme="@style/SplashTheme">
