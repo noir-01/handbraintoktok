@@ -1,4 +1,4 @@
-package com.example.handbrainserver.util;
+package com.example.handbrainserver.game.util;
 
 public enum Gesture {
     MIDDLE_FINGER(0),
@@ -72,7 +72,7 @@ public enum Gesture {
     }
 
     public static boolean rspWin(GesturePair q, GesturePair a){
-        //1. 양 손 맞춰야 함
+        //1. 양 손  7맞춰야 함
         if(q.hasSecond() && a.hasSecond()){
             return _rspWin(q.getFirst(),a.getFirst()) && _rspWin(q.getSecond(),a.getSecond());
         }else{

@@ -1,10 +1,8 @@
-package com.example.handbrainserver.websocket;
+package com.example.handbrainserver.game.websocket;
 
-import com.example.handbrainserver.model.GameSession;
-import com.example.handbrainserver.util.Gesture;
-import com.example.handbrainserver.util.GesturePair;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.example.handbrainserver.game.model.GameSession;
+import com.example.handbrainserver.game.util.Gesture;
+import com.example.handbrainserver.game.util.GesturePair;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;

@@ -1,7 +1,6 @@
-package com.example.handbrainserver.util;
+package com.example.handbrainserver.game.util;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
