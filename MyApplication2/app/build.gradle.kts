@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -22,7 +24,21 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+
         }
+
+        //server domain address in app/secret.properties file
+        val secretPropsFile = file("secret.properties")
+        val secretProps = Properties()
+        if (secretPropsFile.exists()) {
+            secretPropsFile.inputStream().use { stream ->
+                secretProps.load(stream)
+            }
+        }
+        val serverDomain = secretProps.getProperty("SERVER_DOMAIN")
+            ?: throw IllegalArgumentException("SERVER_DOMAIN is not defined in secret.properties")
+
+        resValue("string", "server_domain", serverDomain)
     }
 
     buildTypes {
@@ -87,7 +103,17 @@ dependencies {
     implementation("androidx.camera:camera-view:$cameraxVersion")
     implementation("androidx.camera:camera-extensions:$cameraxVersion")
     implementation("commons-io:commons-io:2.4")
-
+    //mediapipe
+    implementation("com.google.mediapipe:tasks-vision:0.10.14")
+    //KNN
+    implementation("com.github.haifengl:smile-core:2.5.3")
+    //http
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    // Gson Converter (Retrofit에서 JSON 데이터를 객체로 변환하기 위해)
+    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation ("androidx.recyclerview:recyclerview")
+    //firebase
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-analytics")
     implementation ("com.google.firebase:firebase-auth:latest_version")
