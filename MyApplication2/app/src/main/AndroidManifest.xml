@@ -26,34 +26,34 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme" >
         <activity
-            android:name=".SettingActivity"
+            android:name=".activity.SettingActivity"
             android:exported="false" />
         <activity
-            android:name=".RegisterActivity"
+            android:name=".activity.RegisterActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activity.LoginActivity"
             android:exported="true" />
         <activity
-            android:name=".TutorialActivity"
+            android:name=".activity.TutorialActivity"
             android:exported="false" />
         <activity
-            android:name=".MethodActivity"
+            android:name=".activity.MethodActivity"
             android:exported="false" />
         <activity
-            android:name=".InstallActivity"
+            android:name=".activity.InstallActivity"
             android:exported="false" />
         <activity
-            android:name=".VariousGameActivity"
+            android:name=".activity.VariousGameActivity"
             android:exported="false" />
         <activity
-            android:name=".RecordActivity"
+            android:name=".activity.RecordActivity"
             android:exported="false" />
         <activity
-            android:name=".GameStartActivity"
+            android:name=".activity.GameStartActivity"
             android:exported="true" />
         <activity
-            android:name=".SplashActivity"
+            android:name=".activity.SplashActivity"
             android:exported="true"
             android:theme="@style/SplashTheme" >
             <intent-filter>
@@ -63,7 +63,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:exported="true" />
 
         <provider
