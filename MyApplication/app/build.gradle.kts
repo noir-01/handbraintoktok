@@ -36,6 +36,7 @@ android {
 
         resValue("string", "server_domain", serverDomain)
 
+
     }
 
     buildTypes {
