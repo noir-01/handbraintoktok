@@ -10,6 +10,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.activity.result.contract.ActivityResultContracts
 import com.example.myapplication.activity.RecordsActivity
+import com.example.myapplication.R
+import com.example.myapplication.multiUi.LoginActivity
 
 class MainActivity : BaseActivity() {
     private var selectedGameName: String? = null
@@ -38,8 +40,36 @@ class MainActivity : BaseActivity() {
             startActivity(intent)
         }
 
-        buttonRecords.setOnClickListener {
-            val intent = Intent(this, RecordsActivity::class.java)
+        variousGameButton.setOnClickListener{
+            randomNumber = (1..4).random()
+
+            selectedGameName = when(randomNumber){
+                1 -> "mimic"
+                2 -> "rps"
+                3 -> "bwf"
+                4 -> "random"
+                else -> "Unknown Button"
+            }
+            /*
+            잠시 실험하기 위해 주석처리
+
+            if(allPermissionGranted()){
+                val intent = Intent(this, RhythmGameActivity::class.java) //GameActivity로 이동
+                //intent.putExtra("GAME_NAME", selectedGameName)
+                startActivity(intent)
+            }
+            else{
+                requestCameraPermission()
+            }
+             */
+
+            //테스트 코드
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+        }
+
+        recordsButton.setOnClickListener{
+            val intent = Intent(this, RecordActivity::class.java)
             startActivity(intent)
         }
 

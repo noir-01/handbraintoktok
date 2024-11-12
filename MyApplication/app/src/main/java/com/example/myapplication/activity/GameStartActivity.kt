@@ -142,7 +142,65 @@ class GameStartActivity : BaseActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    // Start the camera preview
+    //백그라운드 스레드에서 초기화
+    private fun initializeMediaPipe() {
+        lifecycleScope.launch(Dispatchers.Default) {
+            gestureRecognition = GestureRecognition(this@GameStartActivity)
+
+            //손 인식을 위한 handLandmarkHelper
+            handLandmarkerHelper = HandLandMarkHelper(
+                context = this@GameStartActivity,
+                runningMode = RunningMode.LIVE_STREAM,
+                handLandmarkerHelperListener = object : HandLandMarkHelper.LandmarkerListener {
+                    override fun onError(error: String, errorCode: Int) {
+                        Log.e("HandActivity", "Hand Landmarker error: $error")
+                    }
+
+                    override fun onResults(resultBundle: HandLandMarkHelper.ResultBundle) {
+                        val inferenceTime = resultBundle.inferenceTime
+                        val height = resultBundle.inputImageHeight
+                        val width = resultBundle.inputImageWidth
+                        Log.d("HandActivity","time: $inferenceTime, resol: $width*$height")
+
+                        val predictedIndices = mutableListOf<Int>()
+
+                        for (result in resultBundle.results) {
+                            if (result.landmarks().isNotEmpty()) {
+                                var leftHandIndex: Int? = null
+                                var rightHandIndex: Int? = null
+
+                                for(idx in result.landmarks().indices){
+                                    val handedness = result.handedness()[idx][0]
+                                    val predictedIndex = gestureRecognition.predictByResult(result, idx)
+                                    // predictedIndex가 유효한 경우에만 로그 출력
+                                    if (predictedIndex >= 0 && predictedIndex <= gestureLabels.size) {
+                                        Log.d("HandActivity", "Predicted index: " + gestureLabels[predictedIndex])
+                                        if (handedness.categoryName() == "Left") {
+                                            leftHandIndex = predictedIndex
+                                        } else if (handedness.categoryName() == "Right") {
+                                            rightHandIndex = predictedIndex
+                                        }
+                                        leftHandIndex?.let { predictedIndices.add(it) }
+                                        rightHandIndex?.let { predictedIndices.add(it) }
+                                    }
+                                }
+                            } else {
+                                Log.d("HandActivity", "No hand detected")
+                            }
+                        }
+                        val message = when (predictedIndices.size) {
+                            1 -> "${predictedIndices[0]},null"
+                            else -> predictedIndices.joinToString(",")
+                        }
+                        if(predictedIndices.size!=0) {webSocketClient.sendMessage(message)}
+                    }
+                }
+            )
+            withContext(Dispatchers.Main) {
+                startCamera()
+            }
+        }
+    }
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({
