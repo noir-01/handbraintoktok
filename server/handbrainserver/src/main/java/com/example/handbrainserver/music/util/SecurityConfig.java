@@ -15,6 +15,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.multipart.support.MultipartFilter;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Configuration
 @EnableWebSecurity
@@ -23,13 +24,24 @@ public class SecurityConfig{
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
+                .cors(cors -> cors.configurationSource(request -> {
+                        CorsConfiguration config = new CorsConfiguration();
+                        config.setAllowedOrigins(List.of("*"));
+                        config.setAllowedMethods(List.of("*"));
+                        config.setAllowedHeaders(List.of("*"));
+                        return config;
+                }))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(
                                 "/login","/register", "/admin/upload",
                                 "/music/getMusicList", "/music/download/{musicId}", "/admin",
-                                "/music/{musicId}/getBeatList"
+                                "/music/{musicId}/getBeatList",
+                                "/ws"
                         ).permitAll()
                         .anyRequest().authenticated()
+                )
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/ws") // Disable CSRF for /ws only
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
@@ -42,16 +54,16 @@ public class SecurityConfig{
         return http.build();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+//     @Bean
+//     public CorsConfigurationSource corsConfigurationSource() {
+//         CorsConfiguration configuration = new CorsConfiguration();
+//         configuration.setAllowedOrigins(Arrays.asList("*"));
+//         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+//         configuration.setAllowedHeaders(Arrays.asList("authorization", "content-type", "x-auth-token"));
+//         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//         source.registerCorsConfiguration("/**", configuration);
+//         return source;
+//     }
     //파일 업로드 Filter을 사전에 적용
     @Bean
     public FilterRegistrationBean<MultipartFilter> multipartFilter() {
