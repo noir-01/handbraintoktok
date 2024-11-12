@@ -7,6 +7,7 @@ import android.util.Log
 
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.myapplication.BaseActivity
 
 import com.example.myapplication.R
 import com.example.myapplication.adapters.MusicAdapter

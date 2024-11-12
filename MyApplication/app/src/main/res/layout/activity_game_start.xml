@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.GameStartActivity">
+    tools:context=".GameStartActivity">
 
     <!-- 카메라 프리뷰를 표시할 공간 -->
     <androidx.camera.view.PreviewView
