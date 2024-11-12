@@ -13,7 +13,7 @@ public class BeatExtractor {
         String beats = null;
         try{
             ProcessBuilder builder = new ProcessBuilder("/home/ubuntu/handbraintoktok/musicVenv/bin/python",
-                    "src/main/java/com/example/handbrainserver/music/util/BeatExtract.py", filePath);
+                    "/home/ubuntu/handbraintoktok/handbraintoktok/server/handbrainserver/src/main/java/com/example/handbrainserver/music/util/BeatExtract.py", filePath);
             Process process = builder.start();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             
