@@ -1,11 +1,13 @@
-package com.example.myapplication.activity
+package com.example.myapplication
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.animation.AlphaAnimation
 import android.view.animation.Animation
 import androidx.appcompat.app.AppCompatActivity
-import com.example.myapplication.R
 import com.example.myapplication.databinding.ActivitySplashBinding
 
 class SplashActivity : AppCompatActivity() {
@@ -30,8 +32,9 @@ class SplashActivity : AppCompatActivity() {
         fadeOut.setAnimationListener(object : Animation.AnimationListener {
             override fun onAnimationStart(animation: Animation?) {}
             override fun onAnimationEnd(animation: Animation?) {
+                Log.d("SplashActivity", "Navigating to LoginActivity")
                 // 메인 액티비티로 전환
-                val intent = Intent(this@SplashActivity, MainActivity::class.java)
+                val intent = Intent(this@SplashActivity,MainActivity::class.java)
                 startActivity(intent)
                 finish() // 현재 액티비티 종료
             }

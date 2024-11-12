@@ -3,9 +3,10 @@ package com.example.myapplication.activity
 import android.widget.Button
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.example.myapplication.CustomGraphView
 import com.example.myapplication.R
 
-class RecordActivity : AppCompatActivity() {
+class RecordsActivity : AppCompatActivity() {
 
     private lateinit var customGraphView: CustomGraphView
     private lateinit var originalDataPoints: List<Pair<String, Int>>  // 전체 데이터를 저장할 변수

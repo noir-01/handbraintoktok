@@ -1,9 +1,11 @@
-package com.example.myapplication.activity
+package com.example.myapplication
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.health.connect.datatypes.units.Volume
 import android.media.MediaPlayer
 import android.os.Bundle
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
@@ -50,7 +52,7 @@ open class BaseActivity : AppCompatActivity(){
     private fun applySoundVolume(volume: Int){
         //MediaPlayer가 초기화되지 않았을 경우, 초기화
         if (mediaPlayer == null){
-            //mediaPlayer = MediaPlayer.create(this, R.raw.sample_sound)   //샘플 사운드
+            mediaPlayer = MediaPlayer.create(this, R.raw.background_music)   //샘플 사운드
             mediaPlayer?.isLooping = true   //필요시 반복 재생
         }
 
