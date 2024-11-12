@@ -197,7 +197,7 @@ class MultiActivity : AppCompatActivity(), MainRecyclerViewAdapter.Listener, Mai
         runOnUiThread {
             views.apply {
                 val isVideoCall = model.type == DataModelType.StartVideoCall
-                incomingCallTitleTv.text = "${model.sender}이(가) 게임을 신청했어요!"
+                incomingCallTitleTv.text = "${model.sender}이(가) 게임을 신청했어요"
                 incomingCallLayout.isVisible = true
                 acceptButton.setOnClickListener {
                     getCameraAndMicPermission {
