@@ -19,6 +19,15 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
+import com.example.myapplication.util.GestureRecognition
+import com.example.myapplication.util.HandLandMarkHelper
+import com.example.myapplication.util.WebSocketClient
+import com.example.myapplication.util.gestureLabels
+import com.google.mediapipe.tasks.vision.core.RunningMode
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GameStartActivity : BaseActivity() {
     private lateinit var previewView: PreviewView
@@ -27,6 +36,9 @@ class GameStartActivity : BaseActivity() {
     private lateinit var countdownImageView: ImageView
     private lateinit var startImageView: ImageView
     private var mediaPlayer: MediaPlayer? = null  // Use a nullable MediaPlayer
+    private lateinit var gestureRecognition: GestureRecognition
+    private lateinit var handLandmarkerHelper: HandLandMarkHelper
+    private lateinit var webSocketClient: WebSocketClient
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

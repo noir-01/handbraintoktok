@@ -31,16 +31,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".adapters.MusicAdapter"
-            android:exported="false" />
-        <activity
-            android:name=".adapters.MainRecyclerViewAdapter"
-            android:exported="false" />
-        <activity
             android:name=".activity.RhythmGameActivity"
-            android:exported="false" />
-        <activity
-            android:name=".activity.LoginActivity"
             android:exported="false" />
         <activity
             android:name=".TutorialActivity"
@@ -63,9 +54,6 @@
         <activity
             android:name=".GameStartActivity"
             android:exported="true" />
-        <activity
-            android:name=".activity.RhythmGameActivity"
-            android:exported="false" />
         <activity
             android:name=".SplashActivity"
             android:exported="true"

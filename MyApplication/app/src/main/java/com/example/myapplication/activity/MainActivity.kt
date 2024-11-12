@@ -30,8 +30,8 @@ class MainActivity : BaseActivity() {
         buttonMethod = findViewById(R.id.button_method)
 
         //테스트 코드
-        val intent = Intent(this, LoginActivity::class.java)
-        startActivity(intent)
+//        val intent = Intent(this, LoginActivity::class.java)
+//        startActivity(intent)
 
 
         // Set up button click listeners
@@ -40,36 +40,36 @@ class MainActivity : BaseActivity() {
             startActivity(intent)
         }
 
-        variousGameButton.setOnClickListener{
-            randomNumber = (1..4).random()
-
-            selectedGameName = when(randomNumber){
-                1 -> "mimic"
-                2 -> "rps"
-                3 -> "bwf"
-                4 -> "random"
-                else -> "Unknown Button"
-            }
-            /*
-            잠시 실험하기 위해 주석처리
-
-            if(allPermissionGranted()){
-                val intent = Intent(this, RhythmGameActivity::class.java) //GameActivity로 이동
-                //intent.putExtra("GAME_NAME", selectedGameName)
-                startActivity(intent)
-            }
-            else{
-                requestCameraPermission()
-            }
-             */
-
-            //테스트 코드
-            val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
-        }
-
-        recordsButton.setOnClickListener{
-            val intent = Intent(this, RecordActivity::class.java)
+//        variousGameButton.setOnClickListener{
+//            randomNumber = (1..4).random()
+//
+//            selectedGameName = when(randomNumber){
+//                1 -> "mimic"
+//                2 -> "rps"
+//                3 -> "bwf"
+//                4 -> "random"
+//                else -> "Unknown Button"
+//            }
+//            /*
+//            잠시 실험하기 위해 주석처리
+//
+//            if(allPermissionGranted()){
+//                val intent = Intent(this, RhythmGameActivity::class.java) //GameActivity로 이동
+//                //intent.putExtra("GAME_NAME", selectedGameName)
+//                startActivity(intent)
+//            }
+//            else{
+//                requestCameraPermission()
+//            }
+//             */
+//
+//            //테스트 코드
+//            val intent = Intent(this, LoginActivity::class.java)
+//            startActivity(intent)
+//        }
+//
+        buttonRecords.setOnClickListener{
+            val intent = Intent(this, RecordsActivity::class.java)
             startActivity(intent)
         }
 

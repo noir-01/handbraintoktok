@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.myapplication.activity.VariousGameActivity
+import com.example.myapplication.multiUi.LoginActivity
 
 class GameoptionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -16,7 +17,7 @@ class GameoptionActivity : AppCompatActivity() {
 
         val homeButton=findViewById<ImageButton>(R.id.button_home)
         val randomgameButton=findViewById<ImageButton>(R.id.button_random_game)
-        //val rhythmgameButton=findViewById<ImageButton>(R.id.button_rhythm_game)
+        val rhythmgameButton=findViewById<ImageButton>(R.id.button_rhythm_game)
         val togetherButton=findViewById<ImageButton>(R.id.button_together)
 
         homeButton.setOnClickListener {
@@ -31,7 +32,7 @@ class GameoptionActivity : AppCompatActivity() {
             startActivity(intent)
         }
         togetherButton.setOnClickListener {
-            val intent=Intent(this,VariousGameActivity::class.java)
+            val intent=Intent(this,LoginActivity::class.java)
             startActivity(intent)
         }
     }
