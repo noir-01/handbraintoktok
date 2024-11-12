@@ -9,6 +9,8 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.myapplication.GameStartActivity
+import com.example.myapplication.MainActivity
 import com.example.myapplication.R
 
 class VariousGameActivity : AppCompatActivity() {

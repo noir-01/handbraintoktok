@@ -5,27 +5,41 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.myapplication.activity.RecordActivity">
+    tools:context="com.example.myapplication.activity.RecordsActivity">
+
+
+
 
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/my_change"
-        android:textSize="24sp"
+        android:textSize="25dp"
         android:textStyle="bold"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="20dp"
         android:textColor="@color/black"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
 
-    <com.example.myapplication.activity.CustomGraphView
+    <ImageButton
+        android:id="@+id/button_home"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/home"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="home button"
+        />
+
+
+    <com.example.myapplication.CustomGraphView
         android:id="@+id/customGraphView"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="300dp"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="90dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -33,32 +47,35 @@
 
     <Button
         android:id="@+id/dailyButton"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="@string/per_day"
+        android:layout_margin="10dp"
+        android:background="@drawable/daily"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/weeklyButton"
-        app:layout_constraintTop_toBottomOf="@id/customGraphView" />
+        app:layout_constraintTop_toBottomOf="@id/customGraphView"
+        android:contentDescription="daily button"/>
 
     <Button
         android:id="@+id/weeklyButton"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/per_week"
+        android:background="@drawable/weekly"
         app:layout_constraintStart_toEndOf="@id/dailyButton"
         app:layout_constraintEnd_toStartOf="@id/monthlyButton"
         app:layout_constraintTop_toBottomOf="@id/customGraphView"
-        android:layout_margin="16dp" />
+        android:layout_margin="10dp"
+        android:contentDescription="weekly button"/>
 
     <Button
         android:id="@+id/monthlyButton"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/per_month"
+        android:background="@drawable/monthly"
         app:layout_constraintStart_toEndOf="@id/weeklyButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/customGraphView"
-        android:layout_margin="16dp" />
+        android:layout_margin="10dp"
+        android:contentDescription="monthly button"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
