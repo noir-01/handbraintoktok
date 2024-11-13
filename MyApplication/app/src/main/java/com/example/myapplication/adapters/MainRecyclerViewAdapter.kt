@@ -32,8 +32,6 @@ class MainRecyclerViewAdapter(private val listener:Listener) : RecyclerView.Adap
             val user = list[position]
             holder.bind(user,{
                 listener.onVideoCallClicked(it)
-            },{
-                listener.onAudioCallClicked(it)
             })
         }
     }
@@ -52,33 +50,26 @@ class MainRecyclerViewAdapter(private val listener:Listener) : RecyclerView.Adap
         fun bind(
             user:Pair<String,String>,
             videoCallClicked:(String) -> Unit,
-            audioCallClicked:(String)-> Unit
         ){
             binding.apply {
                 when (user.second) {
                     "ONLINE" -> {
                         videoCallBtn.isVisible = true
-                        audioCallBtn.isVisible = true
                         videoCallBtn.setOnClickListener {
                             videoCallClicked.invoke(user.first)
                         }
-                        audioCallBtn.setOnClickListener {
-                            audioCallClicked.invoke(user.first)
-                        }
                         statusTv.setTextColor(context.resources.getColor(R.color.light_green, null))
-                        statusTv.text = "Online"
+                        statusTv.text = "접속 상태"
                     }
                     "OFFLINE" -> {
                         videoCallBtn.isVisible = false
-                        audioCallBtn.isVisible = false
                         statusTv.setTextColor(context.resources.getColor(R.color.red, null))
-                        statusTv.text = "Offline"
+                        statusTv.text = "미접속 상태"
                     }
                     "IN_CALL" -> {
                         videoCallBtn.isVisible = false
-                        audioCallBtn.isVisible = false
                         statusTv.setTextColor(context.resources.getColor(R.color.yellow, null))
-                        statusTv.text = "In Call"
+                        statusTv.text = "게임중"
                     }
                 }
 
