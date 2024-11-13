@@ -11,7 +11,7 @@ interface ApiService {
     @GET("/music/{musicId}/getBeatList")
     suspend fun getBeats(@Path("musicId") songId: Int): List<Float>
 
-    @GET("/music/{musicId}/download")
+    @GET("/music/download/{musicId}")
     suspend fun downloadMusic(@Path("musicId") songId: Int): ResponseBody
 }
 data class Music(
@@ -21,3 +21,11 @@ data class Music(
     val duration: String,
     val filePath: String?=null
 )
+
+fun durationToSec(duration: String): Int {
+    val parts = duration.split(":")
+    val hours = parts.getOrNull(0)?.toIntOrNull() ?: 0
+    val minutes = parts.getOrNull(1)?.toIntOrNull() ?: 0
+    val seconds = parts.getOrNull(2)?.toIntOrNull() ?: 0
+    return hours * 3600 + minutes * 60 + seconds
+}
