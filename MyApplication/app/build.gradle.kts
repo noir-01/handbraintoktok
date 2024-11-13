@@ -7,6 +7,8 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+    // kapt 플러그인 추가
+    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -15,7 +17,6 @@ android {
 
     buildFeatures.dataBinding = true
     buildFeatures.viewBinding = true
-    
 
     defaultConfig {
         applicationId = "com.example.myapplication"
@@ -28,6 +29,7 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
         val secretPropsFile = file("secret.properties")
         val secretProps = Properties()
         if (secretPropsFile.exists()) {
@@ -39,8 +41,6 @@ android {
             ?: throw IllegalArgumentException("SERVER_DOMAIN is not defined in secret.properties")
 
         resValue("string", "server_domain", serverDomain)
-
-
     }
 
     buildTypes {
@@ -87,47 +87,53 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
-    implementation ("androidx.compose.ui:ui:1.5.1")
-    implementation ("androidx.compose.material3:material3:1.1.0")
-    implementation ("androidx.compose.ui:ui-tooling-preview:1.5.1")
+    implementation("androidx.compose.ui:ui:1.5.1")
+    implementation("androidx.compose.material3:material3:1.1.0")
+    implementation("androidx.compose.ui:ui-tooling-preview:1.5.1")
 
-    //webrtc 관련
+    // WebRTC 관련
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.mesibo.api:webrtc:1.0.5")
+
+    // Hilt DI
     implementation("com.google.dagger:hilt-android:2.52")
-    ksp("com.google.dagger:hilt-android-compiler:2.52")
-    implementation("org.java-websocket:Java-WebSocket:1.5.3")
+    kapt("com.google.dagger:hilt-android-compiler:2.52")
+
+    // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-database-ktx:21.0.0")
+
+    // PermissionX
     implementation("com.guolindev.permissionx:permissionx:1.6.1")
+
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 
-    //firebase
-    implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
-    implementation("com.google.firebase:firebase-analytics")
-
-
+    // CameraX
     implementation("androidx.camera:camera-core:$cameraxVersion")
     implementation("androidx.camera:camera-camera2:$cameraxVersion")
     implementation("androidx.camera:camera-lifecycle:$cameraxVersion")
     implementation("androidx.camera:camera-view:$cameraxVersion")
     implementation("androidx.camera:camera-extensions:$cameraxVersion")
 
-    //mediapipe
+    // MediaPipe
     implementation("com.google.mediapipe:tasks-vision:0.10.14")
-    //KNN
+
+    // KNN Library
     implementation("com.github.haifengl:smile-core:2.5.3")
-    //http
+
+    // HTTP client
     implementation("com.squareup.okhttp3:okhttp:4.10.0")
 
+    // Commons IO
     implementation("commons-io:commons-io:2.4")
 
-    implementation ("com.squareup.retrofit2:retrofit:2.9.0")
-    // Gson Converter (Retrofit에서 JSON 데이터를 객체로 변환하기 위해)
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
-    implementation ("androidx.recyclerview:recyclerview")
+    // Retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
+    // RecyclerView
+    implementation("androidx.recyclerview:recyclerview")
 }
