@@ -12,11 +12,10 @@ class TutorialActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_tutorial)
-        val buttonHome=findViewById<ImageButton>(R.id.button_home)
+        val backButton=findViewById<ImageButton>(R.id.button_back)
 
-        buttonHome.setOnClickListener {
-            val intent= Intent(this,MainActivity::class.java)
-            startActivity(intent)
+        backButton.setOnClickListener {
+            finish()
         }
     }
 }

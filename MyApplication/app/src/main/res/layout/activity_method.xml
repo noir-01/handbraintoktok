@@ -10,12 +10,13 @@
     >
 
     <ImageButton
-        android:id="@+id/button_home"
+        android:id="@+id/button_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/home"
-        android:layout_gravity="end"
-
+        android:background="@drawable/back"
+        android:contentDescription="back button"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
         />
     <Space
         android:layout_width="wrap_content"
