@@ -24,3 +24,4 @@ val gestureLabels: Map<Int, String> = mapOf(
     20 to "six",
     21 to "wolf"
 )
+val reversedGestureLabels: Map<String, Int> = gestureLabels.entries.associate { (key, value) -> value to key }
