@@ -35,7 +35,7 @@ class GameStartActivity : BaseActivity() {
 
     private lateinit var countdownImageView: ImageView
     private lateinit var startImageView: ImageView
-    private var mediaPlayer: MediaPlayer? = null  // Use a nullable MediaPlayer
+    private var mediaPlayer: MediaPlayer? = null
     private lateinit var gestureRecognition: GestureRecognition
     private lateinit var handLandmarkerHelper: HandLandMarkHelper
     private lateinit var webSocketClient: WebSocketClient
@@ -47,6 +47,10 @@ class GameStartActivity : BaseActivity() {
         countdownImageView = findViewById(R.id.countdownImageView)
         startImageView = findViewById(R.id.startImageView)
 
+        val backButton = findViewById<ImageButton>(R.id.button_back)
+        backButton.setOnClickListener {
+            finish()
+        }
         countdownImageView.visibility = View.GONE
         startImageView.visibility = View.GONE
 
@@ -98,7 +102,10 @@ class GameStartActivity : BaseActivity() {
                     countdownImageView.setImageResource(countdownImages[currentIndex])
                     countdownImageView.visibility = View.VISIBLE
 
-                    playCountdownSound()
+                    // playCountdownSound()를 처음 한 번만 재생하도록 조건 추가
+                    if (currentIndex == 0) {
+                        playCountdownSound()
+                    }
 
                     currentIndex++
                     handler.postDelayed(this, 1000)
@@ -106,8 +113,6 @@ class GameStartActivity : BaseActivity() {
                     countdownImageView.visibility = View.GONE
                     startImageView.setImageResource(R.drawable.start)
                     startImageView.visibility = View.VISIBLE
-
-                    playCountdownSound()
 
                     handler.postDelayed({ startImageView.visibility = View.GONE }, 1000)
                 }
@@ -117,22 +122,27 @@ class GameStartActivity : BaseActivity() {
     }
 
     private fun playCountdownSound() {
-        // Release the existing MediaPlayer before creating a new one
         mediaPlayer?.release()
         mediaPlayer = MediaPlayer.create(this, R.raw.start)
         mediaPlayer?.start()
         mediaPlayer?.setOnCompletionListener {
-            it.release()  // Release resources after sound completes
+            it.release()
+            mediaPlayer = null
         }
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        mediaPlayer?.release()
+        mediaPlayer = null
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer?.release()  // Release MediaPlayer resources when activity is destroyed
+        mediaPlayer?.release()
         mediaPlayer = null
     }
 
-    // Handle camera permission request results
     override fun onRequestPermissionsResult(
         requestCode: Int, permissions: Array<out String>, grantResults: IntArray
     ) {
@@ -147,19 +157,16 @@ class GameStartActivity : BaseActivity() {
         }
     }
 
-    // Check if all required permissions are granted
     private fun allPermissionsGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             this, Manifest.permission.CAMERA
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    //백그라운드 스레드에서 초기화
     private fun initializeMediaPipe() {
         lifecycleScope.launch(Dispatchers.Default) {
             gestureRecognition = GestureRecognition(this@GameStartActivity)
 
-            //손 인식을 위한 handLandmarkHelper
             handLandmarkerHelper = HandLandMarkHelper(
                 context = this@GameStartActivity,
                 runningMode = RunningMode.LIVE_STREAM,
@@ -172,7 +179,7 @@ class GameStartActivity : BaseActivity() {
                         val inferenceTime = resultBundle.inferenceTime
                         val height = resultBundle.inputImageHeight
                         val width = resultBundle.inputImageWidth
-                        Log.d("HandActivity","time: $inferenceTime, resol: $width*$height")
+                        Log.d("HandActivity", "time: $inferenceTime, resol: $width*$height")
 
                         val predictedIndices = mutableListOf<Int>()
 
@@ -181,10 +188,9 @@ class GameStartActivity : BaseActivity() {
                                 var leftHandIndex: Int? = null
                                 var rightHandIndex: Int? = null
 
-                                for(idx in result.landmarks().indices){
+                                for (idx in result.landmarks().indices) {
                                     val handedness = result.handedness()[idx][0]
                                     val predictedIndex = gestureRecognition.predictByResult(result, idx)
-                                    // predictedIndex가 유효한 경우에만 로그 출력
                                     if (predictedIndex >= 0 && predictedIndex <= gestureLabels.size) {
                                         Log.d("HandActivity", "Predicted index: " + gestureLabels[predictedIndex])
                                         if (handedness.categoryName() == "Left") {
@@ -204,7 +210,9 @@ class GameStartActivity : BaseActivity() {
                             1 -> "${predictedIndices[0]},null"
                             else -> predictedIndices.joinToString(",")
                         }
-                        if(predictedIndices.size!=0) {webSocketClient.sendMessage(message)}
+                        if (predictedIndices.isNotEmpty()) {
+                            webSocketClient.sendMessage(message)
+                        }
                     }
                 }
             )
@@ -213,6 +221,7 @@ class GameStartActivity : BaseActivity() {
             }
         }
     }
+
     private fun startCamera() {
         val cameraProviderFuture = ProcessCameraProvider.getInstance(this)
         cameraProviderFuture.addListener({

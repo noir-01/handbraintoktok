@@ -54,7 +54,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/logo"/>
+                android:src="@drawable/logo2"/>
 
             <!-- 오른쪽 게임 이미지 -->
             <ImageView
@@ -62,10 +62,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:src="@drawable/logo"/>
+                android:src="@drawable/logo2"/>
         </LinearLayout>
     </LinearLayout>
 
+    <!-- Countdown ImageView centered on the screen -->
     <ImageView
         android:id="@+id/countdownImageView"
         android:layout_width="wrap_content"
@@ -77,6 +78,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:contentDescription="Countdown Image"/>
 
+    <!-- Start ImageView centered on the screen -->
     <ImageView
         android:id="@+id/startImageView"
         android:layout_width="wrap_content"
@@ -88,4 +90,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:contentDescription="Start Image"/>
+
+    <!-- Back Button positioned at the top-left corner -->
+    <ImageButton
+        android:id="@+id/button_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/back"
+        android:contentDescription="Back button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_margin="16dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -10,29 +10,31 @@
 
 
 
+
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/my_change"
-        android:textSize="25dp"
+        android:textSize="30dp"
         android:textStyle="bold"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="22dp"
         android:textColor="@color/black"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-
     <ImageButton
-        android:id="@+id/button_home"
+        android:id="@+id/button_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/home"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:background="@drawable/back"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="home button"
-        />
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:contentDescription="back button" />
+
 
 
     <com.example.myapplication.CustomGraphView

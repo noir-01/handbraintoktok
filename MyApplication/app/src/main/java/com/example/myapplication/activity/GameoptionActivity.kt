@@ -16,16 +16,15 @@ class GameoptionActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_gameoption)
 
-        val homeButton=findViewById<ImageButton>(R.id.button_home)
+        val backButton=findViewById<ImageButton>(R.id.button_back)
         val randomgameButton=findViewById<ImageButton>(R.id.button_random_game)
         val rhythmgameButton=findViewById<ImageButton>(R.id.button_rhythm_game)
         val togetherButton=findViewById<ImageButton>(R.id.button_together)
 
-        homeButton.setOnClickListener {
-            val intent= Intent(this,MainActivity::class.java)
-            startActivity(intent)
-
+        backButton.setOnClickListener {
+          finish()
         }
+
         // 랜덤 게임 완성되면 수정 필요
         randomgameButton.setOnClickListener {
             val intent = Intent(this, GameStartActivity::class.java)

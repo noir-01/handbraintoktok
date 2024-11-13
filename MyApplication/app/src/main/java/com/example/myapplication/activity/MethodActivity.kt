@@ -13,15 +13,14 @@ class MethodActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_method)
 
-        val homeButton=findViewById<ImageButton>(R.id.button_home)
+        val backButton=findViewById<ImageButton>(R.id.button_back)
 
 
         val sharedPreferences = getSharedPreferences("Settings", Context.MODE_PRIVATE)
         val buttonSize = sharedPreferences.getInt("buttonSize", 70)
 
-        homeButton.setOnClickListener{
-            val intent = Intent(this,MainActivity::class.java)
-            startActivity(intent)
+        backButton.setOnClickListener{
+            finish()
         }
 
 

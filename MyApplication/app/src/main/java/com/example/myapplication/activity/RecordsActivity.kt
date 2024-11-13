@@ -2,6 +2,7 @@ package com.example.myapplication.activity
 
 import android.widget.Button
 import android.os.Bundle
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.CustomGraphView
 import com.example.myapplication.R
@@ -23,6 +24,11 @@ class RecordsActivity : AppCompatActivity() {
         val dailyButton: Button = findViewById(R.id.dailyButton)
         val weeklyButton: Button = findViewById(R.id.weeklyButton)
         val monthlyButton: Button = findViewById(R.id.monthlyButton)
+        val backButton: ImageButton=findViewById(R.id.button_back)
+
+        backButton.setOnClickListener{
+            finish()
+        }
 
 
         // 일간 버튼 클릭 이벤트 처리 (최신 10개 데이터)
