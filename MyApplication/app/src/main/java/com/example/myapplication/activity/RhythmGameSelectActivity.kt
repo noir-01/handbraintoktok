@@ -21,6 +21,7 @@ import kotlinx.coroutines.launch
 
 import com.example.myapplication.util.GestureRecognition
 import com.example.myapplication.util.HandLandMarkHelper
+import com.example.myapplication.util.Music
 import com.example.myapplication.util.MusicRepository
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.withContext
@@ -41,7 +42,7 @@ class RhythmGameSelectActivity : BaseActivity(){
     private lateinit var musicRepository: MusicRepository
     private lateinit var recyclerView: RecyclerView
     private lateinit var musicAdapter: MusicAdapter
-    private var selectedMusicId: Int? = null
+    private var selectedMusic: Music? = null
     /*
     * 1. 서버에 요청해서 곡 목록 받아와서 띄우기
     * 2. 곡 선택하면 그 곡 beat 받아오기
@@ -62,7 +63,7 @@ class RhythmGameSelectActivity : BaseActivity(){
         musicRepository = MusicRepository(apiService)
 
         musicAdapter = MusicAdapter(musics = listOf()) { musicId ->
-            selectedMusicId = musicId // 선택된 음악의 ID 저장
+            selectedMusic = musicId // 선택된 음악의 ID 저장
         }
 
         recyclerView = findViewById(R.id.recyclerView)
@@ -70,10 +71,11 @@ class RhythmGameSelectActivity : BaseActivity(){
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         findViewById<Button>(R.id.startRhythmGameButton).setOnClickListener {
-            selectedMusicId?.let { musicId ->
+            selectedMusic?.let { music ->
                 // 선택된 음악 ID가 있으면, 게임 시작 화면으로 전달
                 val intent = Intent(this, RhythmGameStartActivity::class.java)
-                intent.putExtra("MUSIC_ID", musicId)
+                intent.putExtra("MUSIC_ID", music.id)
+                intent.putExtra("DURATION", music.duration)
                 startActivity(intent)
             } ?: run {
                 Toast.makeText(this, "먼저 음악을 선택하세요!", Toast.LENGTH_SHORT).show()

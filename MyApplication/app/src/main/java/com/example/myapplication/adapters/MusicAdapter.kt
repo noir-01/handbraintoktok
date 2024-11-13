@@ -10,13 +10,13 @@ import com.example.myapplication.R
 import com.example.myapplication.util.Music
 
 // ViewHolder 클래스
-class SongViewHolder(itemView: View, private val musics: List<Music>, private val onMusicSelected: (Int) -> Unit) : RecyclerView.ViewHolder(itemView) {
+class SongViewHolder(itemView: View, private val musics: List<Music>, private val onMusicSelected: (Music) -> Unit) : RecyclerView.ViewHolder(itemView) {
     val songButton: AppCompatButton = itemView.findViewById(R.id.songButton)
     init {
         // 버튼 클릭 시 콜백 호출
         songButton.setOnClickListener {
-            val musicId = musics[bindingAdapterPosition].id
-            onMusicSelected(musicId) // 콜백을 통해 음악 ID 전달
+            val music = musics[bindingAdapterPosition]
+            onMusicSelected(music) // 콜백을 통해 음악 ID 전달
         }
     }
 }
@@ -24,7 +24,7 @@ class SongViewHolder(itemView: View, private val musics: List<Music>, private va
 // Adapter 클래스
 class MusicAdapter(
     private var musics: List<Music>,
-    private val onMusicSelected: (Int) -> Unit
+    private val onMusicSelected: (Music) -> Unit
 ) : RecyclerView.Adapter<SongViewHolder>() {
 
 
@@ -64,7 +64,7 @@ class MusicAdapter(
             // RecyclerView 업데이트
             notifyItemChanged(previousPosition) // 이전 선택된 아이템 업데이트
             notifyItemChanged(selectedPosition) // 현재 선택된 아이템 업데이트
-            onMusicSelected(song.id)
+            onMusicSelected(song)
         }
     }
 
