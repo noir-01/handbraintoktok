@@ -6,7 +6,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
-    id("com.google.gms.google-services")
+    //id("com.google.gms.google-services")
 }
 
 android {
