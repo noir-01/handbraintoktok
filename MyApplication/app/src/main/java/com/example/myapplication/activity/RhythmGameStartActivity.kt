@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.Size
+import android.widget.TextView
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -31,6 +32,7 @@ import com.example.myapplication.util.GestureRecognition
 import com.example.myapplication.util.HandLandMarkHelper
 import com.example.myapplication.util.MusicDownloader
 import com.example.myapplication.util.ResourceUtils.imageResources
+import com.example.myapplication.util.difficulty
 import com.example.myapplication.util.durationToSec
 import com.example.myapplication.util.gestureLabels
 import com.example.myapplication.util.reversedGestureLabels
@@ -42,6 +44,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
+import kotlin.math.ceil
 import kotlin.random.Random
 
 class RhythmGameStartActivity: AppCompatActivity() {
@@ -72,14 +75,17 @@ class RhythmGameStartActivity: AppCompatActivity() {
 
     private lateinit var leftHandImageView: ImageView
     private lateinit var rightHandImageView: ImageView
-    
+    private lateinit var comboTextView: TextView
+    private lateinit var scoreTextView: TextView
+
     //콤보, 해당 회차 맞췄는지 확인하는 플래그
     private var combo = 0
     private var answerFlag = false
     //총점 및 한번 맞췄을 때 점수
+    //점수는 기본 점수*콤보 배열을 더해서 계산.
     private var totalScore = 0
-    private val correctScore = 100
-
+    private val correctScore = listOf(100,150,200)
+    private var difficultyInt = 0
 
     //음악 재생
     private var mediaPlayer: MediaPlayer? = null
@@ -99,10 +105,14 @@ class RhythmGameStartActivity: AppCompatActivity() {
 
         leftHandImageView = findViewById(R.id.leftHandImageView)
         rightHandImageView = findViewById(R.id.rightHandImageView)
+        comboTextView = findViewById(R.id.comboTextView)
+        scoreTextView = findViewById(R.id.scoreTextView)
 
         //RhythmGameSelectActivity에서 전달받은 music_id
         val musicId = intent.getIntExtra("MUSIC_ID", -1)
         val musicLength = durationToSec(intent.getStringExtra("DURATION")?:"00:00:00")
+        val difficultyString = intent.getStringExtra("DIFFICULTY")?:"EASY"
+        difficultyInt = difficulty[difficultyString]?:0
 
         val serverDomain = getString(R.string.server_domain)
         apiService = Retrofit.Builder()
@@ -123,7 +133,15 @@ class RhythmGameStartActivity: AppCompatActivity() {
 
                     withContext(Dispatchers.Main) {
                         delay(3000)
-                        makeGameBeatsEasy(beats, bps)
+                        //난이도 따라서 다르게 맵 설정
+                        when(difficultyString){
+                            "EASY"->{makeGameBeatsEasy(beats,bps)}
+                            "NORMAL"->{makeGameBeatsNormal(beats,bps)}
+                            "HARD"->{makeGameBeatsHard(beats,bps)}
+                            else->{
+                                makeGameBeatsEasy(beats,bps)
+                            }
+                        }
                         playMusic(musicId) // 음악 재생을 메인 스레드에서 실행
                     }
 
@@ -163,7 +181,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
             while (mediaPlayer?.isPlaying == true) {
                 val currentTime = getCurrentMusicTime()
 
-                // Use withContext(Dispatchers.Main) to update the UI on the main thread
+                // Main Thread에서 UI 수정
                 withContext(Dispatchers.Main) {
                     //현재 시간이 비트 시간을 넘어갔으면 다음 비트로 이동.
                     if(leftBeatIdx<leftBeats.size)
@@ -171,20 +189,25 @@ class RhythmGameStartActivity: AppCompatActivity() {
                     if(rightBeatIdx<rightBeats.size)
                         updateImage2(false, rightHandImageView, currentTime, rightBeatIdx, rightHandIndex)
 
+                    //적당한 시간 안에 맞췄으면(플래그=true) 콤보, 점수 올리고 플래그 초기화
                     if(leftBeatIdx<leftBeats.size && currentTime>leftBeats[leftBeatIdx]+delayTime){
                         leftBeatIdx++
-                        if(answerFlag) combo++
-                        else combo = 0
+                        //콤보는 20까지만 증가
+                        if(answerFlag && combo<21) combo++
+                        else if (!answerFlag) combo = 0
+                        //점수는 기본 점수* 콤보 배열을 더해서 계산.
+                        totalScore += correctScore[difficultyInt]*combo
                         answerFlag=false
                     }
+                    //오른손
                     if(rightBeatIdx<rightBeats.size && currentTime>rightBeats[rightBeatIdx]+delayTime){
                         rightBeatIdx++
-                        if(answerFlag) combo++
-                        else combo = 0
+                        if(answerFlag && combo<21) combo++
+                        else if (!answerFlag) combo = 0
+                        totalScore += correctScore[difficultyInt]*combo
                         answerFlag=false
                     }
-                    Log.d("Combo", "$combo")
-                    //updateImage(rightHandImageView, rightBeats, rightImages, currentTime, rightAnswers, rightHandIndex)
+                    updateScoreAndCombo()
                     delay(30)  // Delay
                 }
             }
@@ -380,6 +403,10 @@ class RhythmGameStartActivity: AppCompatActivity() {
             }
         }, ContextCompat.getMainExecutor(this))
     }
+    fun updateScoreAndCombo(){
+        comboTextView.text = "Combo: $combo     " // 콤보 텍스트 업데이트
+        scoreTextView.text = "     Score: $totalScore" // 점수 텍스트 업데이트
+    }
     //Easy: 번갈아서? 시간 넉넉하게, 어려운 손동작 빼기. [왼손/오른손 이미지 이름, 왼손/오른손 비트 시간 반환]
     fun makeGameBeatsEasy(beats: List<Float>, bps:Float): Pair<Pair<List<String>, List<String>>, Pair<List<Float>, List<Float>>>{
         val beatsSize = beats.size
@@ -399,9 +426,9 @@ class RhythmGameStartActivity: AppCompatActivity() {
         while(i<beatsSize){
             i += Random.nextInt(3)+5    //5,6,7초 중 랜덤으로
             if(i>=beatsSize) break
-            gameBeats.add(beats[i])
+            if(ceil(i*bps).toInt()<beatsSize)
+                gameBeats.add(beats[ceil(i*bps).toInt()])
         }
-
         //번갈아가면서 게임
         for ((index, value) in gameBeats.withIndex()) {
             if(index%2==0){
@@ -419,5 +446,94 @@ class RhythmGameStartActivity: AppCompatActivity() {
         return Pair(Pair(leftImages,rightImages),Pair(leftBeats,rightBeats))
     }
     //Normal: 번갈아서. 시간 간격 조금 짧게
+    fun makeGameBeatsNormal(beats: List<Float>, bps:Float){
+        val beatsSize = beats.size
+        var i = 0
+
+        //가운데, alien, seven, wolf
+        val numbersToExclude = listOf(
+            reversedGestureLabels["middle_finger"]
+        )
+        val handIndexes = (0..21).toList() - numbersToExclude
+        while(i<beatsSize){
+            i += Random.nextInt(3)+3    //3,4,5초 중 랜덤으로
+            if(i>=beatsSize) break
+            if(ceil(i*bps).toInt()<beatsSize)
+                gameBeats.add(beats[ceil(i*bps).toInt()])
+        }
+        //번갈아가면서 게임
+        for ((index, value) in gameBeats.withIndex()) {
+            if(index%2==0){
+                leftBeats.add(value)
+                val nextGestureIdx = handIndexes.random()!!
+                leftImages.add("hand_"+gestureLabels[nextGestureIdx]+"_l")
+                leftAnswers.add(nextGestureIdx)
+            }else{
+                rightBeats.add(value)
+                val nextGestureIdx = handIndexes.random()!!
+                rightImages.add("hand_"+gestureLabels[nextGestureIdx]+"_r")
+                rightAnswers.add(nextGestureIdx)
+            }
+        }
+    }
     //HARD:   손동작 동시에 출현, 시간 간격 더 짧게.
+    fun makeGameBeatsHard(beats: List<Float>, bps:Float){
+        val beatsSize = beats.size
+        var i = 0
+
+        //가운데, alien, seven, wolf
+        val numbersToExclude = listOf(
+            reversedGestureLabels["middle_finger"]
+        )
+        var handIndexes = (0..21).toList() - numbersToExclude
+        //일단 왼쪽에 몰아주기
+        while(i<beatsSize){
+            i += Random.nextInt(3)+3    //3,4,5초 중 랜덤으로
+            if(i>=beatsSize) break
+            //i초 = i초*bps 개의 beat
+            if(ceil(i*bps).toInt()<beatsSize)
+                leftBeats.add(beats[ceil(i*bps).toInt()])
+        }
+
+        var twohandsTimes = mutableListOf<Float>()
+        for((idx,beatTime) in leftBeats.withIndex()){
+            val nextGestureIdx = handIndexes.random()!!
+            if(nextGestureIdx!=2)
+                leftImages.add("hand_"+gestureLabels[nextGestureIdx]+"_l")
+            else {
+                leftImages.add("hand_" + gestureLabels[nextGestureIdx])
+                twohandsTimes.add(beatTime)
+            }
+            leftAnswers.add(nextGestureIdx)
+        }
+        //2번 제스쳐 나오면 앞뒤로 쉬었다가 다음거 뽑아야함.
+        //오른손 비트 뽑고, 왼쪽에서 2번인 인덱스 확인하고 +- 3초인 구간 있으면 지우기.
+        var j=0
+        while(j<beatsSize){
+            j += Random.nextInt(3)+3    //3,4,5초 중 랜덤으로
+            if(j>=beatsSize) break
+            rightBeats.add(beats[j])
+        }
+        var dropIndexes = mutableListOf<Int>()
+        for(beatTime in twohandsTimes){
+            for ((idx,beatTimeRight) in rightBeats.withIndex()){
+                if (beatTimeRight - beatTime in -3f..3f) {
+                    dropIndexes.add(idx)
+                }
+            }
+        }
+        Log.d("errorLog","$dropIndexes")
+        dropIndexes.sortDescending()
+        for(dropIdx in dropIndexes){
+            rightBeats.removeAt(dropIdx)
+        }
+        //heart_twohands 빼고 뽑기
+        handIndexes = handIndexes - listOf(2)
+        for(beatTime in rightBeats){
+            val nextGestureIdx = handIndexes.random()!!
+            rightImages.add("hand_"+gestureLabels[nextGestureIdx]+"_r")
+            rightAnswers.add(nextGestureIdx)
+        }
+        Log.d("Hard Game","$rightImages.size, $rightAnswers.size")
+    }
 }
