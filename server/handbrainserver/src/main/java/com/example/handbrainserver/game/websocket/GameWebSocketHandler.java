@@ -109,7 +109,7 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
         if (questionType == 3) {
             // 문제 타입이 3인 경우 계산 문제를 가져옵니다.
             int calcQuestion = gameSession.getCalcQuestion();
-            message = String.format("next: %d,%s,null", questionType, calcQuestion);
+            message = String.format("next: %d,%d,null", questionType, calcQuestion);
         } else {
             GesturePair gesturePair = gameSession.getQuestion();
             message = String.format("next: %d,%s,%s", questionType, gesturePair.getFirst().getGestureCode(),
