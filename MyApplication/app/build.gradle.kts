@@ -7,8 +7,6 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
-    // kapt 플러그인 추가
-    id("org.jetbrains.kotlin.kapt")
 }
 
 android {
@@ -94,10 +92,11 @@ dependencies {
     // WebRTC 관련
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.mesibo.api:webrtc:1.0.5")
+    implementation("org.java-websocket:Java-WebSocket:1.5.3")
 
     // Hilt DI
     implementation("com.google.dagger:hilt-android:2.52")
-    kapt("com.google.dagger:hilt-android-compiler:2.52")
+    ksp("com.google.dagger:hilt-android-compiler:2.52")
 
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
