@@ -4,14 +4,11 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!-- 카메라 뷰가 들어갈 위쪽 절반 -->
-    <FrameLayout
-        android:id="@+id/cameraFrame"
+    <androidx.camera.view.PreviewView
+        android:id="@+id/rhythmGameCameraView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
-        <!-- 나중에 카메라 뷰를 이곳에 추가 -->
-    </FrameLayout>
+        android:layout_weight="1" />
 
     <!-- 아래쪽 절반 -->
     <LinearLayout

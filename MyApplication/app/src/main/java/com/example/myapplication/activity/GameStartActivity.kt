@@ -47,7 +47,7 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
     private lateinit var gestureRecognition: GestureRecognition
     private lateinit var handLandmarkerHelper: HandLandMarkHelper
     private lateinit var webSocketClient: WebSocketClient
-    
+
     //websocket interface
     override fun onMessageReceived(message: String) {
         if (message.startsWith("next:")) {
