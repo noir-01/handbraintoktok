@@ -266,6 +266,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
             reversedGestureLabels["seven"],
             reversedGestureLabels["eight"],
             reversedGestureLabels["wolf"],
+            reversedGestureLabels["alien"],
             )
         val handIndexes = (0..21).toList() - numbersToExclude
 
