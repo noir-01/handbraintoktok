@@ -55,7 +55,12 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:src="@drawable/logo2"/>
-
+            <ImageView
+                android:id="@+id/gameImageCenterView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/logo2"
+                android:visibility="gone" />
             <!-- 오른쪽 게임 이미지 -->
             <ImageView
                 android:id="@+id/gameImageRightView"
