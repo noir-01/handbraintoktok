@@ -78,6 +78,8 @@
             android:exported="true"/>
         <activity android:name=".multiUi.CloseActivity"
             android:exported="true"/>
+        <activity android:name=".InstallActivity"
+            android:exported="true"/>
         <receiver android:name=".service.MainServiceReceiver"/>
         <service android:name=".service.MainService"
             android:foregroundServiceType="mediaProjection"/>
