@@ -14,13 +14,6 @@ interface ApiService {
     @GET("/music/download/{musicId}")
     suspend fun downloadMusic(@Path("musicId") songId: Int): ResponseBody
 }
-data class Music(
-    val id: Int,
-    val title: String,
-    val artist: String,
-    val duration: String,
-    val filePath: String?=null
-)
 
 fun durationToSec(duration: String): Int {
     val parts = duration.split(":")
