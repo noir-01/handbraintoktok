@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="10dp">
+
+    <TextView
+        android:id="@+id/rankPosition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="@android:color/black" />
+
+    <!-- 이름 -->
+    <TextView
+        android:id="@+id/rankName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="User Name"
+        android:textSize="18sp"
+        android:layout_marginEnd="16dp" />
+
+    <!-- 점수 -->
+    <TextView
+        android:id="@+id/rankScore"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="500 points"
+        android:textSize="18sp" />
+</LinearLayout>

@@ -1,11 +1,17 @@
 package com.example.myapplication.activity
 
+import android.app.ActionBar
+import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.camera.view.PreviewView
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.WindowManager
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.widget.AppCompatButton
 import androidx.lifecycle.lifecycleScope
 
 
@@ -15,6 +21,7 @@ import com.example.myapplication.BaseActivity
 
 import com.example.myapplication.R
 import com.example.myapplication.adapters.MusicAdapter
+import com.example.myapplication.adapters.RankingAdapter
 import com.example.myapplication.util.ApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,6 +30,7 @@ import com.example.myapplication.util.GestureRecognition
 import com.example.myapplication.util.HandLandMarkHelper
 import com.example.myapplication.util.Music
 import com.example.myapplication.util.MusicRepository
+import com.example.myapplication.util.Rank
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
@@ -61,14 +69,16 @@ class RhythmGameSelectActivity : BaseActivity(){
             .build()
             .create(ApiService::class.java)
         musicRepository = MusicRepository(apiService)
+        recyclerView = findViewById(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(this)
 
-        musicAdapter = MusicAdapter(musics = listOf()) { musicId ->
-            selectedMusic = musicId // 선택된 음악의 ID 저장
+        musicAdapter = MusicAdapter(musics = listOf()) { music ->
+            selectedMusic = music // 선택된 음악의 ID 저장,
+            showRankingDialog(music.id)
         }
 
-        recyclerView = findViewById(R.id.recyclerView)
+
         recyclerView.adapter = musicAdapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
 
         findViewById<Button>(R.id.startRhythmGameButton).setOnClickListener {
             selectedMusic?.let { music ->
@@ -83,16 +93,17 @@ class RhythmGameSelectActivity : BaseActivity(){
                 Toast.makeText(this, "먼저 음악을 선택하세요!", Toast.LENGTH_SHORT).show()
             }
         }
-
+        Log.d("Music Load","loading..")
         loadMusicData()
 
     }
 
     private fun loadMusicData() {
         // Coroutine을 사용하여 비동기적으로 데이터를 가져옵니다
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.Default) {
             try {
                 val musicList = musicRepository.fetchMusics() // 데이터를 가져옴
+                Log.d("MusicActivity", "Music Loaded")
                 withContext(Dispatchers.Main){
                     musicAdapter.updateSongs(musicList) // 데이터를 어댑터에 전달
                     Log.d("MusicActivity", "Music List: $musicList")
@@ -106,5 +117,45 @@ class RhythmGameSelectActivity : BaseActivity(){
     }
     override fun onDestroy() {
         super.onDestroy()
+    }
+
+    fun showRankingDialog(musicId:Int) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_ranking, null)
+
+        // 예시 데이터
+        val rankingList = listOf(
+            Rank(1, "User 1", 500),
+            Rank(2, "User 2", 450),
+            Rank(3, "User 3", 400),
+            Rank(3, "User 3", 400),
+            Rank(3, "User 3", 400),
+            Rank(3, "User 3", 400),
+            Rank(3, "User 3", 400),
+            Rank(3, "User 3", 400),
+            Rank(3, "User 3", 400),
+            Rank(3, "User 3", 400),
+            Rank(3, "User 3", 400),
+        )
+
+        // RecyclerView에 어댑터 설정
+        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.rankingRecyclerView)
+        val adapter = RankingAdapter(rankingList)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter = adapter
+
+        // 게임 시작 버튼 클릭 리스너
+        val startButton = dialogView.findViewById<AppCompatButton>(R.id.startRhythmGameButton)
+        startButton.setOnClickListener {
+            Log.d("Start Game","Start")
+        }
+
+        // 다이얼로그 생성
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(true)
+            .create()
+
+        dialog.show()
+        dialog.window?.setLayout((resources.displayMetrics.widthPixels * 0.9).toInt(), (ActionBar.LayoutParams.WRAP_CONTENT))
     }
 }
