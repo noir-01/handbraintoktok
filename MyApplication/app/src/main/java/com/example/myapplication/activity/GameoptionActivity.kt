@@ -31,10 +31,14 @@ class GameoptionActivity : AppCompatActivity() {
             intent.putExtra("GAME_NAME", "mimic")
             startActivity(intent)
         }
+        /*
+        로그인 구현 위해 멀티 플레이 부분 잠시 보류
         togetherButton.setOnClickListener {
             val intent=Intent(this,LoginActivity::class.java)
             startActivity(intent)
         }
+
+         */
         rhythmgameButton.setOnClickListener {
             val intent=Intent(this,RhythmGameSelectActivity::class.java)
             startActivity(intent)
