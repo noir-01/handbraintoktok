@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.util.Rank
 
-class RankingAdapter(private val rankList: List<Rank>) : RecyclerView.Adapter<RankingAdapter.RankingViewHolder>() {
+class RankingAdapter(private var rankList: List<Rank>) : RecyclerView.Adapter<RankingAdapter.RankingViewHolder>() {
 
     inner class RankingViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val rankingTextView: TextView = view.findViewById(R.id.rankPosition)
@@ -22,10 +22,15 @@ class RankingAdapter(private val rankList: List<Rank>) : RecyclerView.Adapter<Ra
     }
 
     override fun onBindViewHolder(holder: RankingViewHolder, position: Int) {
-        val rank = rankList[position]
+        var rank = rankList[position]
         holder.rankingTextView.text = "#${rank.ranking}"
         holder.nameTextView.text = rank.name
         holder.scoreTextView.text = "${rank.score} points"
+    }
+
+    fun updateData(newRankingList: List<Rank>) {
+        rankList = newRankingList
+        notifyDataSetChanged() // 데이터 변경 알림
     }
 
     override fun getItemCount(): Int {

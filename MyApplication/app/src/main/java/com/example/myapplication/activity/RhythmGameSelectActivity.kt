@@ -80,6 +80,7 @@ class RhythmGameSelectActivity : BaseActivity(){
 
         recyclerView.adapter = musicAdapter
 
+        //게임 시작 버튼
         findViewById<Button>(R.id.startRhythmGameButton).setOnClickListener {
             selectedMusic?.let { music ->
                 // 선택된 음악 ID가 있으면, 게임 시작 화면으로 전달
@@ -123,11 +124,8 @@ class RhythmGameSelectActivity : BaseActivity(){
         val dialogView = layoutInflater.inflate(R.layout.dialog_ranking, null)
 
         // 예시 데이터
-        val rankingList = listOf(
-            Rank(1, "User 1", 500),
-            Rank(2, "User 2", 450),
-            Rank(3, "User 3", 400),
-            Rank(3, "User 3", 400),
+        var rankingList = listOf(
+
             Rank(3, "User 3", 400),
             Rank(3, "User 3", 400),
             Rank(3, "User 3", 400),
@@ -154,6 +152,38 @@ class RhythmGameSelectActivity : BaseActivity(){
             .setView(dialogView)
             .setCancelable(true)
             .create()
+
+        //난이도 선택 버튼
+        val easyButton = dialogView.findViewById<AppCompatButton>(R.id.easyButton)
+        val normalButton = dialogView.findViewById<AppCompatButton>(R.id.normalButton)
+        val hardButton = dialogView.findViewById<AppCompatButton>(R.id.hardButton)
+
+        easyButton.setOnClickListener {
+            rankingList = listOf(
+                Rank(1, "Easy User 1", 300),
+                Rank(2, "Easy User 2", 250),
+                Rank(3, "Easy User 3", 200)
+            )
+            adapter.updateData(rankingList) // 어댑터 데이터 갱신
+        }
+
+        normalButton.setOnClickListener {
+            rankingList = listOf(
+                Rank(1, "Normal User 1", 400),
+                Rank(2, "Normal User 2", 350),
+                Rank(3, "Normal User 3", 300)
+            )
+            adapter.updateData(rankingList)
+        }
+
+        hardButton.setOnClickListener {
+            rankingList = listOf(
+                Rank(1, "Hard User 1", 500),
+                Rank(2, "Hard User 2", 450),
+                Rank(3, "Hard User 3", 400)
+            )
+            adapter.updateData(rankingList)
+        }
 
         dialog.show()
         dialog.window?.setLayout((resources.displayMetrics.widthPixels * 0.9).toInt(), (ActionBar.LayoutParams.WRAP_CONTENT))
