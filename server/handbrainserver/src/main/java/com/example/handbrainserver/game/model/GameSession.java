@@ -69,7 +69,13 @@ public class GameSession {
 
     public boolean isAnswer(GesturePair userAnswer){
         return switch(questionType){
-            case 0 -> (question.getFirst()==userAnswer.getFirst() && question.getSecond()==userAnswer.getSecond());
+            case 0 -> {
+                if (userAnswer.getFirst() == Gesture.HEART_TWO_HANDS || userAnswer.getSecond() == Gesture.HEART_TWO_HANDS) {
+                    yield question.getFirst() == userAnswer.getFirst() || question.getSecond() == userAnswer.getSecond();
+                } else {
+                    yield question.getFirst() == userAnswer.getFirst() && question.getSecond() == userAnswer.getSecond();
+                }
+            }
             case 1 -> Gesture.rspWin(question,userAnswer);
             case 2 -> Gesture.rspLose(question,userAnswer);
             case 3 -> Gesture.calcHand(calcQuestion,userAnswer);
