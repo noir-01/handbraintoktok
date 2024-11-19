@@ -29,7 +29,6 @@ public class HistoryService {
         //null처리 필요
         randomGameHistory.setUser(userRepository.findById(randomGameHistoryDto.getUserId()).get());
         randomGameHistory.setGameType(randomGameHistoryDto.getGameType());
-        randomGameHistory.setGesture(randomGameHistoryDto.getGesture());
         randomGameHistory.setReactionTime(randomGameHistoryDto.getReactionTime());
 
         randomGameHistoryRepo.save(randomGameHistory);

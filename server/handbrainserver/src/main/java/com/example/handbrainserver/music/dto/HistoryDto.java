@@ -16,14 +16,12 @@ public class HistoryDto {
     public static class RandomGameHistoryDto{
         private Long userId;
         private GameType gameType;
-        private Gesture gesture;
         private Float reactionTime;
         private LocalDate date;
         public static RandomGameHistoryDto from(RandomGameHistory randomGameHistory){
             return new RandomGameHistoryDto(
                     randomGameHistory.getUser().getId(),
                     randomGameHistory.getGameType(),
-                    randomGameHistory.getGesture(),
                     randomGameHistory.getReactionTime(),
                     randomGameHistory.getDate()
             );
