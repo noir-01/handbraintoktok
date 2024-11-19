@@ -13,9 +13,8 @@ import java.util.Random;
 @Getter @Setter
 public class RandomGameHistory {
     public RandomGameHistory(){}
-    public RandomGameHistory(GameType gameType, Gesture gesture, Float reactionTime, LocalDate date){
+    public RandomGameHistory(GameType gameType, Integer reactionTime, LocalDate date){
         this.gameType = gameType;
-        this.gesture = gesture;
         this.reactionTime = reactionTime;
         this.date= date;
     }
