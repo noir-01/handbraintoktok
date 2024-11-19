@@ -69,21 +69,24 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
     public void handleGameMessage(WebSocketSession session, String payload) {
         GameSession gameSession = gameSessions.get(session.getId());
 
-        // 예측한 정답을 정수형으로 변환
         String[] inputs = payload.split(",");
         GesturePair userAnswer = new GesturePair();
-
-        userAnswer.setFirst(Gesture.fromCode(Integer.parseInt(inputs[0])));
-        Integer secondAnswer = inputs.length > 1 && !inputs[1].equals("null") ? Integer.parseInt(inputs[1]) : null;
+        
+        Integer firstAnswer = !inputs[0].equals("-1")?Integer.parseInt(inputs[0]):null;
+        Integer secondAnswer = !inputs[1].equals("-1")?Integer.parseInt(inputs[1]):null;
+        if(firstAnswer!=null){
+            userAnswer.setFirst(Gesture.fromCode(firstAnswer));
+        }
         if(secondAnswer!=null){
             userAnswer.setSecond(Gesture.fromCode(secondAnswer));
         }
 
         // 정답 판단 및 문제 출제
         boolean isCorrect = gameSession.isAnswer(userAnswer);
-
         try {
-            if (isCorrect) {
+            if (isCorrect) { 
+                // 반응속도
+                //System.out.println(inputs[2]);
                 // 정답일 경우 다음 문제 출제
                 gameSession.nextProblem();
                 session.sendMessage(new TextMessage("correct"));

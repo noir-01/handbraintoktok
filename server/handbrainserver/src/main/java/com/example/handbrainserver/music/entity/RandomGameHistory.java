@@ -31,12 +31,9 @@ public class RandomGameHistory {
     @Column(nullable = false)
     private GameType gameType;
 
-    // 따라하기 에서만 gesture 넣기? 아님 다 넣기?
-    @Enumerated(EnumType.STRING)
-    private Gesture gesture;
-
+    //밀리초 단위 반응속도
     @Column(nullable = false)
-    private Float reactionTime;
+    private Integer reactionTime;
 
     @Column(nullable = false)
     private LocalDate date;
