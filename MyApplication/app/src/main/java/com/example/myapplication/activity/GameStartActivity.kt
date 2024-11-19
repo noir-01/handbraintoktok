@@ -48,13 +48,21 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
     private lateinit var handLandmarkerHelper: HandLandMarkHelper
     private lateinit var webSocketClient: WebSocketClient
 
+    private var startTime = 0L
+    private var lastMessage: String? = null
+
     //websocket interface
     override fun onMessageReceived(message: String) {
+        if (message == lastMessage) {
+            return // 이전 메시지와 같으면 무시
+        }
+        lastMessage = message
         if (message.startsWith("next:")) {
             val problemInfo = message.substringAfter("next:")
             runOnUiThread {
                 handleNextProblem(problemInfo)
             }
+            startTime = System.currentTimeMillis()
         }else if (message.startsWith("end")) {
             CoroutineScope(Dispatchers.Main).launch {
                 delay(500)
@@ -209,36 +217,33 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
                         val width = resultBundle.inputImageWidth
                         Log.d("HandActivity", "time: $inferenceTime, resol: $width*$height")
 
-                        val predictedIndices = mutableListOf<Int>()
+                        val predictedIndices = mutableListOf(-1,-1)
 
                         for (result in resultBundle.results) {
                             if (result.landmarks().isNotEmpty()) {
-                                var leftHandIndex: Int? = null
-                                var rightHandIndex: Int? = null
-
                                 for (idx in result.landmarks().indices) {
                                     val handedness = result.handedness()[idx][0]
                                     val predictedIndex = gestureRecognition.predictByResult(result, idx)
                                     if (predictedIndex >= 0 && predictedIndex <= gestureLabels.size) {
                                         Log.d("HandActivity", "Predicted index: " + gestureLabels[predictedIndex])
                                         if (handedness.categoryName() == "Left") {
-                                            leftHandIndex = predictedIndex
+                                            predictedIndices[1] = predictedIndex
                                         } else if (handedness.categoryName() == "Right") {
-                                            rightHandIndex = predictedIndex
+                                            predictedIndices[0] = predictedIndex
                                         }
-                                        leftHandIndex?.let { predictedIndices.add(it) }
-                                        rightHandIndex?.let { predictedIndices.add(it) }
                                     }
                                 }
                             } else {
                                 Log.d("HandActivity", "No hand detected")
                             }
                         }
-                        val message = when (predictedIndices.size) {
-                            1 -> "${predictedIndices[0]},null"
-                            else -> predictedIndices.joinToString(",")
-                        }
-                        if (predictedIndices.isNotEmpty()) {
+                        var message = predictedIndices.joinToString(",")
+
+                        if (!(predictedIndices[0]==-1 && predictedIndices[1]==-1)) {
+                            //reactionTime: 문제 출제했던 시간이 있음.
+                            val reactionTime = System.currentTimeMillis() - startTime - inferenceTime
+                            message = "$message,$reactionTime"
+                            Log.d("reaction",message)
                             webSocketClient.sendMessage(message)
                         }
                     }
@@ -300,7 +305,7 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
         val gameImageCenterView = findViewById<ImageView>(R.id.gameImageCenterView)
         val gameImageRightView = findViewById<ImageView>(R.id.gameImageRightView)
         when(val gameType = problemNumbers.getOrNull(0)) {
-            // 따르기
+            // 따라하기
             0 -> {
                 val num1 = problemNumbers.getOrNull(1)
                 val num2 = problemNumbers.getOrNull(2)
