@@ -13,18 +13,18 @@ public class JwtUtil {
     private final String secretKey = "cx1UbIeH6FD+1oSjYSB5bgRk6RV/21AYpu4/ILn1bJo=";
     private long expirationTime = 86400000; // 1일
 
-    public String generateToken(String username) {
+    public String generateToken(Long userId) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(userId.toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
-    public boolean validateToken(String token, String username) {
+    public boolean validateToken(String token, String phoneNum) {
         final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
+        return (extractedUsername.equals(phoneNum) && !isTokenExpired(token));
     }
 
     public String extractUsername(String token) {
