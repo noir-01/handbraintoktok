@@ -49,9 +49,10 @@ public class UserController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestParam String phoneNumber) {
         JwtUtil jwtUtil = new JwtUtil();
-        if (userService.saveUser(phoneNumber)) {
+        Long userId = userService.saveUser(phoneNumber);
+        if (userId!=null) {
             Map<String, String> response = new HashMap<>();
-            response.put("token", jwtUtil.generateToken(phoneNumber));
+            response.put("token", jwtUtil.generateToken(userId));
             return ResponseEntity.ok(response); // 성공적인 경우 JSON 응답 반환
         } else {
             return ResponseEntity.badRequest().body("failed"); // 실패 시 JSON 응답 반환

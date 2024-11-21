@@ -16,13 +16,13 @@ import java.time.LocalTime;
 public class HistoryDto {
     @Getter @Setter @AllArgsConstructor @NoArgsConstructor
     public static class RandomGameHistoryDto{
-        private Long userId;
+        private UserDto userDto;
         private GameType gameType;
         private Integer reactionTime;
         private LocalDate date;
         public static RandomGameHistoryDto from(RandomGameHistory randomGameHistory){
             return new RandomGameHistoryDto(
-                    randomGameHistory.getUser().getId(),
+                    UserDto.from(randomGameHistory.getUser()),
                     randomGameHistory.getGameType(),
                     randomGameHistory.getReactionTime(),
                     randomGameHistory.getDate()
@@ -31,7 +31,7 @@ public class HistoryDto {
     }
     @Getter @Setter @AllArgsConstructor @NoArgsConstructor
     public static class RhythmGameHistoryDto{
-        private Long userId;
+        private UserDto userDto;
         private Integer combo;
         private Integer score;
         private Difficulty difficulty;
@@ -39,7 +39,7 @@ public class HistoryDto {
 
         public static RhythmGameHistoryDto from(RhythmGameHistory rhythmGameHistory){
             return new RhythmGameHistoryDto(
-                    rhythmGameHistory.getUser().getId(),
+                    UserDto.from(rhythmGameHistory.getUser()),
                     rhythmGameHistory.getCombo(),
                     rhythmGameHistory.getScore(),
                     rhythmGameHistory.getDifficulty(),
