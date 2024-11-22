@@ -356,7 +356,8 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
 
     private suspend fun handleNextProblem(problemInfo: String) {
         val problemNumbers = problemInfo.split(",").map { it.trim().toIntOrNull() }
-        when(val gameType = problemNumbers.getOrNull(0)) {
+        val gameType = problemNumbers.getOrNull(0)
+        when(gameType) {
             // 따라하기
             0 -> {
                 gameNextImageView.setImageResource(R.drawable.text_copy)
@@ -369,37 +370,49 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
             }
             3->{
                 gameNextImageView.setImageResource(R.drawable.text_calc)
+                val resourceId = imageResources["num_" + problemNumbers[1].toString()] ?:run {
+                    // resourceId가 null일 경우 액티비티 종료
+                    finish()
+                    return@run // 추가적으로 return해서 이후 코드를 실행하지 않도록 합니다.
+                }
+                gameImageLeftView.visibility = View.GONE
+                gameImageRightView.visibility = View.GONE
+                gameImageCenterView.setImageResource(resourceId as Int)
+                gameImageCenterView.visibility=View.VISIBLE
+                gameImageCenterView.bringToFront()
             }
 
         }
-        val num1 = problemNumbers.getOrNull(1)
-        val num2 = problemNumbers.getOrNull(2)
-        Log.d("Nums","$num1, $num2")
-        // num1이나 num2가 2일 때 중앙 이미지를 표시
-        if (num1 == 2 || num2 == 2) {
-            gameImageLeftView.visibility = View.GONE
-            gameImageRightView.visibility = View.GONE
-            gameImageCenterView.visibility = View.VISIBLE
-            gameImageCenterView.setImageResource(imageResources["hand_" + gestureLabels[2]]!!)
-        } else {
-            // num1, num2가 모두 null이 아니면 좌우 이미지를 표시
-            gameImageLeftView.visibility = View.VISIBLE
-            gameImageRightView.visibility = View.VISIBLE
-            gameImageCenterView.visibility = View.GONE
-
-            num1?.let {
-                gameImageLeftView.setImageResource(imageResources["hand_" + gestureLabels[it] + "_l"]!!)
-                gameImageLeftView.visibility = View.VISIBLE
-                Log.d("Nums","hand_" + gestureLabels[it] + "_l")
-            } ?: run{
+        if(gameType!=3){
+            val num1 = problemNumbers.getOrNull(1)
+            val num2 = problemNumbers.getOrNull(2)
+            Log.d("Nums","$num1, $num2")
+            // num1이나 num2가 2일 때 중앙 이미지를 표시
+            if (num1 == 2 || num2 == 2) {
                 gameImageLeftView.visibility = View.GONE
-            }
-            num2?.let {
-                gameImageRightView.setImageResource(imageResources["hand_" + gestureLabels[it] + "_r"]!!)
-                gameImageRightView.visibility = View.VISIBLE
-                Log.d("Nums","hand_" + gestureLabels[it] + "_r")
-            } ?: run{
                 gameImageRightView.visibility = View.GONE
+                gameImageCenterView.visibility = View.VISIBLE
+                gameImageCenterView.setImageResource(imageResources["hand_" + gestureLabels[2]]!!)
+            } else {
+                // num1, num2가 모두 null이 아니면 좌우 이미지를 표시
+                gameImageLeftView.visibility = View.VISIBLE
+                gameImageRightView.visibility = View.VISIBLE
+                gameImageCenterView.visibility = View.GONE
+
+                num1?.let {
+                    gameImageLeftView.setImageResource(imageResources["hand_" + gestureLabels[it] + "_l"]!!)
+                    gameImageLeftView.visibility = View.VISIBLE
+                    Log.d("Nums","hand_" + gestureLabels[it] + "_l")
+                } ?: run{
+                    gameImageLeftView.visibility = View.GONE
+                }
+                num2?.let {
+                    gameImageRightView.setImageResource(imageResources["hand_" + gestureLabels[it] + "_r"]!!)
+                    gameImageRightView.visibility = View.VISIBLE
+                    Log.d("Nums","hand_" + gestureLabels[it] + "_r")
+                } ?: run{
+                    gameImageRightView.visibility = View.GONE
+                }
             }
         }
     }
