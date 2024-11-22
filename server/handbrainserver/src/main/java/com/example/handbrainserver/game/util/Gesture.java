@@ -36,7 +36,7 @@ public enum Gesture {
     public static int defaultIntMapping(Gesture g){
         return switch(g){
             case ROCK -> 0;
-            case ONE -> 1;
+            case ONE,THUMB_UP -> 1;
             case V,TWO -> 2;
             case THREE, SIX -> 3;
             case FOUR -> 4;
