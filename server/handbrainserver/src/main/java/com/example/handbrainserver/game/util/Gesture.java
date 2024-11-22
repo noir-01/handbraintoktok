@@ -63,11 +63,18 @@ public enum Gesture {
     }
 
     public static boolean calcHand(int answer, GesturePair gesturePair){
-        if(gesturePair.hasSecond()) {
+        //양손 모두 있을 때
+        if(gesturePair.hasFirst()&&gesturePair.hasSecond()) {
             return answer == (defaultIntMapping(gesturePair.getFirst()) + defaultIntMapping(gesturePair.getSecond()));
         }
         else {
-            return answer == defaultIntMapping(gesturePair.getFirst());
+            if(gesturePair.hasFirst()){
+                return answer == defaultIntMapping(gesturePair.getFirst());
+            }else if (gesturePair.hasSecond()){
+                return answer == defaultIntMapping(gesturePair.getSecond());
+            }else{
+                return false;
+            }
         }
     }
 
@@ -78,8 +85,9 @@ public enum Gesture {
         }else{
             if(q.hasFirst())
                 return _rspWin(q.getFirst(),a.getFirst());
-            else
+            else if(q.hasSecond())
                 return _rspWin(q.getSecond(),a.getSecond());
+            else return false;
         }
     }
 
@@ -101,8 +109,9 @@ public enum Gesture {
         }else{
             if(q.hasFirst())
                 return _rspLose(q.getFirst(),a.getFirst());
-            else
+            else if(q.hasSecond())
                 return _rspLose(q.getSecond(),a.getSecond());
+            else return false;
         }
     }
 
