@@ -25,6 +25,7 @@ import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.transition.Visibility
 import com.example.myapplication.util.GestureRecognition
 import com.example.myapplication.util.HandLandMarkHelper
 import com.example.myapplication.util.ResourceUtils.imageResources
@@ -33,9 +34,11 @@ import com.example.myapplication.util.gestureLabels
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.atomic.AtomicInteger
 
 class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
     private lateinit var previewView: PreviewView
@@ -43,6 +46,12 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
 
     private lateinit var countdownImageView: ImageView
     private lateinit var startImageView: ImageView
+    private lateinit var gameNextImageView: ImageView
+    private lateinit var checkImageView: ImageView
+    private lateinit var gameImageLeftView: ImageView
+    private lateinit var gameImageCenterView: ImageView
+    private  lateinit var gameImageRightView: ImageView
+
     private var mediaPlayer: MediaPlayer? = null
     private lateinit var gestureRecognition: GestureRecognition
     private lateinit var handLandmarkerHelper: HandLandMarkHelper
@@ -50,23 +59,44 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
 
     private var startTime = 0L
     private var lastMessage: String? = null
+    private var isFirstProb = true
+    private var probNum = AtomicInteger(0)
+    private var countDownJob: Job?=null
+
 
     //websocket interface
     override fun onMessageReceived(message: String) {
-        if (message == lastMessage) {
-            return // 이전 메시지와 같으면 무시
-        }
-        lastMessage = message
-        if (message.startsWith("next:")) {
-            val problemInfo = message.substringAfter("next:")
-            runOnUiThread {
-                handleNextProblem(problemInfo)
+        CoroutineScope(Dispatchers.IO).launch {
+            if (message == lastMessage) {
+                return@launch // 이전 메시지와 같으면 무시
             }
-            startTime = System.currentTimeMillis()
-        }else if (message.startsWith("end")) {
-            CoroutineScope(Dispatchers.Main).launch {
-                delay(500)
-                finish()
+            lastMessage = message
+            if (message.startsWith("next:")) {
+                val problemInfo = message.substringAfter("next:")
+                probNum.incrementAndGet()
+                //정답이면(다음 문제 오면) 체크 표시 띄우고 잠시 멈췄다가 다음 문제 띄우기
+                withContext(Dispatchers.Main) {
+                    //첫번째 출제가 아닐때만 보이게
+                    if(probNum.get()>1) {
+                        checkImageView.setImageResource(R.drawable.checkmark)
+                        checkImageView.bringToFront()
+                        checkImageView.visibility = View.VISIBLE
+                        delay(1500)
+                        checkImageView.visibility = View.GONE
+                    }
+                    if (countDownJob?.isActive == true) {
+                        Log.d("job","waiting")
+                        countDownJob?.join()
+                    }
+                    handleNextProblem(problemInfo)
+                }
+                isFirstProb=false
+                startTime = System.currentTimeMillis()
+            }else if (message.startsWith("end")) {
+                withContext(Dispatchers.Main) {
+                    delay(1500)
+                    finish()
+                }
             }
         }
     }
@@ -75,25 +105,33 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_start)
 
-        // WebSocket
-        val serverDomain = getString(R.string.server_domain)
-        webSocketClient = WebSocketClient("wss://$serverDomain/ws", this)
-        webSocketClient.connect()
-        webSocketClient.sendMessage("abcde,false")
-        
-        countdownImageView = findViewById(R.id.countdownImageView)
-        startImageView = findViewById(R.id.startImageView)
+        gameImageLeftView = findViewById<ImageView>(R.id.gameImageLeftView)
+        gameImageCenterView = findViewById<ImageView>(R.id.gameImageCenterView)
+        gameImageRightView = findViewById<ImageView>(R.id.gameImageRightView)
+
+//        countdownImageView = findViewById(R.id.countdownImageView)
+//        startImageView = findViewById(R.id.startImageView)
+        gameNextImageView = findViewById(R.id.gameNextImageView)
+        checkImageView = findViewById(R.id.checkImageView)
 
         val backButton = findViewById<ImageButton>(R.id.button_back)
         backButton.setOnClickListener {
             finish()
         }
-        countdownImageView.visibility = View.GONE
-        startImageView.visibility = View.GONE
-
-        showPopup()
-
+        //countdownImageView.visibility = View.GONE
+        //startImageView.visibility = View.GONE
+        gameImageCenterView.visibility = View.GONE
         previewView = findViewById(R.id.camera_previewView)
+
+        showPopupThenWebsocketConnect()
+
+        // WebSocket
+//        val serverDomain = getString(R.string.server_domain)
+//        webSocketClient = WebSocketClient("wss://$serverDomain/ws", this)
+//        CoroutineScope(Dispatchers.IO).launch{
+//            webSocketClient.connect()
+//            webSocketClient.sendMessage("8,true")
+//        }
 
         if (allPermissionsGranted()) {
             initializeMediaPipe()
@@ -103,13 +141,29 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
             )
         }
     }
+    private fun showPopupThenWebsocketConnect(){
+        CoroutineScope(Dispatchers.Main).launch {
+            showPopup {
+                val serverDomain = getString(R.string.server_domain)
+                webSocketClient = WebSocketClient("wss://$serverDomain/ws", this@GameStartActivity)
 
-    private fun showPopup() {
+                // WebSocket 연결은 IO 스레드에서 실행
+                CoroutineScope(Dispatchers.IO).launch {
+                    webSocketClient.connect()  // WebSocket 연결
+                    webSocketClient.sendMessage("8,true")  // 메시지 전송
+                }
+            }
+        }
+    }
+    private fun showPopup(onComplete: () -> Unit) {
         val alertDialog = AlertDialog.Builder(this)
             .setTitle("Game Start")
             .setMessage("핸드폰을 흔들리지 않게 세워주세요.")
             .setPositiveButton("확인") { _, _ ->
-                startCountdown()
+                CoroutineScope(Dispatchers.Main).launch {
+                    startCountdown()
+                    onComplete() // 카운트다운 완료 후에 호출
+                }
             }
             .create()
         alertDialog.setOnShowListener {
@@ -123,7 +177,7 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
     }
 
     private fun startCountdown() {
-        countdownImageView.visibility = View.VISIBLE
+        gameImageCenterView.visibility = View.VISIBLE
 
         val countdownImages = arrayOf(
             R.drawable.three,
@@ -133,29 +187,29 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
         val handler = Handler(Looper.getMainLooper())
         var currentIndex = 0
 
-        val countdownRunnable = object : Runnable {
-            override fun run() {
-                if (currentIndex < countdownImages.size) {
-                    countdownImageView.setImageResource(countdownImages[currentIndex])
-                    countdownImageView.visibility = View.VISIBLE
+        countDownJob = CoroutineScope(Dispatchers.Main).launch {
+            while (currentIndex < countdownImages.size) {
+                // 이미지 업데이트
+                gameImageCenterView.setImageResource(countdownImages[currentIndex])
+                gameImageCenterView.visibility = View.VISIBLE
+                gameImageCenterView.bringToFront()
 
-                    // playCountdownSound()를 처음 한 번만 재생하도록 조건 추가
-                    if (currentIndex == 0) {
-                        playCountdownSound()
-                    }
-
-                    currentIndex++
-                    handler.postDelayed(this, 1000)
-                } else {
-                    countdownImageView.visibility = View.GONE
-                    startImageView.setImageResource(R.drawable.start)
-                    startImageView.visibility = View.VISIBLE
-
-                    handler.postDelayed({ startImageView.visibility = View.GONE }, 1000)
+                // 첫 번째 이미지일 때 소리 재생
+                if (currentIndex == 0) {
+                    playCountdownSound()
                 }
+
+                currentIndex++
+                delay(1000L) // 1초 대기
             }
+            // 카운트다운 완료 처리
+            gameImageCenterView.setImageResource(R.drawable.start)
+            gameImageCenterView.visibility = View.VISIBLE
+
+            // 1초 후 게임 이미지를 숨김
+            delay(1000L)
+            gameImageCenterView.visibility = View.GONE
         }
-        handler.post(countdownRunnable)
     }
 
     private fun playCountdownSound() {
@@ -244,7 +298,9 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
                             val reactionTime = System.currentTimeMillis() - startTime - inferenceTime
                             message = "$message,$reactionTime"
                             Log.d("reaction",message)
-                            webSocketClient.sendMessage(message)
+                            CoroutineScope(Dispatchers.IO).launch{
+                                webSocketClient.sendMessage(message)
+                            }
                         }
                     }
                 }
@@ -298,57 +354,52 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
         }, ContextCompat.getMainExecutor(this))
     }
 
-    private fun handleNextProblem(problemInfo: String) {
+    private suspend fun handleNextProblem(problemInfo: String) {
         val problemNumbers = problemInfo.split(",").map { it.trim().toIntOrNull() }
-
-        val gameImageLeftView = findViewById<ImageView>(R.id.gameImageLeftView)
-        val gameImageCenterView = findViewById<ImageView>(R.id.gameImageCenterView)
-        val gameImageRightView = findViewById<ImageView>(R.id.gameImageRightView)
         when(val gameType = problemNumbers.getOrNull(0)) {
             // 따라하기
             0 -> {
-                val num1 = problemNumbers.getOrNull(1)
-                val num2 = problemNumbers.getOrNull(2)
-
-                // num1이나 num2가 2일 때 중앙 이미지를 표시
-                if (num1 == 2 || num2 == 2) {
-                    gameImageLeftView.visibility = View.GONE
-                    gameImageRightView.visibility = View.GONE
-                    gameImageCenterView.visibility = View.VISIBLE
-                    gameImageCenterView.setImageResource(imageResources["hand_" + gestureLabels[2]]!!)
-                } else {
-                    // num1, num2가 모두 null이 아니면 좌우 이미지를 표시
-                    gameImageLeftView.visibility = View.VISIBLE
-                    gameImageRightView.visibility = View.VISIBLE
-                    gameImageCenterView.visibility = View.GONE
-
-                    num1?.let {
-                        gameImageLeftView.setImageResource(imageResources["hand_" + gestureLabels[it] + "_l"]!!)
-                    }
-                    num2?.let {
-                        gameImageRightView.setImageResource(imageResources["hand_" + gestureLabels[it] + "_r"]!!)
-                    }
-                }
+                gameNextImageView.setImageResource(R.drawable.text_copy)
             }
-        }
-        problemNumbers.forEachIndexed { index, num ->
-            if (num == 2) {
-                // num == 2일 때: 중앙 이미지 표시, 좌우 이미지는 숨김
-                gameImageLeftView.visibility = View.GONE
-                gameImageRightView.visibility = View.GONE
-                gameImageCenterView.visibility = View.VISIBLE
-                gameImageCenterView.setImageResource(imageResources["hand_" + gestureLabels[num]]!!)
-            } else if (num != null) {
-                // 일반 경우: 좌우 이미지 표시, 중앙 이미지는 숨김
-                gameImageLeftView.visibility = View.VISIBLE
-                gameImageRightView.visibility = View.VISIBLE
-                gameImageCenterView.visibility = View.GONE
+            1->{
+                gameNextImageView.setImageResource(R.drawable.text_win)
+            }
+            2->{
+                gameNextImageView.setImageResource(R.drawable.text_lose)
+            }
+            3->{
+                gameNextImageView.setImageResource(R.drawable.text_calc)
+            }
 
-                if (index % 2 == 0) {
-                    gameImageRightView.setImageResource(imageResources["hand_" + gestureLabels[num] + "_r"]!!)
-                } else {
-                    gameImageLeftView.setImageResource(imageResources["hand_" + gestureLabels[num] + "_l"]!!)
-                }
+        }
+        val num1 = problemNumbers.getOrNull(1)
+        val num2 = problemNumbers.getOrNull(2)
+        Log.d("Nums","$num1, $num2")
+        // num1이나 num2가 2일 때 중앙 이미지를 표시
+        if (num1 == 2 || num2 == 2) {
+            gameImageLeftView.visibility = View.GONE
+            gameImageRightView.visibility = View.GONE
+            gameImageCenterView.visibility = View.VISIBLE
+            gameImageCenterView.setImageResource(imageResources["hand_" + gestureLabels[2]]!!)
+        } else {
+            // num1, num2가 모두 null이 아니면 좌우 이미지를 표시
+            gameImageLeftView.visibility = View.VISIBLE
+            gameImageRightView.visibility = View.VISIBLE
+            gameImageCenterView.visibility = View.GONE
+
+            num1?.let {
+                gameImageLeftView.setImageResource(imageResources["hand_" + gestureLabels[it] + "_l"]!!)
+                gameImageLeftView.visibility = View.VISIBLE
+                Log.d("Nums","hand_" + gestureLabels[it] + "_l")
+            } ?: run{
+                gameImageLeftView.visibility = View.GONE
+            }
+            num2?.let {
+                gameImageRightView.setImageResource(imageResources["hand_" + gestureLabels[it] + "_r"]!!)
+                gameImageRightView.visibility = View.VISIBLE
+                Log.d("Nums","hand_" + gestureLabels[it] + "_r")
+            } ?: run{
+                gameImageRightView.visibility = View.GONE
             }
         }
     }
