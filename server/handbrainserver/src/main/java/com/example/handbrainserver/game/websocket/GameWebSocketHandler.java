@@ -74,6 +74,7 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
         
         Integer firstAnswer = !inputs[0].equals("-1")?Integer.parseInt(inputs[0]):null;
         Integer secondAnswer = !inputs[1].equals("-1")?Integer.parseInt(inputs[1]):null;
+
         if(firstAnswer!=null){
             userAnswer.setFirst(Gesture.fromCode(firstAnswer));
         }

@@ -72,14 +72,20 @@ public enum Gesture {
     }
 
     public static boolean rspWin(GesturePair q, GesturePair a){
-        if(q.hasSecond() && a.hasSecond()){
+        //양손 문제일 경우 둘다 확인
+        if(q.hasFirst()&& q.hasSecond()){
             return _rspWin(q.getFirst(),a.getFirst()) && _rspWin(q.getSecond(),a.getSecond());
         }else{
-            return _rspWin(q.getFirst(),a.getFirst());
+            if(q.hasFirst())
+                return _rspWin(q.getFirst(),a.getFirst());
+            else
+                return _rspWin(q.getSecond(),a.getSecond());
         }
     }
 
     public static boolean _rspWin(Gesture question, Gesture answer) {
+        if(answer==null) return false;
+
         return switch (question) {
             case ROCK -> answer == Gesture.FIVE;
             case FIVE -> answer == Gesture.TWO || answer == Gesture.V; // Scissors beat Paper
@@ -89,15 +95,19 @@ public enum Gesture {
     }
 
     public static boolean rspLose(GesturePair q, GesturePair a){
-        //1. 양 손 맞춰야 함
-        if(q.hasSecond() && a.hasSecond()){
+        //양손 문제일 경우 둘다 확인
+        if(q.hasFirst()&& q.hasSecond()){
             return _rspLose(q.getFirst(),a.getFirst()) && _rspLose(q.getSecond(),a.getSecond());
         }else{
-            return _rspLose(q.getFirst(),a.getFirst());
+            if(q.hasFirst())
+                return _rspLose(q.getFirst(),a.getFirst());
+            else
+                return _rspLose(q.getSecond(),a.getSecond());
         }
     }
 
     public static boolean _rspLose(Gesture question, Gesture answer) {
+        if(answer==null) return false;
         return switch (question) {
             case ROCK -> answer == Gesture.TWO || answer == Gesture.V;
             case FIVE -> answer == Gesture.ROCK;
