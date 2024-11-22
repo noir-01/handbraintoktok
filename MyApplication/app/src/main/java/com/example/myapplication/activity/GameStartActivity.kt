@@ -94,7 +94,11 @@ class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
                 startTime = System.currentTimeMillis()
             }else if (message.startsWith("end")) {
                 withContext(Dispatchers.Main) {
+                    checkImageView.setImageResource(R.drawable.checkmark)
+                    checkImageView.bringToFront()
+                    checkImageView.visibility = View.VISIBLE
                     delay(1500)
+                    checkImageView.visibility = View.GONE
                     finish()
                 }
             }
