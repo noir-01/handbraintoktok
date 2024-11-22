@@ -53,7 +53,7 @@ public class GameSession {
                     getCopyQuestion();
                     break;
 
-                case 1: //지는/이기는 가위바위보
+                case 1: //이기는,지는 가위바위보: 문제랑 이기는/지는만 알면 문제랑 답 비교해서 정답인지 알 수 있음. 정답 따로 저장 X
                 case 2:
                     question.setFirst(rspGestures[random.nextInt(rspGestures.length)]);
                     question.setSecond(rspGestures[random.nextInt(rspGestures.length)]);
