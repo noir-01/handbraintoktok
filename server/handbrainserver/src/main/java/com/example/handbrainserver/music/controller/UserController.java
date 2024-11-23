@@ -47,9 +47,9 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestParam String phoneNumber) {
+    public ResponseEntity<?> register(@RequestParam String name) {
         JwtUtil jwtUtil = new JwtUtil();
-        Long userId = userService.saveUser(phoneNumber);
+        Long userId = userService.saveUser(name);
         if (userId!=null) {
             Map<String, String> response = new HashMap<>();
             response.put("token", jwtUtil.generateToken(userId));

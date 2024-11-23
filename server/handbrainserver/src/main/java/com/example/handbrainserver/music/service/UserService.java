@@ -13,9 +13,9 @@ public class UserService {
     public UserService(UserRepository userRepository){
         this.userRepository = userRepository;
     }
-    public Long saveUser(String phoneNumber){
+    public Long saveUser(String name){
         User user = new User();
-        user.setPhoneNumber(phoneNumber);
+        user.setName(name);
         user = userRepository.save(user);
         return user.getId();
     }
