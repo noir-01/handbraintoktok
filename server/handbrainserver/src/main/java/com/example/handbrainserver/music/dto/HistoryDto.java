@@ -32,6 +32,7 @@ public class HistoryDto {
     @Getter @Setter @AllArgsConstructor @NoArgsConstructor
     public static class RhythmGameHistoryDto{
         private UserDto userDto;
+        private Long musicId;
         private Integer combo;
         private Integer score;
         private Difficulty difficulty;
@@ -40,6 +41,7 @@ public class HistoryDto {
         public static RhythmGameHistoryDto from(RhythmGameHistory rhythmGameHistory){
             return new RhythmGameHistoryDto(
                     UserDto.from(rhythmGameHistory.getUser()),
+                    rhythmGameHistory.getMusic().getId(),
                     rhythmGameHistory.getCombo(),
                     rhythmGameHistory.getScore(),
                     rhythmGameHistory.getDifficulty(),

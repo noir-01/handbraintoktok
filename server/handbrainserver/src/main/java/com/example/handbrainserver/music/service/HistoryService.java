@@ -84,6 +84,7 @@ public class HistoryService {
     //dto 입력받아서 최고값이면 update or not
     public void updateWeeklyRecord(HistoryDto.RhythmGameHistoryDto rhythmGameHistoryDto) {
         Long userId = rhythmGameHistoryDto.getUserDto().getUserId();
+        Long musicId = rhythmGameHistoryDto.getMusicId();
         Integer newScore = rhythmGameHistoryDto.getScore();
         Integer newCombo = rhythmGameHistoryDto.getCombo();
         Difficulty difficulty=rhythmGameHistoryDto.getDifficulty();
@@ -95,7 +96,7 @@ public class HistoryService {
         LocalDate endOfWeek = getWeekEnd(date);
 
         // 기존 주간 최고 기록 조회
-        Optional<RhythmGameHistory> existingRecord = rhythmGameHistoryRepo.findMyTopRecordWeekly(user, startOfWeek, endOfWeek);
+        Optional<RhythmGameHistory> existingRecord = rhythmGameHistoryRepo.findMyTopRecordWeekly(user, musicId, startOfWeek, endOfWeek);
 
         if (existingRecord.isPresent()) {
             // 기존 기록이 있다면, 새로운 점수가 더 높은 경우 업데이트
@@ -119,10 +120,10 @@ public class HistoryService {
         }
     }
 
-    public List<HistoryDto.RhythmGameHistoryDto> findAllUserRecordWeekly(){
+    public List<HistoryDto.RhythmGameHistoryDto> findAllUserRecordWeekly(Long musicId){
         LocalDate startOfWeek = getWeekStart(LocalDate.now());
         LocalDate endOfWeek = getWeekEnd(LocalDate.now());
-        return rhythmGameHistoryRepo.findAllUserRecordWeekly(startOfWeek,endOfWeek).stream()
+        return rhythmGameHistoryRepo.findAllUserRecordWeekly(musicId, startOfWeek,endOfWeek).stream()
                 .map(HistoryDto.RhythmGameHistoryDto::from)
                 .collect(Collectors.toList());
     }

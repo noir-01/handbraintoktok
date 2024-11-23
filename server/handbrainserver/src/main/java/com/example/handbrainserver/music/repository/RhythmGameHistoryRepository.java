@@ -17,9 +17,11 @@ import java.util.Optional;
 
 public interface RhythmGameHistoryRepository extends JpaRepository<RhythmGameHistory, Long> {
     //사용자의 주간 기록이 존재하는지 확인
-    @Query("SELECT h FROM RhythmGameHistory h WHERE h.user = :user AND h.date BETWEEN :startOfWeek AND :endOfWeek")
-    Optional<RhythmGameHistory> findMyTopRecordWeekly(User user, LocalDate startOfWeek, LocalDate endOfWeek);
+    @Query("SELECT h FROM RhythmGameHistory h WHERE h.user = :user AND h.music.id = :musicId AND h.date BETWEEN :startOfWeek AND :endOfWeek")
+    Optional<RhythmGameHistory> findMyTopRecordWeekly(
+            User user, Long musicId, LocalDate startOfWeek, LocalDate endOfWeek);
 
-    @Query("SELECT h FROM RhythmGameHistory h WHERE h.date BETWEEN :startOfWeek AND :endOfWeek ORDER BY h.score DESC")
-    List<RhythmGameHistory> findAllUserRecordWeekly(LocalDate startOfWeek, LocalDate endOfWeek);
+    @Query("SELECT h FROM RhythmGameHistory h WHERE h.music.id = :musicId AND h.date BETWEEN :startOfWeek AND :endOfWeek ORDER BY h.score DESC")
+    List<RhythmGameHistory> findAllUserRecordWeekly(
+            Long musicId, LocalDate startOfWeek, LocalDate endOfWeek);
 }

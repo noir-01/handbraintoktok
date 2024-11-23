@@ -12,17 +12,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-public class HistoryController {
+public class  HistoryController {
     private final HistoryService historyService;
     private final UserService userService;
     private final JwtUtil jwtUtil = new JwtUtil();
@@ -68,6 +65,19 @@ public class HistoryController {
             case WEEKLY -> historyService.findRandomGameHistoryWeekly(userId,gameType);
             case MONTHLY -> historyService.findRandomGameHistoryMonthly(userId,gameType);
         };
+    }
+
+    @GetMapping("/history/rhythm/get/{musicId}")
+    public List<HistoryDto.RhythmGameHistoryDto> getRhythmGameRanking(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("musicId") Long musicId
+    ){
+        //나중에 유저 친구 관계 가져올 때 필요함.
+        String processedToken = token.replace("Bearer ", ""); // Bearer 제거
+        JwtUtil jwtUtil = new JwtUtil();
+        Long userId = Long.parseLong(jwtUtil.extractUsername(processedToken));
+
+        return historyService.findAllUserRecordWeekly(musicId);
     }
 
 }

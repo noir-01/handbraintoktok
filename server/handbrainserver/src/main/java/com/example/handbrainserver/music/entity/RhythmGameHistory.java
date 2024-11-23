@@ -18,6 +18,10 @@ public class RhythmGameHistory {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne
+    @JoinColumn(name = "music_id", nullable = false) // music_id는 외래 키
+    private Music music;
+
     @Column(nullable = false)
     private Integer combo;
 
