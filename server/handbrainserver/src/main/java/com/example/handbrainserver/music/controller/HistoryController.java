@@ -2,13 +2,17 @@ package com.example.handbrainserver.music.controller;
 
 import com.example.handbrainserver.music.dto.HistoryDto;
 import com.example.handbrainserver.music.dto.PeriodAverageDataDto;
+import com.example.handbrainserver.music.dto.UserDto;
 import com.example.handbrainserver.music.service.FriendService;
 import com.example.handbrainserver.music.service.HistoryService;
 import com.example.handbrainserver.music.service.UserService;
+import com.example.handbrainserver.music.util.Difficulty;
 import com.example.handbrainserver.music.util.GameType;
 import com.example.handbrainserver.music.util.JwtUtil;
 import com.example.handbrainserver.music.util.Period;
 import io.jsonwebtoken.Jwt;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +59,36 @@ public class  HistoryController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("error");
         }
     }
+    @Getter @Setter
+    private static class RhythmGameDto{
+        private Long musicId;
+        private Difficulty difficulty;
+        private Integer combo;
+        private Integer score;
+    }
+    @PostMapping("/history/rhythm/upload")
+    public ResponseEntity<?> uploadRhythmGameHistory(
+            @RequestHeader("Authorization") String token,
+            @RequestBody RhythmGameDto rhythmGameDtoPost
+    ){
+        String processedToken = token.replace("Bearer ", ""); // Bearer 제거
+        Long userId = Long.parseLong(jwtUtil.extractUsername(processedToken));
+
+        HistoryDto.RhythmGameHistoryDto historyDto = new HistoryDto.RhythmGameHistoryDto();
+        UserDto userDto = new UserDto();
+        userDto.setUserId(userId);
+
+        historyDto.setUserDto(userDto);
+        historyDto.setMusicId(rhythmGameDtoPost.getMusicId());
+        historyDto.setDifficulty(rhythmGameDtoPost.getDifficulty());
+        historyDto.setDate(LocalDate.now());
+        historyDto.setCombo(rhythmGameDtoPost.getCombo());
+        historyDto.setScore(rhythmGameDtoPost.getScore());
+
+        historyService.updateWeeklyRecord(historyDto);
+        return ResponseEntity.ok("success");
+    }
+
     @GetMapping("/history/random/get")
     public List<PeriodAverageDataDto> getRandomGameHistory(
             @RequestHeader("Authorization") String token,
