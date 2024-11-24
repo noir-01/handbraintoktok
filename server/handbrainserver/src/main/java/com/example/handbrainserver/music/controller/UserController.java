@@ -74,7 +74,7 @@ public class UserController {
 
     @PostMapping("/friend/upload")
     public ResponseEntity<?> friendRelation(
-            @RequestHeader String token,
+            @RequestHeader("Authorization") String token,
             @RequestBody List<String> contacts
     ){
         String processedToken = token.replace("Bearer ", ""); // Bearer 제거
