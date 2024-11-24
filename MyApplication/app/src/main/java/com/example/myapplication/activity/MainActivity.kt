@@ -69,7 +69,7 @@ class MainActivity : BaseActivity() {
 //        }
 //
         buttonRecords.setOnClickListener{
-            val intent = Intent(this, RecordsActivity::class.java)
+            val intent = Intent(this, RecordActivity::class.java)
             startActivity(intent)
         }
 
