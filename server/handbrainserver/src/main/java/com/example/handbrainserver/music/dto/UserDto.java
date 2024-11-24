@@ -10,8 +10,20 @@ import lombok.Setter;
 public class UserDto {
     private Long userId;
     private String name;
+    private String phoneNumberHashed;
 
     public static UserDto from(User user){
-        return new UserDto(user.getId(),user.getName());
+        return new UserDto(user.getId(),user.getName(),user.getPhoneNumberHash());
+    }
+
+    @Getter @Setter @AllArgsConstructor @NoArgsConstructor
+    public static class UserDtoWithOutId{
+        private String name;
+        private String phoneNumber;
+    }
+    @Getter @Setter @AllArgsConstructor @NoArgsConstructor
+    public static class UserDtoWithIdAndName{
+        private Long userId;
+        private String name;
     }
 }
