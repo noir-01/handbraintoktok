@@ -2,6 +2,7 @@ package com.example.handbrainserver.music.controller;
 
 import com.example.handbrainserver.music.dto.HistoryDto;
 import com.example.handbrainserver.music.dto.PeriodAverageDataDto;
+import com.example.handbrainserver.music.service.FriendService;
 import com.example.handbrainserver.music.service.HistoryService;
 import com.example.handbrainserver.music.service.UserService;
 import com.example.handbrainserver.music.util.GameType;
@@ -22,11 +23,14 @@ import java.util.List;
 public class  HistoryController {
     private final HistoryService historyService;
     private final UserService userService;
+    private final FriendService friendService;
+
     private final JwtUtil jwtUtil = new JwtUtil();
     @Autowired
-    public HistoryController(HistoryService historyService,UserService userService){
+    public HistoryController(HistoryService historyService,UserService userService,FriendService friendService){
         this.historyService = historyService;
         this.userService = userService;
+        this.friendService = friendService;
     }
 
 
@@ -66,18 +70,22 @@ public class  HistoryController {
             case MONTHLY -> historyService.findRandomGameHistoryMonthly(userId,gameType);
         };
     }
-
+    
+    // 친구 목록 조회하고 랭킹 정보 받기 
     @GetMapping("/history/rhythm/get/{musicId}")
     public List<HistoryDto.RhythmGameHistoryDto> getRhythmGameRanking(
             @RequestHeader("Authorization") String token,
             @PathVariable("musicId") Long musicId
     ){
-        //나중에 유저 친구 관계 가져올 때 필요함.
         String processedToken = token.replace("Bearer ", ""); // Bearer 제거
-        JwtUtil jwtUtil = new JwtUtil();
         Long userId = Long.parseLong(jwtUtil.extractUsername(processedToken));
 
-        return historyService.findAllUserRecordWeekly(musicId);
+        List<Long> userIds = friendService.getFriendIds(userId);
+        //내 id도 추가
+        userIds.add(userId);
+
+        //return historyService.findAllUserRecordWeekly(musicId);
+        return historyService.getFriendRecordWeekly(userIds,musicId);
     }
 
 }

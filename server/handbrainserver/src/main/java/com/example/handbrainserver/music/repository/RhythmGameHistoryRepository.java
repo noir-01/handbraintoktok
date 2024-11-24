@@ -24,4 +24,15 @@ public interface RhythmGameHistoryRepository extends JpaRepository<RhythmGameHis
     @Query("SELECT h FROM RhythmGameHistory h WHERE h.music.id = :musicId AND h.date BETWEEN :startOfWeek AND :endOfWeek ORDER BY h.score DESC")
     List<RhythmGameHistory> findAllUserRecordWeekly(
             Long musicId, LocalDate startOfWeek, LocalDate endOfWeek);
+    
+    //나+친구들 기록 뽑기
+    @Query("SELECT h FROM RhythmGameHistory h WHERE h.music.id = :musicId " +
+            "AND h.user.id IN :userIds " +
+            "AND h.date BETWEEN :startOfWeek AND :endOfWeek " +
+            "ORDER BY h.score DESC")
+    List<RhythmGameHistory> findFriendRecordWeekly(
+            Long musicId,
+            List<Long> userIds,
+            LocalDate startOfWeek,
+            LocalDate endOfWeek);
 }

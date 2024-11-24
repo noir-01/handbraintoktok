@@ -28,7 +28,7 @@ public class HistoryService {
     private final RhythmGameHistoryRepository rhythmGameHistoryRepo;
     private final UserRepository userRepository;
     @Autowired
-    public HistoryService(RandomGameHistoryRepository rgh, RhythmGameHistoryRepository rhgh, UserRepository userRepository){
+    public HistoryService(RandomGameHistoryRepository rgh, RhythmGameHistoryRepository rhgh, UserRepository userRepository, FriendService friendService){
         this.randomGameHistoryRepo = rgh;
         this.rhythmGameHistoryRepo = rhgh;
         this.userRepository = userRepository;
@@ -120,10 +120,21 @@ public class HistoryService {
         }
     }
 
-    public List<HistoryDto.RhythmGameHistoryDto> findAllUserRecordWeekly(Long musicId){
+    public List<HistoryDto.RhythmGameHistoryDto> getAllUserRecordWeekly(Long musicId){
         LocalDate startOfWeek = getWeekStart(LocalDate.now());
         LocalDate endOfWeek = getWeekEnd(LocalDate.now());
         return rhythmGameHistoryRepo.findAllUserRecordWeekly(musicId, startOfWeek,endOfWeek).stream()
+                .map(HistoryDto.RhythmGameHistoryDto::from)
+                .collect(Collectors.toList());
+    }
+
+    public List<HistoryDto.RhythmGameHistoryDto> getFriendRecordWeekly(List<Long> userIds, Long musicId) {
+
+        LocalDate startOfWeek = getWeekStart(LocalDate.now());
+        LocalDate endOfWeek = getWeekEnd(LocalDate.now());
+
+
+        return rhythmGameHistoryRepo.findFriendRecordWeekly(musicId, userIds, startOfWeek, endOfWeek).stream()
                 .map(HistoryDto.RhythmGameHistoryDto::from)
                 .collect(Collectors.toList());
     }
@@ -137,7 +148,5 @@ public class HistoryService {
         // 해당 날짜가 포함된 주의 일요일
         return date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
     }
-
-
 
 }
