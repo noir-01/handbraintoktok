@@ -7,12 +7,10 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.camera.view.PreviewView
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.WindowManager
-import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.widget.AppCompatButton
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.DividerItemDecoration
 
 
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -22,19 +20,18 @@ import com.example.myapplication.BaseActivity
 import com.example.myapplication.R
 import com.example.myapplication.adapters.MusicAdapter
 import com.example.myapplication.adapters.RankingAdapter
-import com.example.myapplication.util.ApiService
+import com.example.myapplication.util.network.ApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-import com.example.myapplication.util.GestureRecognition
-import com.example.myapplication.util.HandLandMarkHelper
-import com.example.myapplication.util.Music
+import com.example.myapplication.util.mediapipe.GestureRecognition
+import com.example.myapplication.util.mediapipe.HandLandMarkHelper
+import com.example.myapplication.util.dataClass.Music
 import com.example.myapplication.util.MusicRepository
-import com.example.myapplication.util.Rank
-import kotlinx.coroutines.GlobalScope
+import com.example.myapplication.util.dataClass.Rank
+import com.example.myapplication.util.network.RetrofitClient
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.withContext
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 
 class RhythmGameSelectActivity : BaseActivity(){
     private lateinit var previewView: PreviewView
@@ -63,37 +60,38 @@ class RhythmGameSelectActivity : BaseActivity(){
         setContentView(R.layout.activity_rhythmgame)
 
         val serverDomain = getString(R.string.server_domain)
-        apiService = Retrofit.Builder()
-            .baseUrl("https://$serverDomain")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(ApiService::class.java)
+//        apiService = Retrofit.Builder()
+//        .baseUrl("https://$serverDomain")
+//        .addConverterFactory(GsonConverterFactory.create())
+//        .build()
+//        .create(ApiService::class.java)
+        apiService = RetrofitClient.apiService
         musicRepository = MusicRepository(apiService)
         recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         musicAdapter = MusicAdapter(musics = listOf()) { music ->
             selectedMusic = music // 선택된 음악의 ID 저장,
-            showRankingDialog(music.id)
+            showRankingDialog(this, music.id)
         }
 
 
         recyclerView.adapter = musicAdapter
 
         //게임 시작 버튼
-        findViewById<Button>(R.id.startRhythmGameButton).setOnClickListener {
-            selectedMusic?.let { music ->
-                // 선택된 음악 ID가 있으면, 게임 시작 화면으로 전달
-                val intent = Intent(this, RhythmGameStartActivity::class.java)
-                intent.putExtra("MUSIC_ID", music.id)
-                intent.putExtra("DURATION", music.duration)
-                //hard-coded, 나중에 난이도 선택 버튼 만들기.
-                intent.putExtra("DIFFICULTY","HARD")
-                startActivity(intent)
-            } ?: run {
-                Toast.makeText(this, "먼저 음악을 선택하세요!", Toast.LENGTH_SHORT).show()
-            }
-        }
+//        findViewById<Button>(R.id.startRhythmGameButton).setOnClickListener {
+//            selectedMusic?.let { music ->
+//                // 선택된 음악 ID가 있으면, 게임 시작 화면으로 전달
+//                val intent = Intent(this, RhythmGameStartActivity::class.java)
+//                intent.putExtra("MUSIC_ID", music.id)
+//                intent.putExtra("DURATION", music.duration)
+//                //hard-coded, 나중에 난이도 선택 버튼 만들기.
+//                intent.putExtra("DIFFICULTY","HARD")
+//                startActivity(intent)
+//            } ?: run {
+//                Toast.makeText(this, "먼저 음악을 선택하세요!", Toast.LENGTH_SHORT).show()
+//            }
+//        }
         Log.d("Music Load","loading..")
         loadMusicData()
 
@@ -120,72 +118,223 @@ class RhythmGameSelectActivity : BaseActivity(){
         super.onDestroy()
     }
 
-    fun showRankingDialog(musicId:Int) {
+    fun showRankingDialog(context: Context, musicId:Int) {
+        var selectedDifficulty: String? = null
         val dialogView = layoutInflater.inflate(R.layout.dialog_ranking, null)
 
-        // 예시 데이터
-        var rankingList = listOf(
+        // 1. IO 스레드에서 순위 받아옴
+        CoroutineScope(Dispatchers.IO).launch {
+            val rhythmGameHistoryList = apiService.getRhythmRank(musicId)
+            // 2. Default 스레드에서 rankMap 만듦.
+            withContext(Dispatchers.Default){
+                val groupedByDifficulty = rhythmGameHistoryList.groupBy { it.difficulty }
+                val rankMap = mutableMapOf<String, List<Rank>>()
+                groupedByDifficulty.forEach { (difficulty, gameHistoryList) ->
+                    // 점수 기준으로 내림차순 정렬
+                    // 순위 매기며 Rank 객체 리스트 생성
+                    val rankList = gameHistoryList.mapIndexed { index, rhythmGameHistoryDto ->
+                        Rank(
+                            ranking = index + 1, // 순위는 1부터 시작
+                            name = rhythmGameHistoryDto.userDto.name,
+                            combo = rhythmGameHistoryDto.combo,
+                            score = rhythmGameHistoryDto.score
+                        )
+                    }
+                    rankMap[difficulty] = rankList
+                }
+                withContext(Dispatchers.Main) {
+                    // 예시: 초기 데이터를 다이얼로그에 보여주는 부분
+                    var rankingList = rankMap["EASY"] ?: emptyList()
 
-            Rank(3, "User 3", 400),
-            Rank(3, "User 3", 400),
-            Rank(3, "User 3", 400),
-            Rank(3, "User 3", 400),
-            Rank(3, "User 3", 400),
-            Rank(3, "User 3", 400),
-            Rank(3, "User 3", 400),
-        )
+                    // RecyclerView에 어댑터 설정
+                    val recyclerView =
+                        dialogView.findViewById<RecyclerView>(R.id.rankingRecyclerView)
+                    val adapter = RankingAdapter(rankingList)
+                    recyclerView.layoutManager = LinearLayoutManager(context)
+                    recyclerView.adapter = adapter
+                    val divider = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+                    recyclerView.addItemDecoration(divider)
 
-        // RecyclerView에 어댑터 설정
-        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.rankingRecyclerView)
-        val adapter = RankingAdapter(rankingList)
-        recyclerView.layoutManager = LinearLayoutManager(this)
-        recyclerView.adapter = adapter
+                    // 난이도 버튼
+                    val easyButton = dialogView.findViewById<AppCompatButton>(R.id.easyButton)
+                    val normalButton = dialogView.findViewById<AppCompatButton>(R.id.normalButton)
+                    val hardButton = dialogView.findViewById<AppCompatButton>(R.id.hardButton)
+                    val buttons = listOf(easyButton, normalButton, hardButton)
+                    val startButton = dialogView.findViewById<AppCompatButton>(R.id.startRhythmGameButton)
+                    startButton.setOnClickListener {
+                        selectedMusic?.let { music ->
+                            val intent = Intent(this@RhythmGameSelectActivity, RhythmGameStartActivity::class.java)
+                            intent.putExtra("MUSIC_ID", music.id)
+                            intent.putExtra("DURATION", music.duration)
+                            //hard-coded, 나중에 난이도 선택 버튼 만들기.
+                            intent.putExtra("DIFFICULTY", selectedDifficulty)
+                            startActivity(intent)
+                            Log.d("Start Game", "Start")
+                        }
+                    }
+                    fun updateButtonStyles(selectedButton: AppCompatButton?) {
+                        buttons.forEach { button ->
+                            if (button == selectedButton) {
+                                button.setBackgroundColor(
+                                    ContextCompat.getColor(
+                                        context,
+                                        R.color.teal_700
+                                    )
+                                ) // 선택된 색상
+                                button.setTextColor(
+                                    ContextCompat.getColor(
+                                        context,
+                                        R.color.white
+                                    )
+                                ) // 텍스트 색상
+                            } else {
+                                button.setBackgroundColor(
+                                    ContextCompat.getColor(
+                                        context,
+                                        R.color.teal_200
+                                    )
+                                ) // 기본 색상
+                                button.setTextColor(
+                                    ContextCompat.getColor(
+                                        context,
+                                        R.color.teal_700
+                                    )
+                                ) // 기본 텍스트 색상
+                            }
+                        }
+                    }
 
-        // 게임 시작 버튼 클릭 리스너
-        val startButton = dialogView.findViewById<AppCompatButton>(R.id.startRhythmGameButton)
-        startButton.setOnClickListener {
-            Log.d("Start Game","Start")
+                    // 난이도 버튼 클릭 리스너
+                    easyButton.setOnClickListener {
+                        rankingList = rankMap["EASY"] ?: emptyList()
+                        adapter.updateData(rankingList) // 어댑터 데이터 갱신
+                        updateButtonStyles(easyButton)
+                        selectedDifficulty = "EASY"
+                    }
+
+                    normalButton.setOnClickListener {
+                        rankingList = rankMap["NORMAL"] ?: emptyList()
+                        adapter.updateData(rankingList)
+                        updateButtonStyles(normalButton)
+                        selectedDifficulty = "NORMAL"
+                    }
+
+                    hardButton.setOnClickListener {
+                        rankingList = rankMap["HARD"] ?: emptyList()
+                        adapter.updateData(rankingList)
+                        updateButtonStyles(hardButton)
+                        selectedDifficulty = "HARD"
+                    }
+
+                    // 다이얼로그 생성
+                    val dialog = AlertDialog.Builder(context)
+                        .setView(dialogView)
+                        .setCancelable(true)
+                        .create()
+
+                    dialog.show()
+                    dialog.window?.setLayout(
+                        (resources.displayMetrics.widthPixels * 0.9).toInt(),
+                        (ActionBar.LayoutParams.WRAP_CONTENT)
+                    )
+                }
+            }
+
+
         }
 
-        // 다이얼로그 생성
-        val dialog = AlertDialog.Builder(this)
-            .setView(dialogView)
-            .setCancelable(true)
-            .create()
-
-        //난이도 선택 버튼
-        val easyButton = dialogView.findViewById<AppCompatButton>(R.id.easyButton)
-        val normalButton = dialogView.findViewById<AppCompatButton>(R.id.normalButton)
-        val hardButton = dialogView.findViewById<AppCompatButton>(R.id.hardButton)
-
-        easyButton.setOnClickListener {
-            rankingList = listOf(
-                Rank(1, "Easy User 1", 300),
-                Rank(2, "Easy User 2", 250),
-                Rank(3, "Easy User 3", 200)
-            )
-            adapter.updateData(rankingList) // 어댑터 데이터 갱신
-        }
-
-        normalButton.setOnClickListener {
-            rankingList = listOf(
-                Rank(1, "Normal User 1", 400),
-                Rank(2, "Normal User 2", 350),
-                Rank(3, "Normal User 3", 300)
-            )
-            adapter.updateData(rankingList)
-        }
-
-        hardButton.setOnClickListener {
-            rankingList = listOf(
-                Rank(1, "Hard User 1", 500),
-                Rank(2, "Hard User 2", 450),
-                Rank(3, "Hard User 3", 400)
-            )
-            adapter.updateData(rankingList)
-        }
-
-        dialog.show()
-        dialog.window?.setLayout((resources.displayMetrics.widthPixels * 0.9).toInt(), (ActionBar.LayoutParams.WRAP_CONTENT))
+//        // 예시 데이터
+//        var rankingList = listOf(
+//
+//            Rank(3, "User 3", 400),
+//            Rank(4, "User 3", 400),
+//            Rank(5, "User 3", 400),
+//            Rank(6, "User 3", 400),
+//            Rank(7, "User 3", 400),
+//            Rank(8, "User 3", 400),
+//            Rank(9, "User 3", 400),
+//        )
+//
+//        // RecyclerView에 어댑터 설정
+//        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.rankingRecyclerView)
+//        val adapter = RankingAdapter(rankingList)
+//        recyclerView.layoutManager = LinearLayoutManager(this)
+//        recyclerView.adapter = adapter
+//        val divider = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
+//        recyclerView.addItemDecoration(divider)
+//
+//        // 게임 시작 버튼 클릭 리스너
+//        val startButton = dialogView.findViewById<AppCompatButton>(R.id.startRhythmGameButton)
+//        startButton.setOnClickListener {
+//            selectedMusic?.let { music ->
+//                val intent = Intent(this, RhythmGameStartActivity::class.java)
+//                intent.putExtra("MUSIC_ID", music.id)
+//                intent.putExtra("DURATION", music.duration)
+//                //hard-coded, 나중에 난이도 선택 버튼 만들기.
+//                intent.putExtra("DIFFICULTY", selectedDifficulty)
+//                startActivity(intent)
+//                Log.d("Start Game", "Start")
+//            }
+//        }
+//
+//        // 다이얼로그 생성
+//        val dialog = AlertDialog.Builder(this)
+//            .setView(dialogView)
+//            .setCancelable(true)
+//            .create()
+//
+//        //난이도 선택 버튼
+//        val easyButton = dialogView.findViewById<AppCompatButton>(R.id.easyButton)
+//        val normalButton = dialogView.findViewById<AppCompatButton>(R.id.normalButton)
+//        val hardButton = dialogView.findViewById<AppCompatButton>(R.id.hardButton)
+//        val buttons = listOf(easyButton, normalButton, hardButton)
+//
+//        fun updateButtonStyles(selectedButton: AppCompatButton?) {
+//            buttons.forEach { button ->
+//                if (button == selectedButton) {
+//                    button.setBackgroundColor(ContextCompat.getColor(context, R.color.teal_700)) // 선택된 색상
+//                    button.setTextColor(ContextCompat.getColor(context, R.color.white)) // 텍스트 색상
+//                } else {
+//                    button.setBackgroundColor(ContextCompat.getColor(context, R.color.teal_200)) // 기본 색상
+//                    button.setTextColor(ContextCompat.getColor(context, R.color.teal_700)) // 기본 텍스트 색상
+//                }
+//            }
+//        }
+//
+//        easyButton.setOnClickListener {
+//            rankingList = listOf(
+//                Rank(1, "Easy User 1", 300),
+//                Rank(2, "Easy User 2", 250),
+//                Rank(3, "Easy User 3", 200)
+//            )
+//            adapter.updateData(rankingList) // 어댑터 데이터 갱신
+//            updateButtonStyles(easyButton)
+//            selectedDifficulty = "EASY"
+//        }
+//
+//        normalButton.setOnClickListener {
+//            rankingList = listOf(
+//                Rank(1, "Normal User 1", 400),
+//                Rank(2, "Normal User 2", 350),
+//                Rank(3, "Normal User 3", 300)
+//            )
+//            adapter.updateData(rankingList)
+//            updateButtonStyles(normalButton)
+//            selectedDifficulty = "NORMAL"
+//        }
+//
+//        hardButton.setOnClickListener {
+//            rankingList = listOf(
+//                Rank(1, "Hard User 1", 500),
+//                Rank(2, "Hard User 2", 450),
+//                Rank(3, "Hard User 3", 400)
+//            )
+//            adapter.updateData(rankingList)
+//            updateButtonStyles(hardButton)
+//            selectedDifficulty = "HARD"
+//        }
+//
+//        dialog.show()
+//        dialog.window?.setLayout((resources.displayMetrics.widthPixels * 0.9).toInt(), (ActionBar.LayoutParams.WRAP_CONTENT))
     }
 }
