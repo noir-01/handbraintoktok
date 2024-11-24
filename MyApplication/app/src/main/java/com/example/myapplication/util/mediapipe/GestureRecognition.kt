@@ -1,17 +1,12 @@
-package com.example.myapplication.util
+package com.example.myapplication.util.mediapipe
 
 import java.io.BufferedReader
 import android.content.Context
-import android.util.Log
-import com.example.myapplication.R
 import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarkerResult
-import java.io.FileReader
 import smile.classification.KNN
 import java.io.InputStreamReader
 import kotlin.math.acos
 import kotlin.math.sqrt
-import com.example.myapplication.util.calculateAngles
-import com.example.myapplication.util.calculateDistances
 
 class GestureRecognition(private val context: Context, private val numNeighbors: Int = 3) {
 

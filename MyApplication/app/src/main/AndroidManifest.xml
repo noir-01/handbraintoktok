@@ -31,6 +31,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RecordActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.RhythmGameSelectActivity"
             android:exported="false" />
         <activity

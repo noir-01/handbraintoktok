@@ -1,15 +1,11 @@
-package com.example.myapplication.util
+package com.example.myapplication.util.mediapipe
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.ImageFormat
 import android.graphics.YuvImage
-import android.media.Image
-import android.util.Log
 import androidx.camera.core.ImageProxy
-import com.google.mediapipe.tasks.vision.handlandmarker.HandLandmarkerResult
 import java.io.ByteArrayOutputStream
-import kotlin.math.*
 
 fun imageToNV21(image: ImageProxy): ByteArray {
     val planes = image.planes

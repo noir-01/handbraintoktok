@@ -1,14 +1,7 @@
-package com.example.myapplication.util
+package com.example.myapplication.util.mediapipe
 
 import kotlin.math.acos
 import kotlin.math.pow
-import kotlin.math.sqrt
-
-import kotlin.math.acos
-import kotlin.math.sqrt
-import kotlin.math.pow
-
-import kotlin.math.acos
 import kotlin.math.sqrt
 
 fun calculateAngles(joint: Array<FloatArray>): FloatArray {

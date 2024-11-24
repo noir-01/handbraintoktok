@@ -1,8 +1,12 @@
-package com.example.myapplication.util
+package com.example.myapplication.util.network
 
+import com.example.myapplication.util.dataClass.Music
+import com.example.myapplication.util.dataClass.RandomGameHistoryDto
+import com.example.myapplication.util.dataClass.RhythmGameHistoryDto
 import okhttp3.ResponseBody
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @GET("/music/getMusicList")
@@ -13,6 +17,15 @@ interface ApiService {
 
     @GET("/music/download/{musicId}")
     suspend fun downloadMusic(@Path("musicId") songId: Int): ResponseBody
+
+    @GET("/history/rhythm/get/{musicId}")
+    suspend fun getRhythmRank(@Path("musicId") musicId: Int): List<RhythmGameHistoryDto>
+
+    @GET("/history/random/get")
+    suspend fun getRandomHistory(
+        @Query("gameType") gameType:String,
+        @Query("period") period:String
+    ): List<RandomGameHistoryDto>
 }
 
 fun durationToSec(duration: String): Int {

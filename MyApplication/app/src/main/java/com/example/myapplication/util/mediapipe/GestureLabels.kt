@@ -1,4 +1,4 @@
-package com.example.myapplication.util
+package com.example.myapplication.util.mediapipe
 
 val gestureLabels: Map<Int, String> = mapOf(
     0 to "middle_finger",
@@ -25,13 +25,6 @@ val gestureLabels: Map<Int, String> = mapOf(
     21 to "wolf"
 )
 val reversedGestureLabels: Map<String, Int> = gestureLabels.entries.associate { (key, value) -> value to key }
-
-val questionType: Map<String, Int> = mapOf(
-    "copy" to 0,
-    "win" to 1,
-    "lose" to 2,
-    "calc" to 3
-)
 
 val difficulty: Map<String,Int> = mapOf(
     "EASY" to 0,

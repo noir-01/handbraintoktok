@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
-import com.example.myapplication.util.Rank
+import com.example.myapplication.util.dataClass.Rank
 
 class RankingAdapter(private var rankList: List<Rank>) : RecyclerView.Adapter<RankingAdapter.RankingViewHolder>() {
 
@@ -23,9 +23,9 @@ class RankingAdapter(private var rankList: List<Rank>) : RecyclerView.Adapter<Ra
 
     override fun onBindViewHolder(holder: RankingViewHolder, position: Int) {
         var rank = rankList[position]
-        holder.rankingTextView.text = "#${rank.ranking}"
+        holder.rankingTextView.text = "${rank.ranking}"
         holder.nameTextView.text = rank.name
-        holder.scoreTextView.text = "${rank.score} points"
+        holder.scoreTextView.text = "${rank.score}점"
     }
 
     fun updateData(newRankingList: List<Rank>) {

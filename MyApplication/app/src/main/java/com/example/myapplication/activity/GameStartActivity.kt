@@ -13,7 +13,6 @@ import android.util.Size
 import android.view.Gravity
 import android.view.View
 import android.widget.*
-import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -25,12 +24,11 @@ import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.transition.Visibility
-import com.example.myapplication.util.GestureRecognition
-import com.example.myapplication.util.HandLandMarkHelper
+import com.example.myapplication.util.mediapipe.GestureRecognition
+import com.example.myapplication.util.mediapipe.HandLandMarkHelper
 import com.example.myapplication.util.ResourceUtils.imageResources
-import com.example.myapplication.util.WebSocketClient
-import com.example.myapplication.util.gestureLabels
+import com.example.myapplication.util.network.WebSocketClient
+import com.example.myapplication.util.mediapipe.gestureLabels
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -40,7 +38,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicInteger
 
-class GameStartActivity : BaseActivity(),WebSocketClient.WebSocketCallback {
+class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
     private lateinit var previewView: PreviewView
     private val CAMERA_REQUEST_CODE = 1001
 

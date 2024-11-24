@@ -1,15 +1,12 @@
 package com.example.myapplication.adapters
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
 import com.example.myapplication.ViewHolder.MusicViewHolder
-import com.example.myapplication.util.Music
-import com.example.myapplication.util.Rank
+import com.example.myapplication.util.dataClass.Music
 
 // Adapter 클래스
 class MusicAdapter(

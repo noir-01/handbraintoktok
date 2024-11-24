@@ -1,4 +1,4 @@
-package com.example.myapplication.util
+package com.example.myapplication.util.mediapipe
 
 /*
  * Copyright 2022 The TensorFlow Authors. All Rights Reserved.
@@ -16,7 +16,6 @@ package com.example.myapplication.util
  * limitations under the License.
  */
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix

@@ -5,7 +5,7 @@ import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
-import com.example.myapplication.util.Music
+import com.example.myapplication.util.dataClass.Music
 
 // ViewHolder 클래스
 class MusicViewHolder(itemView: View, private val musics: List<Music>, private val onMusicSelected: (Music) -> Unit) : RecyclerView.ViewHolder(itemView) {

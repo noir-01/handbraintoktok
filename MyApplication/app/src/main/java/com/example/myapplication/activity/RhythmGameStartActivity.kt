@@ -27,15 +27,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.R
-import com.example.myapplication.util.ApiService
-import com.example.myapplication.util.GestureRecognition
-import com.example.myapplication.util.HandLandMarkHelper
+import com.example.myapplication.util.network.ApiService
+import com.example.myapplication.util.mediapipe.GestureRecognition
+import com.example.myapplication.util.mediapipe.HandLandMarkHelper
 import com.example.myapplication.util.MusicDownloader
 import com.example.myapplication.util.ResourceUtils.imageResources
-import com.example.myapplication.util.difficulty
-import com.example.myapplication.util.durationToSec
-import com.example.myapplication.util.gestureLabels
-import com.example.myapplication.util.reversedGestureLabels
+import com.example.myapplication.util.mediapipe.difficulty
+import com.example.myapplication.util.network.durationToSec
+import com.example.myapplication.util.mediapipe.gestureLabels
+import com.example.myapplication.util.mediapipe.reversedGestureLabels
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -434,12 +434,12 @@ class RhythmGameStartActivity: AppCompatActivity() {
             if(index%2==0){
                 leftBeats.add(value)
                 val nextGestureIdx = handIndexes.random()!!
-                leftImages.add("hand_"+gestureLabels[nextGestureIdx]+"_l")
+                leftImages.add("hand_"+ gestureLabels[nextGestureIdx]+"_l")
                 leftAnswers.add(nextGestureIdx)
             }else{
                 rightBeats.add(value)
                 val nextGestureIdx = handIndexes.random()!!
-                rightImages.add("hand_"+gestureLabels[nextGestureIdx]+"_r")
+                rightImages.add("hand_"+ gestureLabels[nextGestureIdx]+"_r")
                 rightAnswers.add(nextGestureIdx)
             }
         }
@@ -466,12 +466,12 @@ class RhythmGameStartActivity: AppCompatActivity() {
             if(index%2==0){
                 leftBeats.add(value)
                 val nextGestureIdx = handIndexes.random()!!
-                leftImages.add("hand_"+gestureLabels[nextGestureIdx]+"_l")
+                leftImages.add("hand_"+ gestureLabels[nextGestureIdx]+"_l")
                 leftAnswers.add(nextGestureIdx)
             }else{
                 rightBeats.add(value)
                 val nextGestureIdx = handIndexes.random()!!
-                rightImages.add("hand_"+gestureLabels[nextGestureIdx]+"_r")
+                rightImages.add("hand_"+ gestureLabels[nextGestureIdx]+"_r")
                 rightAnswers.add(nextGestureIdx)
             }
         }
@@ -499,7 +499,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
         for((idx,beatTime) in leftBeats.withIndex()){
             val nextGestureIdx = handIndexes.random()!!
             if(nextGestureIdx!=2)
-                leftImages.add("hand_"+gestureLabels[nextGestureIdx]+"_l")
+                leftImages.add("hand_"+ gestureLabels[nextGestureIdx]+"_l")
             else {
                 leftImages.add("hand_" + gestureLabels[nextGestureIdx])
                 twohandsTimes.add(beatTime)
@@ -531,7 +531,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
         handIndexes = handIndexes - listOf(2)
         for(beatTime in rightBeats){
             val nextGestureIdx = handIndexes.random()!!
-            rightImages.add("hand_"+gestureLabels[nextGestureIdx]+"_r")
+            rightImages.add("hand_"+ gestureLabels[nextGestureIdx]+"_r")
             rightAnswers.add(nextGestureIdx)
         }
         Log.d("Hard Game","$rightImages.size, $rightAnswers.size")
