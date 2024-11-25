@@ -1,5 +1,6 @@
-package com.example.handbrainserver.music.util;
+package com.example.handbrainserver.config;
 
+import com.example.handbrainserver.music.util.TokenAuthenticationFilter;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
