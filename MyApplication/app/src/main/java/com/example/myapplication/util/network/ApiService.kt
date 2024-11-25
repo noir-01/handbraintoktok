@@ -1,10 +1,15 @@
 package com.example.myapplication.util.network
 
 import com.example.myapplication.util.dataClass.Music
+import com.example.myapplication.util.dataClass.NumDto
 import com.example.myapplication.util.dataClass.RandomGameHistoryDto
 import com.example.myapplication.util.dataClass.RhythmGameHistoryDto
+import com.example.myapplication.util.dataClass.VerificationRequest
 import okhttp3.ResponseBody
+import retrofit2.Response
+import retrofit2.http.Body
 import retrofit2.http.GET
+import retrofit2.http.POST
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -26,6 +31,13 @@ interface ApiService {
         @Query("gameType") gameType:String,
         @Query("period") period:String
     ): List<RandomGameHistoryDto>
+
+    @POST("/sms/send")
+    suspend fun sendSms(@Body numDto: NumDto): Response<Unit>
+
+    @POST("/sms/verify/register")
+    suspend fun verifyCode(@Body verificationRequest: VerificationRequest): Response<Map<String, Any>>
+
 }
 
 fun durationToSec(duration: String): Int {
