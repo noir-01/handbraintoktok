@@ -34,7 +34,7 @@ class SplashActivity : AppCompatActivity() {
             override fun onAnimationEnd(animation: Animation?) {
                 Log.d("SplashActivity", "Navigating to LoginActivity")
                 // 메인 액티비티로 전환
-                val intent = Intent(this@SplashActivity,LoginActivity::class.java)
+                val intent = Intent(this@SplashActivity,RegisterActivity::class.java)
                 startActivity(intent)
                 finish() // 현재 액티비티 종료
             }
