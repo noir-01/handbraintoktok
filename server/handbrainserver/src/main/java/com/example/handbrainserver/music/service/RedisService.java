@@ -2,6 +2,7 @@ package com.example.handbrainserver.music.service;
 
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class RedisService {
@@ -14,7 +15,7 @@ public class RedisService {
 
     // Redis에 데이터 저장 (만료 시간 설정)
     public void setWithExpiration(String key, String value, long timeoutInSeconds) {
-        redisTemplate.opsForValue().set(key, value, timeoutInSeconds);
+        redisTemplate.opsForValue().set(key, value, timeoutInSeconds,TimeUnit.SECONDS);
     }
 
     // Redis에서 데이터 조회

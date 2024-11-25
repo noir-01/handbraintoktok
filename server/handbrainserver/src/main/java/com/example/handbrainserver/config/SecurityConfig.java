@@ -38,7 +38,7 @@ public class SecurityConfig{
                                 "/login","/register", "/admin/upload",
                                 "/music/getMusicList", "/music/download/{musicId}", "/admin",
                                 "/music/{musicId}/getBeatList",
-                                "/ws"
+                                "/ws", "/sms/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

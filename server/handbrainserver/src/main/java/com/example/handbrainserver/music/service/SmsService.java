@@ -16,6 +16,8 @@ public class SmsService {
     private String smsId; // SMS ID
     @Value("${sms.api.apiKey}")
     private String apiKey; // API Key
+    @Value("${sms.callBack}")
+    private String callBackPhoneNumber; //발신번호
 
     private final RestTemplate restTemplate;
     private final RedisService redisService;
@@ -52,8 +54,8 @@ public class SmsService {
 
     // 인증번호를 Redis에 저장
     public void storeCodeInRedis(String phoneNumber, String code) {
-        // Redis에 3분(180초) 동안 저장
-        redisService.setWithExpiration(phoneNumber, code, 180);
+        // Redis에 30분(1800초) 동안 저장
+        redisService.setWithExpiration(phoneNumber, code, 1800);
     }
 
     // SMS 전송
@@ -64,7 +66,8 @@ public class SmsService {
         String encodedString = encodeToBase64(smsId, token);
 
         String url = "https://sms.gabia.com/api/send/sms";
-        String payload = "phone=" + phoneNumber + "&callback=myPhone&message=" + code + "&refkey=[[RESTAPITEST1549847130]]";
+        String payload = "phone=" + phoneNumber + "&callback=" + callBackPhoneNumber 
+            + "&message=" + code + "&refkey=[[RESTAPITEST1549847130]]";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("Authorization", "Basic " + encodedString);

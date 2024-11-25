@@ -55,6 +55,7 @@ public class SmsController {
         if (smsService.verifyCode(phoneNumber, code)) {
             JwtUtil jwtUtil = new JwtUtil();
             Long userId = userService.saveUser(new UserDto.UserDtoWithOutId(name, phoneNumber));
+            System.out.println("userid: "+userId.toString());
             if (userId != -1) {
                 Map<String, String> response = new HashMap<>();
                 response.put("token", jwtUtil.generateToken(userId));

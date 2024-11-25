@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
     private final UserRepository userRepository;
+    private CryptoUtil cryptoUtil = new CryptoUtil();
     @Autowired
     public UserService(UserRepository userRepository){
         this.userRepository = userRepository;
@@ -19,7 +20,7 @@ public class UserService {
         User user = new User();
         user.setName(userDtoWithOutId.getName());
         try {
-            user.setPhoneNumberHash(CryptoUtil.encrypt(userDtoWithOutId.getPhoneNumber()));
+            user.setPhoneNumberHash(cryptoUtil.encrypt(userDtoWithOutId.getPhoneNumber()));
             user = userRepository.save(user);
             return user.getId();
 

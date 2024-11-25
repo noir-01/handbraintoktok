@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 public class FriendService {
     private final FriendRepository friendRepository;
     private final UserRepository userRepository;
+    private CryptoUtil cryptoUtil = new CryptoUtil();
     @Autowired
     public FriendService(FriendRepository friendRepository, UserRepository userRepository){
         this.friendRepository = friendRepository;
@@ -25,7 +26,7 @@ public class FriendService {
         List<String> phoneHashes = contacts.stream()
                 .map(phoneNumber -> {
                     try {
-                        return CryptoUtil.encrypt(phoneNumber);
+                        return cryptoUtil.encrypt(phoneNumber);
                     } catch (Exception e) {
                         return "";
                     }
