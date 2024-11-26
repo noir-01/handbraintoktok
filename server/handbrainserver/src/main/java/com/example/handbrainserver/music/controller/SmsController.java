@@ -22,7 +22,8 @@ public class SmsController {
 
     private final SmsService smsService;
     private final UserService userService;
-    private JwtUtil jwtUtil = new JwtUtil();
+    @Autowired
+    private JwtUtil jwtUtil;
     @Autowired
     private CryptoUtil cryptoUtil;
     @Autowired
