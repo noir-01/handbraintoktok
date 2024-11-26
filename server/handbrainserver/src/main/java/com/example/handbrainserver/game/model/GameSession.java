@@ -2,6 +2,7 @@ package com.example.handbrainserver.game.model;
 
 import com.example.handbrainserver.game.util.Gesture;
 import com.example.handbrainserver.game.util.GesturePair;
+import com.example.handbrainserver.music.util.GameType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +15,7 @@ public class GameSession {
     private Long userId;
     private String sessionId;
     private long startTime;
-    private boolean isRandomGame;
+    private GameType gameType;
 
     private int questionCounter;
     private GesturePair question;
@@ -44,30 +45,34 @@ public class GameSession {
     }
     public void nextProblem() {
         Gesture[] rspGestures = {Gesture.ROCK, Gesture.TWO, Gesture.FIVE};
+        switch(gameType){
+            case COPY:
+                questionType=0;
+                break;
+            case RSP:
+                questionType= random.nextInt(2)+1;
+                break;
+            case CALC:
+                questionType=3;
+                break;
+            case RANDOM:
+                questionType=random.nextInt(4);
+                break;
+        }
+        switch(questionType){
+            case 0: //따라하기
+                getCopyQuestion();
+                break;
 
-        //기본 따라하기 - 랜덤으로 따라할 동작 2개 뽑아서 반환
-        if(!isRandomGame){
-            questionType = 0;
-            getCopyQuestion();
+            case 1: //이기는,지는 가위바위보: 문제랑 이기는/지는만 알면 문제랑 답 비교해서 정답인지 알 수 있음. 정답 따로 저장 X
+            case 2:
+                question.setFirst(rspGestures[random.nextInt(rspGestures.length)]);
+                question.setSecond(rspGestures[random.nextInt(rspGestures.length)]);
+                break;
 
-        }else{
-            //따라하기, 지는/이기는 가위바위보, 숫자 계산
-            questionType = random.nextInt(4);
-            switch(questionType){
-                case 0: //따라하기
-                    getCopyQuestion();
-                    break;
-
-                case 1: //이기는,지는 가위바위보: 문제랑 이기는/지는만 알면 문제랑 답 비교해서 정답인지 알 수 있음. 정답 따로 저장 X
-                case 2:
-                    question.setFirst(rspGestures[random.nextInt(rspGestures.length)]);
-                    question.setSecond(rspGestures[random.nextInt(rspGestures.length)]);
-                    break;
-                    
-                case 3: //숫자 계산
-                    calcQuestion = random.nextInt(11);
-                    break;
-            }
+            case 3: //숫자 계산
+                calcQuestion = random.nextInt(11);
+                break;
         }
         questionCounter-=1;
     }
