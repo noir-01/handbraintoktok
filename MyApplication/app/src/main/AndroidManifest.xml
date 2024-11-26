@@ -44,10 +44,10 @@
             android:name=".RecordActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.RhythmGameSelectActivity"
+            android:name=".activity.game.RhythmGameSelectActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.RhythmGameStartActivity"
+            android:name=".activity.game.RhythmGameStartActivity"
             android:exported="false" />
         <activity
             android:name=".TutorialActivity"
@@ -68,7 +68,7 @@
             android:name=".activity.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".GameStartActivity"
+            android:name=".activity.game.GameStartActivity"
             android:exported="true" />
         <activity
             android:name=".SplashActivity"

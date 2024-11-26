@@ -8,27 +8,38 @@ import com.example.myapplication.util.network.RetrofitClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class RegisterOrNotActivity : AppCompatActivity() {
     val tokenManager = RetrofitClient.getTokenManager()
     val apiService = RetrofitClient.apiService
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+
         //토큰이 있으면 로그인 시도, 성공 시 메인화면으로 바로 이동
         if(tokenManager.getToken()!=null){
             CoroutineScope(Dispatchers.IO).launch{
                 val response = apiService.login()
-                if(response.isSuccessful){
-                    val intent = Intent(this@RegisterOrNotActivity, MainActivity::class.java)
-                    startActivity(intent)
-                    finish()
+                withContext(Dispatchers.Main){
+                    if(response.isSuccessful){
+                        val intent = Intent(this@RegisterOrNotActivity, MainActivity::class.java)
+                        startActivity(intent)
+                        finish()
+                    }else{
+                        initializeUI()
+                    }
                 }
             }
+        }else{
+            //토큰 없으면 바로 화면 띄우기
+            initializeUI()
         }
 
-        super.onCreate(savedInstanceState)
+    }
+    private fun initializeUI(){
         setContentView(R.layout.activity_register_or_not)
-
         // 버튼 연결
         val btnSignup = findViewById<Button>(R.id.btn_signup)
         val btnAuthenticate = findViewById<Button>(R.id.btn_authenticate)

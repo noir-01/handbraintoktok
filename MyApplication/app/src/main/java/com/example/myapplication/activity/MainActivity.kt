@@ -7,13 +7,10 @@ import android.widget.Toast
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageButton
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.activity.result.contract.ActivityResultContracts
-import com.example.myapplication.activity.RecordsActivity
-import com.example.myapplication.R
-import com.example.myapplication.multiUi.LoginActivity
 import androidx.activity.OnBackPressedCallback
+import com.example.myapplication.activity.game.GameStartActivity
 
 class MainActivity : BaseActivity() {
     private var selectedGameName: String? = null

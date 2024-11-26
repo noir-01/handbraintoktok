@@ -1,4 +1,4 @@
-package com.example.myapplication.activity
+package com.example.myapplication.activity.game
 
 import android.Manifest
 import android.content.pm.PackageManager

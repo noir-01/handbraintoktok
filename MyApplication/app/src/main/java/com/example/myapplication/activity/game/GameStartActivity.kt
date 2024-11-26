@@ -1,4 +1,4 @@
-package com.example.myapplication
+package com.example.myapplication.activity.game
 
 import android.Manifest
 import android.app.AlertDialog
@@ -24,6 +24,8 @@ import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import com.example.myapplication.BaseActivity
+import com.example.myapplication.R
 import com.example.myapplication.util.mediapipe.GestureRecognition
 import com.example.myapplication.util.mediapipe.HandLandMarkHelper
 import com.example.myapplication.util.ResourceUtils.imageResources
