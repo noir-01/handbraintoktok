@@ -120,7 +120,14 @@ class RegisterActivity : AppCompatActivity() {
                             Toast.makeText(this@RegisterActivity, "토큰을 받을 수 없습니다.", Toast.LENGTH_SHORT).show()
                         }
                     } else {
-                        Toast.makeText(this@RegisterActivity, "인증 실패!", Toast.LENGTH_SHORT).show()
+                        var toastMessage = ""
+                        when(response.code()){
+                            401 -> toastMessage = "인증번호 틀림"
+                            404 -> toastMessage = "회원가입 해주세요"
+                            409 -> toastMessage = "이미 가입된 유저입니다"
+                            500 -> toastMessage = "서버 오류, 잠시 후 다시 시도하세요"
+                        }
+                        Toast.makeText(this@RegisterActivity, toastMessage, Toast.LENGTH_SHORT).show()
                     }
                 }
 

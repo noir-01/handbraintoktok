@@ -32,14 +32,25 @@ interface ApiService {
         @Query("period") period:String
     ): List<RandomGameHistoryDto>
 
+    // Response<200>, {"state" : "success"}
+    // Response<500>, {"state" : "token expired"}
     @POST("/login/token")
     suspend fun login(): Response<Unit>
 
+    // Response<200>,{"message" : "success"}
     @POST("/sms/send")
     suspend fun sendSms(@Body numDto: NumDto): Response<Unit>
 
+    /* 응답 꼴
+    * Response<200>, {"token"  : "...."}
+    * Response<401>, {"status" : "인증번호 틀림"}
+    * Response<404>, {"status" : "유저 없음"}
+    * Response<409>, {"status" : "이미 가입된 유저입니다"}
+    * Response<500>, {"status" : "서버 오류"} <= 암호화 과정에서 오류
+    */
     @POST("/sms/verify/register")
     suspend fun verifyCode(@Body verificationRequest: VerificationRequest): Response<Map<String, Any>>
+
 
     @POST("/sms/verify/refresh")
     suspend fun verifyRefresh(@Body verificationRequest: VerificationRequest): Response<Map<String, Any>>
