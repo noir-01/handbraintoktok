@@ -11,7 +11,7 @@ import java.util.Random;
 @Getter
 public class GameSession {
 
-    private String userId;
+    private Long userId;
     private String sessionId;
     private long startTime;
     private boolean isRandomGame;
@@ -21,6 +21,9 @@ public class GameSession {
     private GesturePair correctAnswer;
     private int questionType;
     private int calcQuestion;
+
+    private int reactionTimeSum = 0;
+    private int questionNums;
     
     Random random = new Random();
 
@@ -29,7 +32,9 @@ public class GameSession {
         this.startTime = System.currentTimeMillis();
 
         //10문제 카운트
-        this.questionCounter = 10;
+        this.questionNums = 10;
+        this.questionCounter=questionNums;
+
         question = new GesturePair();
         correctAnswer = new GesturePair();
     }
@@ -108,6 +113,12 @@ public class GameSession {
         int prob = random.nextInt(3);
         Gesture[] rsp = {Gesture.ROCK,Gesture.TWO,Gesture.FIVE};
         return rsp[prob].getGestureCode();
+    }
+    public void addReactionTime(int reactionTime){
+        this.reactionTimeSum += reactionTime;
+    }
+    public int getReactionTimeAverage(){
+        return this.reactionTimeSum / this.questionNums;
     }
 
 }
