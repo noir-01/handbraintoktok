@@ -10,13 +10,11 @@ import com.example.handbrainserver.music.util.Difficulty;
 import com.example.handbrainserver.music.util.GameType;
 import com.example.handbrainserver.music.util.JwtUtil;
 import com.example.handbrainserver.music.util.Period;
-import io.jsonwebtoken.Jwt;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -47,7 +45,7 @@ public class  HistoryController {
     ){
         String processedToken = token.replace("Bearer ", ""); // Bearer 제거
         try{
-            Long userId = Long.parseLong(jwtUtil.extractUsername(processedToken));
+            Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
             HistoryDto.RandomGameHistoryDto randomGameHistoryDto = new HistoryDto.RandomGameHistoryDto(
                     userService.getUserById(userId),
                     gameType,reactionTime,date
@@ -72,7 +70,7 @@ public class  HistoryController {
             @RequestBody RhythmGameDto rhythmGameDtoPost
     ){
         String processedToken = token.replace("Bearer ", ""); // Bearer 제거
-        Long userId = Long.parseLong(jwtUtil.extractUsername(processedToken));
+        Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
 
         HistoryDto.RhythmGameHistoryDto historyDto = new HistoryDto.RhythmGameHistoryDto();
         UserDto userDto = new UserDto();
@@ -97,7 +95,7 @@ public class  HistoryController {
     ) {
         String processedToken = token.replace("Bearer ", ""); // Bearer 제거
         JwtUtil jwtUtil = new JwtUtil();
-        Long userId = Long.parseLong(jwtUtil.extractUsername(processedToken));
+        Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
         return switch(period){
             case DAILY-> historyService.findRandomGameHistoryDaily(userId,gameType);
             case WEEKLY -> historyService.findRandomGameHistoryWeekly(userId,gameType);
@@ -112,7 +110,7 @@ public class  HistoryController {
             @PathVariable("musicId") Long musicId
     ){
         String processedToken = token.replace("Bearer ", ""); // Bearer 제거
-        Long userId = Long.parseLong(jwtUtil.extractUsername(processedToken));
+        Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
 
         List<Long> userIds = friendService.getFriendIds(userId);
         //내 id도 추가

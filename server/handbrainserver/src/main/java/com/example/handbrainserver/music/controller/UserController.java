@@ -1,19 +1,14 @@
 package com.example.handbrainserver.music.controller;
 
-import com.example.handbrainserver.music.dto.UserDto;
 import com.example.handbrainserver.music.service.FriendService;
 import com.example.handbrainserver.music.service.UserService;
 import com.example.handbrainserver.music.util.JwtUtil;
 import lombok.Getter;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +35,7 @@ public class UserController {
         try {
             String processedToken = token.replace("Bearer ", ""); // Bearer 제거
             JwtUtil jwtUtil = new JwtUtil();
-            Long userId = Long.parseLong(jwtUtil.extractUsername(processedToken));
+            Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
             response.put("state","success");
             return ResponseEntity.ok(response);
         }catch(Exception e){
@@ -86,7 +81,7 @@ public class UserController {
     ){
         String processedToken = token.replace("Bearer ", ""); // Bearer 제거
         JwtUtil jwtUtil = new JwtUtil();
-        Long userId = Long.parseLong(jwtUtil.extractUsername(processedToken));
+        Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
         try {
             friendService.updateFriends(userId, contacts);
             return ResponseEntity.ok("success");

@@ -4,7 +4,6 @@ import com.example.handbrainserver.game.model.GameSession;
 import com.example.handbrainserver.game.util.Gesture;
 import com.example.handbrainserver.game.util.GesturePair;
 import com.example.handbrainserver.music.dto.HistoryDto;
-import com.example.handbrainserver.music.entity.RandomGameHistory;
 import com.example.handbrainserver.music.service.HistoryService;
 import com.example.handbrainserver.music.service.UserService;
 import com.example.handbrainserver.music.util.GameType;
@@ -20,7 +19,6 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 @Component
 public class GameWebSocketHandler extends TextWebSocketHandler {
@@ -52,7 +50,7 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
             if (inputs.length == 2) { // 두 개의 값이 있는 경우
                 //처음에 token 전송으로 유저 찾아야 함.
                 String token = inputs[0].trim(); // 첫 번째 값: token, token=>phoneNum=>id
-                Long userId = userService.getUserByPhone(jwtUtil.extractUsername(token)).getUserId();
+                Long userId = Long.parseLong(jwtUtil.extractUserId(token));
 
                 String gameTypeString = inputs[1].trim();
                 switch(gameTypeString){

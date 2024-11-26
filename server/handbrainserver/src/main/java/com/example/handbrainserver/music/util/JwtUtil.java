@@ -3,11 +3,10 @@ package com.example.handbrainserver.music.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import javax.crypto.SecretKey;
+
 @Component
 public class JwtUtil {
     private final String secretKey = "cx1UbIeH6FD+1oSjYSB5bgRk6RV/21AYpu4/ILn1bJo=";
@@ -23,11 +22,11 @@ public class JwtUtil {
     }
 
     public boolean validateToken(String token, String phoneNum) {
-        final String extractedUsername = extractUsername(token);
+        final String extractedUsername = extractUserId(token);
         return (extractedUsername.equals(phoneNum) && !isTokenExpired(token));
     }
 
-    public String extractUsername(String token) {
+    public String extractUserId(String token) {
         return extractAllClaims(token).getSubject();
     }
 
