@@ -21,20 +21,19 @@ class GameoptionActivity : AppCompatActivity() {
           finish()
         }
 
-        // 랜덤 게임 완성되면 수정 필요
         randomgameButton.setOnClickListener {
             val intent = Intent(this, GameStartActivity::class.java)
-            intent.putExtra("GAME_NAME", "mimic")
+            intent.putExtra("MODE", "RANDOM")
             startActivity(intent)
         }
-        /*
-        로그인 구현 위해 멀티 플레이 부분 잠시 보류
+        //따라하기 게임 테스트용
         togetherButton.setOnClickListener {
-            val intent=Intent(this,LoginActivity::class.java)
+            val intent=Intent(this,GameStartActivity::class.java)
+            intent.putExtra("MODE", "COPY")
             startActivity(intent)
         }
 
-         */
+         
         rhythmgameButton.setOnClickListener {
             val intent=Intent(this, RhythmGameSelectActivity::class.java)
             startActivity(intent)
