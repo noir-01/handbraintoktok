@@ -54,8 +54,8 @@ public class SmsService {
 
     // 인증번호를 Redis에 저장
     public void storeCodeInRedis(String phoneNumber, String code) {
-        // Redis에 30분(1800초) 동안 저장
-        redisService.setWithExpiration(phoneNumber, code, 1800);
+        // Redis에 5분(300초) 동안 저장
+        redisService.setWithExpiration(phoneNumber, code, 300);
     }
 
     // SMS 전송
@@ -64,10 +64,12 @@ public class SmsService {
 
         // 인증번호와 전화번호를 사용해 SMS 발송
         String encodedString = encodeToBase64(smsId, token);
+        
+        String msg = "손뇌톡톡 인증번호는 ["+code+"] 입니다. 5분 안에 입력해주세요."; 
 
         String url = "https://sms.gabia.com/api/send/sms";
         String payload = "phone=" + phoneNumber + "&callback=" + callBackPhoneNumber 
-            + "&message=" + code + "&refkey=[[RESTAPITEST1549847130]]";
+            + "&message=" + msg + "&refkey=[[RESTAPITEST1549847130]]";
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("Authorization", "Basic " + encodedString);

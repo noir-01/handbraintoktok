@@ -4,5 +4,5 @@ public enum GameType {
     COPY,
     RSP,    //rock scissors paper
     CALC,
-    RANDOM;
+    RANDOM
 }
