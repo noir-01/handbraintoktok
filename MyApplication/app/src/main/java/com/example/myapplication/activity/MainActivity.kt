@@ -1,6 +1,7 @@
 package com.example.myapplication
 
 import android.Manifest
+import android.app.AlertDialog
 import android.content.pm.PackageManager
 import android.widget.Toast
 import android.content.Intent
@@ -12,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.example.myapplication.activity.RecordsActivity
 import com.example.myapplication.R
 import com.example.myapplication.multiUi.LoginActivity
+import androidx.activity.OnBackPressedCallback
 
 class MainActivity : BaseActivity() {
     private var selectedGameName: String? = null
@@ -29,10 +31,6 @@ class MainActivity : BaseActivity() {
         buttonRecords = findViewById(R.id.button_records)
         buttonMethod = findViewById(R.id.button_method)
 
-        //테스트 코드
-//        val intent = Intent(this, LoginActivity::class.java)
-//        startActivity(intent)
-
 
         // Set up button click listeners
         buttonStartGame.setOnClickListener {
@@ -40,50 +38,42 @@ class MainActivity : BaseActivity() {
             startActivity(intent)
         }
 
-//        variousGameButton.setOnClickListener{
-//            randomNumber = (1..4).random()
-//
-//            selectedGameName = when(randomNumber){
-//                1 -> "mimic"
-//                2 -> "rps"
-//                3 -> "bwf"
-//                4 -> "random"
-//                else -> "Unknown Button"
-//            }
-//            /*
-//            잠시 실험하기 위해 주석처리
-//
-//            if(allPermissionGranted()){
-//                val intent = Intent(this, RhythmGameActivity::class.java) //GameActivity로 이동
-//                //intent.putExtra("GAME_NAME", selectedGameName)
-//                startActivity(intent)
-//            }
-//            else{
-//                requestCameraPermission()
-//            }
-//             */
-//
-//            //테스트 코드
-//            val intent = Intent(this, LoginActivity::class.java)
-//            startActivity(intent)
-//        }
-//
         buttonRecords.setOnClickListener{
             val intent = Intent(this, RecordActivity::class.java)
             startActivity(intent)
         }
-
         buttonMethod.setOnClickListener {
             val intent = Intent(this, MethodActivity::class.java)
             startActivity(intent)
         }
-
         // Optionally, request camera permission if needed
         if (!allPermissionGranted()) {
             requestCameraPermission()
         }
+
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                showExitConfirmationDialog()
+            }
+        })
+
     }
 
+    private fun showExitConfirmationDialog() {
+        // AlertDialog 생성
+        AlertDialog.Builder(this)
+            .setTitle("앱 종료")
+            .setMessage("정말 종료하시겠습니까?")
+            .setPositiveButton("예") { _, _ ->
+                // 앱 종료
+                finishAffinity()
+            }
+            .setNegativeButton("아니오") { dialog, _ ->
+                // 팝업 닫기
+                dialog.dismiss()
+            }
+            .show()
+    }
 
     private fun allPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
