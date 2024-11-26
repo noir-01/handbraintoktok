@@ -24,7 +24,8 @@ import java.util.Map;
 public class GameWebSocketHandler extends TextWebSocketHandler {
     //sessionId, GameSession
     private final Map<String, GameSession> gameSessions = new HashMap<>();
-    private JwtUtil jwtUtil = new JwtUtil();
+    @Autowired
+    private JwtUtil jwtUtil;
     @Autowired
     private UserService userService;
     @Autowired
@@ -121,8 +122,8 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
                 gameSession.nextProblem();
 
                 session.sendMessage(new TextMessage("correct"));
-                //마지막 문제면 반응속도 기록(랜덤 아닐때만)
-
+                
+                //마지막 문제면 반응속도 기록
                 if (gameSession.isEnd()) {
                     HistoryDto.RandomGameHistoryDto historyDto = new HistoryDto.RandomGameHistoryDto();
                     historyDto.setUserDto(
