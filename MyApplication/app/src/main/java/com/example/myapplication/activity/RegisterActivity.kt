@@ -5,10 +5,12 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.transition.Visibility
 import com.example.myapplication.util.dataClass.NumDto
 import com.example.myapplication.util.dataClass.VerificationRequest
 import com.example.myapplication.util.network.ApiService
@@ -18,6 +20,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -26,8 +29,17 @@ class RegisterActivity : AppCompatActivity() {
     val tokenManager = RetrofitClient.getTokenManager()
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
+
+        //////////////////////////////////////////////////////////////
+        // RegisterOrNotActivity에서 Extra로 mode(Register/Auth) 전달
+
+        val mode = intent.getStringExtra("mode")
+
+        //////////////////////////////////////////////////////////////
+
 
         val phoneEditText = findViewById<EditText>(R.id.phoneEditText)
         val verifyButton = findViewById<Button>(R.id.verifyButton)
@@ -35,6 +47,8 @@ class RegisterActivity : AppCompatActivity() {
         val startButton = findViewById<Button>(R.id.startButton)
         val nameText = findViewById<EditText>(R.id.nameEditText)
 
+        //Auth에선 이름 칸 안보이게
+        if(mode=="Auth") nameText.visibility= View.GONE
 
         val serverDomain = getString(R.string.server_domain)
         val retrofit = Retrofit.Builder()
@@ -74,14 +88,24 @@ class RegisterActivity : AppCompatActivity() {
         }
 
         startButton.setOnClickListener{
-            Log.d("Register","Clicked!")
             val phoneNumber = phoneEditText.text.toString()
             val code = otpEditText.text.toString()
             val name = nameText.text.toString()
+            lateinit var response: Response<Map<String, Any>>
             CoroutineScope(Dispatchers.IO).launch {
-                val response = apiService.verifyCode(
-                    VerificationRequest(phoneNumber, code, name)
-                )
+                when(mode){
+                    "Register" ->{
+                        response = apiService.verifyCode(
+                            VerificationRequest(phoneNumber, code, name)
+                        )
+                    }
+                    "Auth" ->{
+                        response = apiService.verifyRefresh(
+                            VerificationRequest(phoneNumber, code, "")
+                        )
+                    }
+                }
+
                 runOnUiThread {
                     if (response.isSuccessful) {
                         val responseBody = response.body()

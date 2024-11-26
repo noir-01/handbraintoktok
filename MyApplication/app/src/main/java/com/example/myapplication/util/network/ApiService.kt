@@ -32,11 +32,17 @@ interface ApiService {
         @Query("period") period:String
     ): List<RandomGameHistoryDto>
 
+    @POST("/login")
+    suspend fun login(): Response<Unit>
+
     @POST("/sms/send")
     suspend fun sendSms(@Body numDto: NumDto): Response<Unit>
 
     @POST("/sms/verify/register")
     suspend fun verifyCode(@Body verificationRequest: VerificationRequest): Response<Map<String, Any>>
+
+    @POST("/sms/verify/refresh")
+    suspend fun verifyRefresh(@Body verificationRequest: VerificationRequest): Response<Map<String, Any>>
 
 }
 
