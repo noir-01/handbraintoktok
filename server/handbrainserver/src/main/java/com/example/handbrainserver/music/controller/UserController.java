@@ -31,15 +31,23 @@ public class UserController {
         this.friendService = friendService;
     }
 
-    @GetMapping("/login")
-    public String login(Model model) {
-        return "login"; // 로그인 페이지 템플릿 이름
-    }
-    @PostMapping(value="/login",consumes = "application/x-www-form-urlencoded")
-    public void login(@RequestParam String username, @RequestParam String token) {
-        if(jwtUtil.validateToken(token,username)) {
-            Authentication authentication = new UsernamePasswordAuthenticationToken(token, null, new ArrayList<>());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+    @PostMapping
+    public ResponseEntity<?> login(
+        @RequestHeader("Authorization") String token
+    ){
+        Map<String, String> response = new HashMap<>();
+
+        try {
+            String processedToken = token.replace("Bearer ", ""); // Bearer 제거
+            JwtUtil jwtUtil = new JwtUtil();
+            Long userId = Long.parseLong(jwtUtil.extractUsername(processedToken));
+            response.put("state","success");
+            return ResponseEntity.ok(response);
+        }catch(Exception e){
+            e.printStackTrace();
+            response.put("state","token expired");
+            return ResponseEntity.badRequest().body(response);
+
         }
     }
     @Getter

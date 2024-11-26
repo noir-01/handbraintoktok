@@ -32,4 +32,13 @@ public class UserService {
     public UserDto getUserById(Long userId){
         return UserDto.from(userRepository.findById(userId).get());
     }
+    public UserDto getUserByPhone(String phoneNumber){
+        try{
+            String phoneHash = cryptoUtil.encrypt(phoneNumber);
+            return UserDto.from(userRepository.findByPhoneNumberHash(phoneHash).get());
+        }catch(Exception e){
+            e.printStackTrace();
+            return null;
+        }
+    }
 }
