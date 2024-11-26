@@ -32,7 +32,7 @@ interface ApiService {
         @Query("period") period:String
     ): List<RandomGameHistoryDto>
 
-    @POST("/login")
+    @POST("/login/token")
     suspend fun login(): Response<Unit>
 
     @POST("/sms/send")

@@ -31,7 +31,7 @@ public class UserController {
         this.friendService = friendService;
     }
 
-    @PostMapping
+    @PostMapping("/login/token")
     public ResponseEntity<?> login(
         @RequestHeader("Authorization") String token
     ){
