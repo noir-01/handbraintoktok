@@ -20,13 +20,18 @@ public class UserService {
         User user = new User();
         user.setName(userDtoWithOutId.getName());
         try {
-            user.setPhoneNumberHash(cryptoUtil.encrypt(userDtoWithOutId.getPhoneNumber()));
+            String phoneNumberHash = cryptoUtil.encrypt(userDtoWithOutId.getPhoneNumber());
+            //이미 존재하는 유저면 -1 반환
+            if(userRepository.existsUserByPhoneNumberHash(phoneNumberHash)){
+                return -1L;
+            }
+            user.setPhoneNumberHash(phoneNumberHash);
             user = userRepository.save(user);
             return user.getId();
 
         }catch(Exception e){
             e.printStackTrace();
-            return -1L;
+            return -2L;
         }
     }
     public UserDto getUserById(Long userId){

@@ -47,7 +47,6 @@ public class UserController {
             e.printStackTrace();
             response.put("state","token expired");
             return ResponseEntity.badRequest().body(response);
-
         }
     }
     @Getter
@@ -56,23 +55,23 @@ public class UserController {
         private String token;
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<?> register(
-            @RequestBody UserDto.UserDtoWithOutId userDtoWithOutId
-    ) {
-        JwtUtil jwtUtil = new JwtUtil();
-        Long userId = userService.saveUser(
-                new UserDto.UserDtoWithOutId(userDtoWithOutId.getName(), userDtoWithOutId.getPhoneNumber())
-        );
-
-        if(userId!=-1){
-            Map<String, String> response = new HashMap<>();
-            response.put("token", jwtUtil.generateToken(userId));
-            return ResponseEntity.ok(response); // 성공적인 경우 JSON 응답 반환
-        }else{
-            return ResponseEntity.badRequest().body("failed"); // 실패 시 JSON 응답 반환
-        }
-    }
+//    @PostMapping("/register")
+//    public ResponseEntity<?> register(
+//            @RequestBody UserDto.UserDtoWithOutId userDtoWithOutId
+//    ) {
+//        JwtUtil jwtUtil = new JwtUtil();
+//        Long userId = userService.saveUser(
+//                new UserDto.UserDtoWithOutId(userDtoWithOutId.getName(), userDtoWithOutId.getPhoneNumber())
+//        );
+//
+//        if(userId!=-1){
+//            Map<String, String> response = new HashMap<>();
+//            response.put("token", jwtUtil.generateToken(userId));
+//            return ResponseEntity.ok(response); // 성공적인 경우 JSON 응답 반환
+//        }else{
+//            return ResponseEntity.badRequest().body("failed"); // 실패 시 JSON 응답 반환
+//        }
+//    }
 
     @GetMapping("/home")
     public String home(Model model) {
