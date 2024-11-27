@@ -9,6 +9,7 @@ object RetrofitClient {
 
     fun initialize(tokenManager: TokenManager) {
         RetrofitClient.tokenManager = tokenManager
+        val interceptor = AuthInterceptor(tokenManager)
     }
 
     private val client by lazy {

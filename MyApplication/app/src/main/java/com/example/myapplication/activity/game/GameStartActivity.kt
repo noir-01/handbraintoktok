@@ -31,6 +31,7 @@ import com.example.myapplication.util.mediapipe.HandLandMarkHelper
 import com.example.myapplication.util.ResourceUtils.imageResources
 import com.example.myapplication.util.network.WebSocketClient
 import com.example.myapplication.util.mediapipe.gestureLabels
+import com.example.myapplication.util.network.RetrofitClient
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -62,7 +63,8 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
     private var isFirstProb = true
     private var probNum = AtomicInteger(0)
     private var countDownJob: Job?=null
-
+    val tokenManager = RetrofitClient.getTokenManager()
+    var socketInitMessage = tokenManager.getToken() + ","
 
     //websocket interface
     override fun onMessageReceived(message: String) {
@@ -108,6 +110,11 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_start)
+        
+        //gameOptionActivity에서 putExtra로 전달
+        val mode = intent.getStringExtra("MODE")
+        //게임 모드를 initMessage에 붙여서 전송(COPY/RSP/CALC/RANDOM)
+        socketInitMessage+=mode
 
         gameImageLeftView = findViewById<ImageView>(R.id.gameImageLeftView)
         gameImageCenterView = findViewById<ImageView>(R.id.gameImageCenterView)
@@ -154,7 +161,8 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
                 // WebSocket 연결은 IO 스레드에서 실행
                 CoroutineScope(Dispatchers.IO).launch {
                     webSocketClient.connect()  // WebSocket 연결
-                    webSocketClient.sendMessage("8,true")  // 메시지 전송
+
+                    webSocketClient.sendMessage(socketInitMessage)  // 메시지 전송
                 }
             }
         }

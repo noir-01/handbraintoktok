@@ -96,9 +96,9 @@ class MainActivity : BaseActivity() {
                 4 -> "random"
                 else -> "Unknown Button"
             }
-            val intent = Intent(this, GameStartActivity::class.java)
-            intent.putExtra("GAME_NAME", selectedGameName)
-            startActivity(intent)
+//            val intent = Intent(this, GameStartActivity::class.java)
+//            intent.putExtra("GAME_NAME", selectedGameName)
+//            startActivity(intent)
         }
     }
 
