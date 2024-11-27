@@ -32,11 +32,14 @@ import com.example.myapplication.util.mediapipe.GestureRecognition
 import com.example.myapplication.util.mediapipe.HandLandMarkHelper
 import com.example.myapplication.util.MusicDownloader
 import com.example.myapplication.util.ResourceUtils.imageResources
+import com.example.myapplication.util.dataClass.RhythmGamePostDto
 import com.example.myapplication.util.mediapipe.difficulty
 import com.example.myapplication.util.network.durationToSec
 import com.example.myapplication.util.mediapipe.gestureLabels
 import com.example.myapplication.util.mediapipe.reversedGestureLabels
+import com.example.myapplication.util.network.RetrofitClient
 import com.google.mediapipe.tasks.vision.core.RunningMode
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -48,7 +51,7 @@ import kotlin.math.ceil
 import kotlin.random.Random
 
 class RhythmGameStartActivity: AppCompatActivity() {
-    private lateinit var apiService: ApiService
+    private val apiService = RetrofitClient.apiService
     private lateinit var musicDownloader: MusicDownloader
 
     private val CAMERA_REQUEST_CODE = 1001
@@ -86,6 +89,8 @@ class RhythmGameStartActivity: AppCompatActivity() {
     private var totalScore = 0
     private val correctScore = listOf(100,150,200)
     private var difficultyInt = 0
+    private var difficultyString = "EASY"
+
 
     //음악 재생
     private var mediaPlayer: MediaPlayer? = null
@@ -111,15 +116,10 @@ class RhythmGameStartActivity: AppCompatActivity() {
         //RhythmGameSelectActivity에서 전달받은 music_id
         val musicId = intent.getIntExtra("MUSIC_ID", -1)
         val musicLength = durationToSec(intent.getStringExtra("DURATION")?:"00:00:00")
-        val difficultyString = intent.getStringExtra("DIFFICULTY")?:"EASY"
+        difficultyString = intent.getStringExtra("DIFFICULTY")?:"EASY"
         difficultyInt = difficulty[difficultyString]?:0
 
         val serverDomain = getString(R.string.server_domain)
-        apiService = Retrofit.Builder()
-            .baseUrl("https://$serverDomain")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-            .create(ApiService::class.java)
         musicDownloader = MusicDownloader(apiService, this)
         
         if (musicId != -1) {
@@ -135,9 +135,18 @@ class RhythmGameStartActivity: AppCompatActivity() {
                         delay(3000)
                         //난이도 따라서 다르게 맵 설정
                         when(difficultyString){
-                            "EASY"->{makeGameBeatsEasy(beats,bps)}
-                            "NORMAL"->{makeGameBeatsNormal(beats,bps)}
-                            "HARD"->{makeGameBeatsHard(beats,bps)}
+                            "EASY"->{
+                                makeGameBeatsEasy(beats,bps)
+                                imageShowTime=1.8f
+                            }
+                            "NORMAL"->{
+                                makeGameBeatsNormal(beats,bps)
+                                imageShowTime=1.5f
+                            }
+                            "HARD"->{
+                                makeGameBeatsHard(beats,bps)
+                                imageShowTime=1.5f
+                            }
                             else->{
                                 makeGameBeatsEasy(beats,bps)
                             }
@@ -166,8 +175,20 @@ class RhythmGameStartActivity: AppCompatActivity() {
             setDataSource(musicFile.absolutePath)
             prepareAsync() // 비동기 준비
             setOnPreparedListener {
-                start() // 음악 시작
-                trackMusicTime() // 음악 시간 추적 시작
+                start()
+                trackMusicTime()
+            }
+            setOnCompletionListener {
+                CoroutineScope(Dispatchers.IO).launch {
+                    apiService.uploadRhythmGameHistory(
+                        RhythmGamePostDto(musicId, difficultyString,combo,totalScore)
+                    )
+                    withContext(Dispatchers.Main){
+                        //기록 or 순위 화면 보여주기로 수정
+                        finish()
+                    }
+                }
+
             }
         }
     }
@@ -280,22 +301,22 @@ class RhythmGameStartActivity: AppCompatActivity() {
         var top = originalHeight * 0.5f
         var bottom = originalHeight * 1.5f
 
-        // beatTime 넘어가면 기존 이미지 사이즈만큼만 그리도록.
+        // beatTime 이전에는 작아지는 직사각형 그리기
         if(currentTime<beatTime) {
 //        val top = originalHeight * 0.25f + originalHeight * 0.25f * (1-rate)
 //        val bottom = originalHeight * 1.75f - originalHeight * 0.25f * (1-rate)
             top = originalHeight * 0.5f * (1 - rate)
             bottom = originalHeight * 2f - originalHeight * 0.5f * (1 - rate)
+            canvas.drawRect(left, top, right, bottom, borderPaint)
+            
         }
-
-        if(currentTime<beatTime+delayTime) {
+        //beatTime 넘으면 사이즈 맞춰서 그리기
+        else{
             canvas.drawRect(left, top, right, bottom, borderPaint)
         }
 
         imageView.setImageBitmap(bitmapWithBorder)
-
     }
-
 
     fun hideImage(imageView: ImageView) {
         imageView.setImageDrawable(null)
@@ -424,7 +445,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
         val handIndexes = (0..21).toList() - numbersToExclude
 
         while(i<beatsSize){
-            i += Random.nextInt(3)+5    //5,6,7초 중 랜덤으로
+            i += Random.nextInt(3)+4    //4,5,6초 중 랜덤으로
             if(i>=beatsSize) break
             if(ceil(i*bps).toInt()<beatsSize)
                 gameBeats.add(beats[ceil(i*bps).toInt()])
