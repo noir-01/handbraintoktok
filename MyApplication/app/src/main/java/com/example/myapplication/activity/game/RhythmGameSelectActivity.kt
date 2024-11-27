@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.camera.view.PreviewView
 import android.util.Log
+import android.view.View
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -154,6 +155,17 @@ class RhythmGameSelectActivity : BaseActivity(){
                     recyclerView.adapter = adapter
                     val divider = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
                     recyclerView.addItemDecoration(divider)
+                    // 다이얼로그 생성
+                    val dialog = AlertDialog.Builder(context)
+                        .setView(dialogView)
+                        .setCancelable(true)
+                        .create()
+
+                    dialog.show()
+                    dialog.window?.setLayout(
+                        (resources.displayMetrics.widthPixels * 0.9).toInt(),
+                        (ActionBar.LayoutParams.WRAP_CONTENT)
+                    )
 
                     // 난이도 버튼
                     val easyButton = dialogView.findViewById<AppCompatButton>(R.id.easyButton)
@@ -169,6 +181,7 @@ class RhythmGameSelectActivity : BaseActivity(){
                             //hard-coded, 나중에 난이도 선택 버튼 만들기.
                             intent.putExtra("DIFFICULTY", selectedDifficulty)
                             startActivity(intent)
+                            dialog.dismiss()
                             Log.d("Start Game", "Start")
                         }
                     }
@@ -225,116 +238,8 @@ class RhythmGameSelectActivity : BaseActivity(){
                         updateButtonStyles(hardButton)
                         selectedDifficulty = "HARD"
                     }
-
-                    // 다이얼로그 생성
-                    val dialog = AlertDialog.Builder(context)
-                        .setView(dialogView)
-                        .setCancelable(true)
-                        .create()
-
-                    dialog.show()
-                    dialog.window?.setLayout(
-                        (resources.displayMetrics.widthPixels * 0.9).toInt(),
-                        (ActionBar.LayoutParams.WRAP_CONTENT)
-                    )
                 }
             }
-
-
         }
-
-//        // 예시 데이터
-//        var rankingList = listOf(
-//
-//            Rank(3, "User 3", 400),
-//            Rank(4, "User 3", 400),
-//            Rank(5, "User 3", 400),
-//            Rank(6, "User 3", 400),
-//            Rank(7, "User 3", 400),
-//            Rank(8, "User 3", 400),
-//            Rank(9, "User 3", 400),
-//        )
-//
-//        // RecyclerView에 어댑터 설정
-//        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.rankingRecyclerView)
-//        val adapter = RankingAdapter(rankingList)
-//        recyclerView.layoutManager = LinearLayoutManager(this)
-//        recyclerView.adapter = adapter
-//        val divider = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-//        recyclerView.addItemDecoration(divider)
-//
-//        // 게임 시작 버튼 클릭 리스너
-//        val startButton = dialogView.findViewById<AppCompatButton>(R.id.startRhythmGameButton)
-//        startButton.setOnClickListener {
-//            selectedMusic?.let { music ->
-//                val intent = Intent(this, RhythmGameStartActivity::class.java)
-//                intent.putExtra("MUSIC_ID", music.id)
-//                intent.putExtra("DURATION", music.duration)
-//                //hard-coded, 나중에 난이도 선택 버튼 만들기.
-//                intent.putExtra("DIFFICULTY", selectedDifficulty)
-//                startActivity(intent)
-//                Log.d("Start Game", "Start")
-//            }
-//        }
-//
-//        // 다이얼로그 생성
-//        val dialog = AlertDialog.Builder(this)
-//            .setView(dialogView)
-//            .setCancelable(true)
-//            .create()
-//
-//        //난이도 선택 버튼
-//        val easyButton = dialogView.findViewById<AppCompatButton>(R.id.easyButton)
-//        val normalButton = dialogView.findViewById<AppCompatButton>(R.id.normalButton)
-//        val hardButton = dialogView.findViewById<AppCompatButton>(R.id.hardButton)
-//        val buttons = listOf(easyButton, normalButton, hardButton)
-//
-//        fun updateButtonStyles(selectedButton: AppCompatButton?) {
-//            buttons.forEach { button ->
-//                if (button == selectedButton) {
-//                    button.setBackgroundColor(ContextCompat.getColor(context, R.color.teal_700)) // 선택된 색상
-//                    button.setTextColor(ContextCompat.getColor(context, R.color.white)) // 텍스트 색상
-//                } else {
-//                    button.setBackgroundColor(ContextCompat.getColor(context, R.color.teal_200)) // 기본 색상
-//                    button.setTextColor(ContextCompat.getColor(context, R.color.teal_700)) // 기본 텍스트 색상
-//                }
-//            }
-//        }
-//
-//        easyButton.setOnClickListener {
-//            rankingList = listOf(
-//                Rank(1, "Easy User 1", 300),
-//                Rank(2, "Easy User 2", 250),
-//                Rank(3, "Easy User 3", 200)
-//            )
-//            adapter.updateData(rankingList) // 어댑터 데이터 갱신
-//            updateButtonStyles(easyButton)
-//            selectedDifficulty = "EASY"
-//        }
-//
-//        normalButton.setOnClickListener {
-//            rankingList = listOf(
-//                Rank(1, "Normal User 1", 400),
-//                Rank(2, "Normal User 2", 350),
-//                Rank(3, "Normal User 3", 300)
-//            )
-//            adapter.updateData(rankingList)
-//            updateButtonStyles(normalButton)
-//            selectedDifficulty = "NORMAL"
-//        }
-//
-//        hardButton.setOnClickListener {
-//            rankingList = listOf(
-//                Rank(1, "Hard User 1", 500),
-//                Rank(2, "Hard User 2", 450),
-//                Rank(3, "Hard User 3", 400)
-//            )
-//            adapter.updateData(rankingList)
-//            updateButtonStyles(hardButton)
-//            selectedDifficulty = "HARD"
-//        }
-//
-//        dialog.show()
-//        dialog.window?.setLayout((resources.displayMetrics.widthPixels * 0.9).toInt(), (ActionBar.LayoutParams.WRAP_CONTENT))
     }
 }
