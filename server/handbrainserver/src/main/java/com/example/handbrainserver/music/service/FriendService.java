@@ -22,7 +22,7 @@ public class FriendService {
         this.userRepository = userRepository;
     }
 
-    public void updateFriends(Long userId, List<String> contacts){
+    public Integer updateFriends(Long userId, List<String> contacts){
         List<String> phoneHashes = contacts.stream()
                 .map(phoneNumber -> {
                     try {
@@ -41,6 +41,11 @@ public class FriendService {
                 .map(user -> new Friend(userId, user.getId()))
                 .collect(Collectors.toList());
         friendRepository.saveAll(newFriends);
+        
+        if (matchedUsers == null) {
+            return 0;
+        }
+        return matchedUsers.size();
     }
     public List<Long> getFriendIds(Long userId) {
         List<Friend> friends = friendRepository.findByUserId(userId);

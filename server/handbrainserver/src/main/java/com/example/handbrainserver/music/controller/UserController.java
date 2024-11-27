@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -86,11 +87,15 @@ public class UserController {
         JwtUtil jwtUtil = new JwtUtil();
         Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
         try {
-            friendService.updateFriends(userId, contacts);
-            return ResponseEntity.ok("success");
+            Integer friendNum = friendService.updateFriends(userId, contacts);
+            return ResponseEntity.ok(Map.of(
+                "status","success",
+                "friendNum", friendNum
+            ));
         }catch(Exception e){
             e.printStackTrace();
-            return ResponseEntity.status(500).body("Database error");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(Map.of("status", "서버 오류 발생"));
         }
     }
 
