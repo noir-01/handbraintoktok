@@ -4,6 +4,7 @@ import com.example.myapplication.util.dataClass.Music
 import com.example.myapplication.util.dataClass.NumDto
 import com.example.myapplication.util.dataClass.RandomGameHistoryDto
 import com.example.myapplication.util.dataClass.RhythmGameHistoryDto
+import com.example.myapplication.util.dataClass.RhythmGamePostDto
 import com.example.myapplication.util.dataClass.VerificationRequest
 import okhttp3.ResponseBody
 import retrofit2.Response
@@ -31,6 +32,12 @@ interface ApiService {
         @Query("gameType") gameType:String,
         @Query("period") period:String
     ): List<RandomGameHistoryDto>
+
+    @POST("/history/rhythm/upload")
+    suspend fun uploadRhythmGameHistory(@Body rhythmGamePostDto: RhythmGamePostDto)
+
+    @POST("/friend/upload")
+    suspend fun uploadFriend(@Body contacts:List<String>): Response<Map<String, Any>>
 
     // Response<200>, {"state" : "success"}
     // Response<500>, {"state" : "token expired"}

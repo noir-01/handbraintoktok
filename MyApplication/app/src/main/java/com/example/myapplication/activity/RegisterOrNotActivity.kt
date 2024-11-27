@@ -1,7 +1,9 @@
 package com.example.myapplication
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.util.network.RetrofitClient
@@ -17,17 +19,19 @@ class RegisterOrNotActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
         //토큰이 있으면 로그인 시도, 성공 시 메인화면으로 바로 이동
         if(tokenManager.getToken()!=null){
             CoroutineScope(Dispatchers.IO).launch{
                 val response = apiService.login()
                 withContext(Dispatchers.Main){
                     if(response.isSuccessful){
+                        Log.d("token",tokenManager.getToken().toString())
                         val intent = Intent(this@RegisterOrNotActivity, MainActivity::class.java)
+                        //val options = ActivityOptions.makeCustomAnimation(this@RegisterOrNotActivity, R.anim.fade_in, R.anim.fade_in)
+                        //startActivity(intent,options.toBundle())
                         startActivity(intent)
-                        finish()
                     }else{
+                        //토큰 검증 실패 시(유효기간 초과 등)
                         initializeUI()
                     }
                 }
