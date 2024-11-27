@@ -1,7 +1,10 @@
 package com.example.myapplication
 
+import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -9,6 +12,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.transition.Visibility
 import com.example.myapplication.util.dataClass.NumDto
@@ -23,6 +27,7 @@ import kotlinx.coroutines.withContext
 import retrofit2.Response
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import kotlinx.coroutines.async
 
 class RegisterActivity : AppCompatActivity() {
 
@@ -57,6 +62,26 @@ class RegisterActivity : AppCompatActivity() {
             .build()
         val apiService = retrofit.create(ApiService::class.java)
 
+        //register=>main 넘어가는 조건을 이전에 처리하기
+        val sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
+        val isContactSyncDone = sharedPreferences.getBoolean("isContactSyncDone", false)
+
+
+        fun startTimer(): Boolean {
+            val countDownTimer = object : CountDownTimer(5000, 1000) {
+                @SuppressLint("SetTextI18n")
+                override fun onTick(millisUntilFinished: Long) {
+                    verifyButton.text = "${millisUntilFinished / 1000}초"
+                }
+
+                override fun onFinish() {
+                    verifyButton.isEnabled = true
+                    verifyButton.text = "인증번호 전송"
+                }
+            }
+            countDownTimer.start()
+            return true
+        }
 
         // 전화번호 입력 시 11글자인지 확인
         phoneEditText.addTextChangedListener(object : TextWatcher {
@@ -72,6 +97,14 @@ class RegisterActivity : AppCompatActivity() {
         // 인증하기 버튼 클릭 시 인증번호 입력 칸과 시작하기 버튼 활성화
         verifyButton.setOnClickListener {
             val phoneNumber = phoneEditText.text.toString()
+            // 버튼 비활성화
+            verifyButton.isEnabled = false
+
+            //비동기로 버튼 비활성화
+            CoroutineScope(Dispatchers.Main).launch{
+                val timerJob = launch { startTimer() }
+            }
+
             CoroutineScope(Dispatchers.IO).launch {
                 val response = apiService.sendSms(NumDto(phoneNumber))
                 withContext(Dispatchers.Main) {
@@ -86,6 +119,7 @@ class RegisterActivity : AppCompatActivity() {
             otpEditText.isEnabled = true
             startButton.isEnabled = true
         }
+
 
         startButton.setOnClickListener{
             val phoneNumber = phoneEditText.text.toString()
@@ -108,13 +142,18 @@ class RegisterActivity : AppCompatActivity() {
 
                 runOnUiThread {
                     if (response.isSuccessful) {
+                        val intent: Intent
                         val responseBody = response.body()
                         val token = responseBody?.get("token")?.toString() // token 값 추출
                         Log.d("token Recieved","$token");
                         token?.let {
-                            //성공하면 토큰 저장하고 메인화면으로 넘어가기
+                            //성공하면 토큰 저장하고 다음 화면(연락처 연동)으로 넘어가기
                             tokenManager.saveToken(it)
-                            val intent = Intent(this@RegisterActivity, MainActivity::class.java)
+                            if(isContactSyncDone){
+                                intent = Intent(this@RegisterActivity, MainActivity::class.java)
+                            }else{
+                                intent = Intent(this@RegisterActivity, AddFriendActivity::class.java)
+                            }
                             startActivity(intent)
                         } ?: run {
                             Toast.makeText(this@RegisterActivity, "토큰을 받을 수 없습니다.", Toast.LENGTH_SHORT).show()
@@ -133,5 +172,7 @@ class RegisterActivity : AppCompatActivity() {
 
             }
         }
+
     }
+
 }
