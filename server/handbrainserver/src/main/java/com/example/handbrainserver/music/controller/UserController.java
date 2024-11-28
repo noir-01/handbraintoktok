@@ -1,5 +1,6 @@
 package com.example.handbrainserver.music.controller;
 
+import com.example.handbrainserver.music.dto.UserDto;
 import com.example.handbrainserver.music.service.FriendService;
 import com.example.handbrainserver.music.service.UserService;
 import com.example.handbrainserver.music.util.JwtUtil;
@@ -38,7 +39,6 @@ public class UserController {
 
         try {
             String processedToken = token.replace("Bearer ", ""); // Bearer 제거
-            JwtUtil jwtUtil = new JwtUtil();
             Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
             response.put("state","success");
             return ResponseEntity.ok(response);
@@ -48,29 +48,15 @@ public class UserController {
             return ResponseEntity.badRequest().body(response);
         }
     }
-    @Getter
-    private class LoginRequest{
-        private String phoneNumber;
-        private String token;
+    @GetMapping("/get/myname")
+    public ResponseEntity<?> getMyName(
+            @RequestHeader("Authorization") String token
+    ){
+        String processedToken = token.replace("Bearer ", ""); // Bearer 제거
+        Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
+        String userName = userService.getUserById(userId).getName();
+        return ResponseEntity.ok(Map.of("name",userName));
     }
-
-//    @PostMapping("/register")
-//    public ResponseEntity<?> register(
-//            @RequestBody UserDto.UserDtoWithOutId userDtoWithOutId
-//    ) {
-//        JwtUtil jwtUtil = new JwtUtil();
-//        Long userId = userService.saveUser(
-//                new UserDto.UserDtoWithOutId(userDtoWithOutId.getName(), userDtoWithOutId.getPhoneNumber())
-//        );
-//
-//        if(userId!=-1){
-//            Map<String, String> response = new HashMap<>();
-//            response.put("token", jwtUtil.generateToken(userId));
-//            return ResponseEntity.ok(response); // 성공적인 경우 JSON 응답 반환
-//        }else{
-//            return ResponseEntity.badRequest().body("failed"); // 실패 시 JSON 응답 반환
-//        }
-//    }
 
     @GetMapping("/home")
     public String home(Model model) {
@@ -84,7 +70,6 @@ public class UserController {
             @RequestBody List<String> contacts
     ){
         String processedToken = token.replace("Bearer ", ""); // Bearer 제거
-        JwtUtil jwtUtil = new JwtUtil();
         Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
         try {
             Integer friendNum = friendService.updateFriends(userId, contacts);
