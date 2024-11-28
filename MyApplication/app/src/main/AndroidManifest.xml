@@ -33,6 +33,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".activity.game.RhythmGameResultActivity"
+            android:exported="false" />
+        <activity
             android:name=".AddFriendActivity"
             android:exported="false" />
         <activity
