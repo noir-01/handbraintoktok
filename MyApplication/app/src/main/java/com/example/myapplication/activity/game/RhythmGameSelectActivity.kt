@@ -7,7 +7,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.camera.view.PreviewView
 import android.util.Log
-import android.view.View
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -125,7 +124,7 @@ class RhythmGameSelectActivity : BaseActivity(){
 
         // 1. IO 스레드에서 순위 받아옴
         CoroutineScope(Dispatchers.IO).launch {
-            val rhythmGameHistoryList = apiService.getRhythmRank(musicId)
+            val rhythmGameHistoryList = apiService.getRhythmRecords(musicId)
             // 2. Default 스레드에서 rankMap 만듦.
             withContext(Dispatchers.Default){
                 val groupedByDifficulty = rhythmGameHistoryList.groupBy { it.difficulty }
@@ -181,6 +180,18 @@ class RhythmGameSelectActivity : BaseActivity(){
                             //hard-coded, 나중에 난이도 선택 버튼 만들기.
                             intent.putExtra("DIFFICULTY", selectedDifficulty)
                             startActivity(intent)
+
+                            ////결과창 테스트
+//                            val totalScore = 12
+//                            val combo = 0
+//                            val intent = Intent(this@RhythmGameSelectActivity, RhythmGameResultActivity::class.java)
+//                            intent.putExtra("MUSIC_ID", musicId)
+//                            intent.putExtra("DIFFICULTY", selectedDifficulty)
+//                            intent.putExtra("SCORE",totalScore)
+//                            intent.putExtra("COMBO",combo)
+//                            startActivity(intent)
+//                            finish()
+
                             dialog.dismiss()
                             Log.d("Start Game", "Start")
                         }

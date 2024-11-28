@@ -1,6 +1,7 @@
 package com.example.myapplication.activity.game
 
 import android.Manifest
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -121,7 +122,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
 
         val serverDomain = getString(R.string.server_domain)
         musicDownloader = MusicDownloader(apiService, this)
-        
+
         if (musicId != -1) {
             lifecycleScope.launch(Dispatchers.IO){
                 try {
@@ -184,7 +185,11 @@ class RhythmGameStartActivity: AppCompatActivity() {
                         RhythmGamePostDto(musicId, difficultyString,combo,totalScore)
                     )
                     withContext(Dispatchers.Main){
-                        //기록 or 순위 화면 보여주기로 수정
+                        val intent = Intent(this@RhythmGameStartActivity, RhythmGameResultActivity::class.java)
+                        intent.putExtra("MUSIC_ID", musicId)
+                        intent.putExtra("DIFFICULTY", difficultyString)
+                        intent.putExtra("SCORE",totalScore)
+                        intent.putExtra("COMBO",combo)
                         finish()
                     }
                 }

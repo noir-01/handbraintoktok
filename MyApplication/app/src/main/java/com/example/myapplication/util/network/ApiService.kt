@@ -25,13 +25,16 @@ interface ApiService {
     suspend fun downloadMusic(@Path("musicId") songId: Int): ResponseBody
 
     @GET("/history/rhythm/get/{musicId}")
-    suspend fun getRhythmRank(@Path("musicId") musicId: Int): List<RhythmGameHistoryDto>
+    suspend fun getRhythmRecords(@Path("musicId") musicId: Int): List<RhythmGameHistoryDto>
 
     @GET("/history/random/get")
     suspend fun getRandomHistory(
         @Query("gameType") gameType:String,
         @Query("period") period:String
     ): List<RandomGameHistoryDto>
+
+    @GET("/history/rhythm/get/{musicId}/{difficulty}")
+    suspend fun getRhythmRecord(@Path("musicId") musicId: Int, @Path("difficulty") difficulty:String): Response<Map<String,Any>>
 
     @POST("/history/rhythm/upload")
     suspend fun uploadRhythmGameHistory(@Body rhythmGamePostDto: RhythmGamePostDto)
