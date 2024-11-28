@@ -38,4 +38,30 @@ public interface RhythmGameHistoryRepository extends JpaRepository<RhythmGameHis
             List<Long> userIds,
             LocalDate startOfWeek,
             LocalDate endOfWeek);
+
+    @Query(value = "SELECT COUNT(*) + 1 AS rank " +
+            "FROM rhythm_game_history r " +
+            "WHERE r.difficulty = :difficulty " +
+            "AND r.music_id = :musicId " +
+            "AND r.date BETWEEN :startOfWeek AND :endOfWeek " +
+            "AND r.score > (" +
+            "    SELECT rh.score " +
+            "    FROM rhythm_game_history rh " +
+            "    WHERE rh.user_id = :userId " +
+            "    AND rh.difficulty = :difficulty " +
+            "    AND rh.music_id = :musicId " +
+            "    AND rh.date BETWEEN :startOfWeek AND :endOfWeek" +
+            ") " +
+            "AND r.user_id IN (" +
+            "    SELECT f.friend_id " +
+            "    FROM friend f " +
+            "    WHERE f.user_id = :userId" +
+            ")", nativeQuery = true)
+    Integer findUserRankAmongFriends(
+            @Param("userId") Long userId,
+            @Param("musicId") Long musicId,
+            @Param("difficulty") String difficulty, // Enum 값은 문자열로 변환
+            @Param("startOfWeek") LocalDate startOfWeek,
+            @Param("endOfWeek") LocalDate endOfWeek
+    );
 }

@@ -147,6 +147,20 @@ public class HistoryService {
                 .collect(Collectors.toList());
     }
 
+    public Integer getUserRankThisWeek(Long userId,Long musicId, Difficulty difficulty){
+        LocalDate startOfWeek = getWeekStart(LocalDate.now());
+        LocalDate endOfWeek = getWeekEnd(LocalDate.now());
+
+        Integer ranking = rhythmGameHistoryRepo.findUserRankNative(
+                userId,
+                musicId,
+                difficulty.name(),
+                startOfWeek, endOfWeek
+        );
+        if(ranking!=null)
+            return ranking;
+        else return -1;
+    }
     public LocalDate getWeekStart(LocalDate date) {
         // 해당 날짜가 포함된 주의 월요일
         return date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));

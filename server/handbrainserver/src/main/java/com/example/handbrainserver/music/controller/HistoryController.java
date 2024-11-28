@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 public class  HistoryController {
@@ -105,7 +106,7 @@ public class  HistoryController {
     
     // 친구 목록 조회하고 랭킹 정보 받기 
     @GetMapping("/history/rhythm/get/{musicId}")
-    public List<HistoryDto.RhythmGameHistoryDto> getRhythmGameRanking(
+    public List<HistoryDto.RhythmGameHistoryDto> getRhythmGameScores(
             @RequestHeader("Authorization") String token,
             @PathVariable("musicId") Long musicId
     ){
@@ -120,4 +121,25 @@ public class  HistoryController {
         return historyService.getFriendRecordWeekly(userIds,musicId);
     }
 
+    @GetMapping("/history/rhythm/get/{musicId}/{difficulty}")
+    public ResponseEntity<?> getRhythmGameRanking(
+            @RequestHeader("Authorization") String token,
+            @PathVariable("musicId") Long musicId,
+            @PathVariable("difficulty") String difficulty
+    ){
+        String processedToken = token.replace("Bearer ", ""); // Bearer 제거
+        Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
+
+        //return historyService.findAllUserRecordWeekly(musicId);
+        Integer ranking = historyService.getUserRankThisWeek(userId,musicId,Difficulty.valueOf(difficulty));
+        if(ranking==-1){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("status", "failed"));
+        }else{
+            return ResponseEntity.ok(Map.of(
+                "status","success",
+                "ranking",ranking
+            ));
+        }
+    }
 }
