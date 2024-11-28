@@ -39,7 +39,7 @@ public interface RhythmGameHistoryRepository extends JpaRepository<RhythmGameHis
             LocalDate startOfWeek,
             LocalDate endOfWeek);
 
-    @Query(value = "SELECT COUNT(*) + 1 AS rank " +
+    @Query(value = "SELECT COUNT(*) + 1 " +
             "FROM rhythm_game_history r " +
             "WHERE r.difficulty = :difficulty " +
             "AND r.music_id = :musicId " +
