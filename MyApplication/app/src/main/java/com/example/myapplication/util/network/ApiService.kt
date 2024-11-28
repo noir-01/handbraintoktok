@@ -34,7 +34,10 @@ interface ApiService {
     ): List<RandomGameHistoryDto>
 
     @GET("/history/rhythm/get/{musicId}/{difficulty}")
-    suspend fun getRhythmRecord(@Path("musicId") musicId: Int, @Path("difficulty") difficulty:String): Response<Map<String,Any>>
+    suspend fun getRhythmMyRank(@Path("musicId") musicId: Int, @Path("difficulty") difficulty:String): Response<Map<String,Any>>
+
+    @GET("/get/myname")
+    suspend fun getMyName(): Response<Map<String,Any>>
 
     @POST("/history/rhythm/upload")
     suspend fun uploadRhythmGameHistory(@Body rhythmGamePostDto: RhythmGamePostDto)

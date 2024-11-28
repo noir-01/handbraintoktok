@@ -32,6 +32,7 @@ import kotlinx.coroutines.async
 class RegisterActivity : AppCompatActivity() {
 
     val tokenManager = RetrofitClient.getTokenManager()
+    val apiService = RetrofitClient.apiService
 
     override fun onCreate(savedInstanceState: Bundle?) {
 
@@ -56,11 +57,6 @@ class RegisterActivity : AppCompatActivity() {
         if(mode=="Auth") nameText.visibility= View.GONE
 
         val serverDomain = getString(R.string.server_domain)
-        val retrofit = Retrofit.Builder()
-            .baseUrl("https://$serverDomain")
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
-        val apiService = retrofit.create(ApiService::class.java)
 
         //register=>main 넘어가는 조건을 이전에 처리하기
         val sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
@@ -140,24 +136,36 @@ class RegisterActivity : AppCompatActivity() {
                     }
                 }
 
-                runOnUiThread {
+                CoroutineScope(Dispatchers.Main).launch {
                     if (response.isSuccessful) {
                         val intent: Intent
                         val responseBody = response.body()
                         val token = responseBody?.get("token")?.toString() // token 값 추출
                         Log.d("token Recieved","$token");
                         token?.let {
-                            //성공하면 토큰 저장하고 다음 화면(연락처 연동)으로 넘어가기
+                            //성공하면 토큰+이름 저장하고 다음 화면(연락처 연동)으로 넘어가기
                             tokenManager.saveToken(it)
-                            if(isContactSyncDone){
-                                intent = Intent(this@RegisterActivity, MainActivity::class.java)
-                            }else{
-                                intent = Intent(this@RegisterActivity, AddFriendActivity::class.java)
+
+                            withContext(Dispatchers.IO){
+                                //인증만 다시 했을 경우 앱이 이름을 모르고 있는 상태, sharedPreferences에 저장
+                                val myName = getMyName()
+                                Log.d("Register","$myName")
+                                val sharedPreferences = getSharedPreferences("AppPreferences", Context.MODE_PRIVATE)
+                                sharedPreferences.edit()
+                                    .putString("userName", myName)
+                                    .apply()
                             }
-                            startActivity(intent)
                         } ?: run {
                             Toast.makeText(this@RegisterActivity, "토큰을 받을 수 없습니다.", Toast.LENGTH_SHORT).show()
                         }
+
+                        if(isContactSyncDone){
+                            intent = Intent(this@RegisterActivity, MainActivity::class.java)
+                        }else{
+                            intent = Intent(this@RegisterActivity, AddFriendActivity::class.java)
+                        }
+                        startActivity(intent)
+
                     } else {
                         var toastMessage = ""
                         when(response.code()){
@@ -175,4 +183,19 @@ class RegisterActivity : AppCompatActivity() {
 
     }
 
+    fun saveUserName(context: Context, userName: String) {
+        val sharedPreferences = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("user_name", userName)
+        editor.apply() // 비동기 저장
+    }
+
+    suspend fun getMyName(): String {
+        var name = ""
+        val response = apiService.getMyName()  // 비동기 작업
+        if (response.isSuccessful) {
+            name = response.body()?.get("name").toString()
+        }
+        return name
+    }
 }
