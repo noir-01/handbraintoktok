@@ -46,7 +46,7 @@ class RhythmGameResultActivity : AppCompatActivity() {
 
         currentScore=intent.getIntExtra("SCORE",0)
 
-        currentScore = 63
+        //currentScore = 3
 
         currentCombo=intent.getIntExtra("COMBO",0)
         difficulty= intent.getStringExtra("DIFFICULTY").toString()
@@ -72,7 +72,7 @@ class RhythmGameResultActivity : AppCompatActivity() {
 
                 val leaderboardAdapter = binding.leaderboardRecyclerView.adapter as LeaderboardAdapter
                 //animateRecyclerRank(previousRank,newRank)
-                leaderboardAdapter.updateList(newLeaderBoard)
+                leaderboardAdapter.submitList(newLeaderBoard)
             }
         }
         binding.confirmButton.setOnClickListener {
@@ -86,21 +86,22 @@ class RhythmGameResultActivity : AppCompatActivity() {
 
     private fun setupLeaderboard(leaderboard: MutableList<UserScore>) {
         binding.leaderboardRecyclerView.apply{
-            adapter=LeaderboardAdapter(leaderboard)
+            adapter=LeaderboardAdapter(this@RhythmGameResultActivity)
             layoutManager=LinearLayoutManager(this@RhythmGameResultActivity)
             itemAnimator=DefaultItemAnimator().apply{
                 moveDuration = 3000 // 애니메이션 지속 시간 조절
                 addDuration = 3000
                 removeDuration = 3000
             }
-
         }
+        (binding.leaderboardRecyclerView.adapter as LeaderboardAdapter).submitList(leaderboard)
     }
 
     private suspend fun getRankRecordsBefore(): MutableList<UserScore> {
         return withContext(Dispatchers.IO) {
             val results: List<RhythmGameHistoryDto> = apiService.getRhythmRecords(musicId)
-            results.mapIndexed { index, dto ->
+            val filteredResults = results.filter { it.difficulty == difficulty }
+            filteredResults.mapIndexed { index, dto ->
                 UserScore(
                     rank = index + 1, // 순위는 1부터 시작
                     name = dto.userDto.name,
@@ -115,7 +116,7 @@ class RhythmGameResultActivity : AppCompatActivity() {
     private suspend fun getRankIndex(): Int {
         return withContext(Dispatchers.IO) {
             try {
-                val result = apiService.getRhythmRecord(musicId, difficulty = difficulty)
+                val result = apiService.getRhythmMyRank(musicId, difficulty = difficulty)
                 if (result.isSuccessful) {
                     val ranking = result.body()?.get("ranking")?.toString()?.toDoubleOrNull()?.toInt()
                     return@withContext ranking ?: -1 // -1을 기본값으로 반환 (null인 경우)
