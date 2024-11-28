@@ -151,7 +151,7 @@ public class HistoryService {
         LocalDate startOfWeek = getWeekStart(LocalDate.now());
         LocalDate endOfWeek = getWeekEnd(LocalDate.now());
 
-        Integer ranking = rhythmGameHistoryRepo.findUserRankNative(
+        Integer ranking = rhythmGameHistoryRepo.findUserRankAmongFriends(
                 userId,
                 musicId,
                 difficulty.name(),
