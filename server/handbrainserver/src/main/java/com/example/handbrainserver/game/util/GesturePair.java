@@ -17,9 +17,13 @@ public class GesturePair {
         this.first = first;
         this.second = null;  // 필요 없을 경우 null
     }
-    public GesturePair(){}
+    public GesturePair(){
+        this.first=null;
+        this.second=null;
+    }
 
     public boolean hasSecond() {
         return second != null;  // 두 번째 값이 있는지 확인하는 헬퍼 메서드
     }
+    public boolean hasFirst() {return first!=null;}
 }

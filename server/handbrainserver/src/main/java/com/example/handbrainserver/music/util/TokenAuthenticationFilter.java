@@ -22,7 +22,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String token = extractToken(request);
 
         if (token != null && !jwtUtil.isTokenExpired(token)) {
-            Authentication auth = new UsernamePasswordAuthenticationToken(jwtUtil.extractUsername(token), null,new ArrayList<>());
+            Authentication auth = new UsernamePasswordAuthenticationToken(jwtUtil.extractUserId(token), null,new ArrayList<>());
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 

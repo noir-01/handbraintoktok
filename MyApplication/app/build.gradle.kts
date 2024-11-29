@@ -18,7 +18,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.myapplication"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -135,4 +135,8 @@ dependencies {
 
     // RecyclerView
     implementation("androidx.recyclerview:recyclerview")
+    //for token manage
+    implementation("androidx.security:security-crypto:1.1.0-alpha06")
+    //chart
+    implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
 }

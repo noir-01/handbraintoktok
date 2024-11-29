@@ -18,6 +18,8 @@
     <uses-permission android:name="android.permission.CAMERA"/>
     <uses-permission android:name="android.permission.CAPTURE_VIDEO_OUTPUT"
         tools:ignore="ProtectedPermissions" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -31,10 +33,28 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.RhythmGameSelectActivity"
+            android:name=".activity.game.RhythmGameResultActivity"
             android:exported="false" />
         <activity
-            android:name=".activity.RhythmGameStartActivity"
+            android:name=".AddFriendActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterOrNotActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RecordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.game.RhythmGameSelectActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.game.RhythmGameStartActivity"
             android:exported="false" />
         <activity
             android:name=".TutorialActivity"
@@ -55,7 +75,7 @@
             android:name=".activity.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".GameStartActivity"
+            android:name=".activity.game.GameStartActivity"
             android:exported="true" />
         <activity
             android:name=".SplashActivity"

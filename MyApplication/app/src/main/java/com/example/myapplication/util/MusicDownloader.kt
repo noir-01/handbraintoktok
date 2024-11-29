@@ -1,9 +1,9 @@
 package com.example.myapplication.util
 
 import android.content.Context
+import com.example.myapplication.util.network.ApiService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.ResponseBody
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream

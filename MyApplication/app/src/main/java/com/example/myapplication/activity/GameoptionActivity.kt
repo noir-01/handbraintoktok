@@ -3,13 +3,9 @@ package com.example.myapplication
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ImageButton
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import com.example.myapplication.activity.RhythmGameSelectActivity
-import com.example.myapplication.activity.VariousGameActivity
-import com.example.myapplication.multiUi.LoginActivity
+import com.example.myapplication.activity.game.GameStartActivity
+import com.example.myapplication.activity.game.RhythmGameSelectActivity
 
 class GameoptionActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,22 +21,21 @@ class GameoptionActivity : AppCompatActivity() {
           finish()
         }
 
-        // 랜덤 게임 완성되면 수정 필요
         randomgameButton.setOnClickListener {
             val intent = Intent(this, GameStartActivity::class.java)
-            intent.putExtra("GAME_NAME", "mimic")
+            intent.putExtra("MODE", "RANDOM")
             startActivity(intent)
         }
-        /*
-        로그인 구현 위해 멀티 플레이 부분 잠시 보류
+        //따라하기 게임 테스트용
         togetherButton.setOnClickListener {
-            val intent=Intent(this,LoginActivity::class.java)
+            val intent=Intent(this,GameStartActivity::class.java)
+            intent.putExtra("MODE", "COPY")
             startActivity(intent)
         }
 
-         */
+         
         rhythmgameButton.setOnClickListener {
-            val intent=Intent(this,RhythmGameSelectActivity::class.java)
+            val intent=Intent(this, RhythmGameSelectActivity::class.java)
             startActivity(intent)
         }
     }

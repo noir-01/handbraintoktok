@@ -95,6 +95,16 @@ object ResourceUtils {
         "hand_v_l" to R.drawable.hand_v_l,
         "hand_v_r" to R.drawable.hand_v_r,
         "hand_wolf_l" to R.drawable.hand_wolf_l,
-        "hand_wolf_r" to R.drawable.hand_wolf_r
+        "hand_wolf_r" to R.drawable.hand_wolf_r,
+        "num_1" to R.drawable.num_1,
+        "num_2" to R.drawable.num_2,
+        "num_3" to R.drawable.num_3,
+        "num_4" to R.drawable.num_4,
+        "num_5" to R.drawable.num_5,
+        "num_6" to R.drawable.num_6,
+        "num_7" to R.drawable.num_7,
+        "num_8" to R.drawable.num_8,
+        "num_9" to R.drawable.num_9,
+        "num_10" to R.drawable.num_10
     )
 }

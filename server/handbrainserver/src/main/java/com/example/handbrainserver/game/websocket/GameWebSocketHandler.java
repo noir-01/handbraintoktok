@@ -3,6 +3,12 @@ package com.example.handbrainserver.game.websocket;
 import com.example.handbrainserver.game.model.GameSession;
 import com.example.handbrainserver.game.util.Gesture;
 import com.example.handbrainserver.game.util.GesturePair;
+import com.example.handbrainserver.music.dto.HistoryDto;
+import com.example.handbrainserver.music.service.HistoryService;
+import com.example.handbrainserver.music.service.UserService;
+import com.example.handbrainserver.music.util.GameType;
+import com.example.handbrainserver.music.util.JwtUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -10,6 +16,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,6 +24,12 @@ import java.util.Map;
 public class GameWebSocketHandler extends TextWebSocketHandler {
     //sessionId, GameSession
     private final Map<String, GameSession> gameSessions = new HashMap<>();
+    @Autowired
+    private JwtUtil jwtUtil;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private HistoryService historyService;
 
     @Override
     public void afterConnectionEstablished(WebSocketSession session) throws Exception {
@@ -33,14 +46,30 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
 
         if (gameSession.getUserId() == null) {
             // JSON 메시지 파싱
-            String[] inputs = payload.split(","); // ":"로 구분된 문자열로 입력을 처리
+            String[] inputs = payload.split(","); // ","로 구분된 문자열로 입력을 처리
 
             if (inputs.length == 2) { // 두 개의 값이 있는 경우
-                String userId = inputs[0].trim(); // 첫 번째 값: userId
-                boolean isRandomGame = Boolean.parseBoolean(inputs[1].trim());
+                //처음에 token 전송으로 유저 찾아야 함.
+                String token = inputs[0].trim(); // 첫 번째 값: token, token=>phoneNum=>id
+                Long userId = Long.parseLong(jwtUtil.extractUserId(token));
+
+                String gameTypeString = inputs[1].trim();
+                switch(gameTypeString){
+                    case "COPY":
+                        gameSession.setGameType(GameType.COPY);
+                        break;
+                    case "RSP":
+                        gameSession.setGameType(GameType.RSP);
+                        break;
+                    case "CALC":
+                        gameSession.setGameType(GameType.CALC);
+                        break;
+                    case "RANDOM":
+                        gameSession.setGameType(GameType.RANDOM);
+                        break;
+                }
 
                 gameSession.setUserId(userId);
-                gameSession.setRandomGame(isRandomGame);
                 session.sendMessage(new TextMessage("게임 시작! 첫 문제를 기다리세요."));
 
                 //첫문제 출제.
@@ -49,7 +78,6 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
                 session.sendMessage(new TextMessage(nextGameMessage(gameSession)));
 
             } else {
-
                 session.sendMessage(new TextMessage("잘못된 첫 번째 메시지입니다."));
             }
 
@@ -68,27 +96,48 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
 
     public void handleGameMessage(WebSocketSession session, String payload) {
         GameSession gameSession = gameSessions.get(session.getId());
-
-        // 예측한 정답을 정수형으로 변환
+        
+        //유저는 firstAnser,secondAnswer,reactionTime 전송
         String[] inputs = payload.split(",");
         GesturePair userAnswer = new GesturePair();
+        
+        Integer firstAnswer = !inputs[0].equals("-1")?Integer.parseInt(inputs[0]):null;
+        Integer secondAnswer = !inputs[1].equals("-1")?Integer.parseInt(inputs[1]):null;
+        Integer reactionTime = Integer.parseInt(inputs[2]);
 
-        userAnswer.setFirst(Gesture.fromCode(Integer.parseInt(inputs[0])));
-        Integer secondAnswer = inputs.length > 1 && !inputs[1].equals("null") ? Integer.parseInt(inputs[1]) : null;
+        if(firstAnswer!=null){
+            userAnswer.setFirst(Gesture.fromCode(firstAnswer));
+        }
         if(secondAnswer!=null){
             userAnswer.setSecond(Gesture.fromCode(secondAnswer));
         }
 
         // 정답 판단 및 문제 출제
         boolean isCorrect = gameSession.isAnswer(userAnswer);
-
         try {
             if (isCorrect) {
-                // 정답일 경우 다음 문제 출제
+                //System.out.println(inputs[2]);
+                // 정답일 경우 반응속도 더해놓기 (나중에 평균내서 저장)
+                gameSession.addReactionTime(reactionTime);
                 gameSession.nextProblem();
-                session.sendMessage(new TextMessage("correct"));
 
+                session.sendMessage(new TextMessage("correct"));
+                
+                //마지막 문제면 반응속도 기록
                 if (gameSession.isEnd()) {
+                    HistoryDto.RandomGameHistoryDto historyDto = new HistoryDto.RandomGameHistoryDto();
+                    historyDto.setUserDto(
+                            userService.getUserById(gameSession.getUserId())
+                    );
+                    historyDto.setGameType(
+                            gameSession.getGameType()
+                    );
+                    historyDto.setDate(LocalDate.now());
+                    historyDto.setReactionTime(
+                            gameSession.getReactionTimeAverage())
+                    ;
+                    historyService.saveRandomGameHistory(historyDto);
+
                     session.sendMessage(new TextMessage("end"));
                 } else {
                     //gameMessage 만들어서 전송
