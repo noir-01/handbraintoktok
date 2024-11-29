@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/dog1_jump_01" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_jump_02" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_jump_03" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_jump_04" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_jump_05" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_jump_06" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_jump_07" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_jump_08" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_jump_09" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_jump_10" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_jump_11" android:duration="100"/>
+</animation-list>

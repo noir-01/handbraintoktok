@@ -2,6 +2,7 @@ package com.example.handbrainserver.game.model;
 
 import com.example.handbrainserver.game.util.Gesture;
 import com.example.handbrainserver.game.util.GesturePair;
+import com.example.handbrainserver.music.util.GameType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,16 +12,19 @@ import java.util.Random;
 @Getter
 public class GameSession {
 
-    private String userId;
+    private Long userId;
     private String sessionId;
     private long startTime;
-    private boolean isRandomGame;
+    private GameType gameType;
 
     private int questionCounter;
     private GesturePair question;
     private GesturePair correctAnswer;
     private int questionType;
     private int calcQuestion;
+
+    private int reactionTimeSum = 0;
+    private int questionNums;
     
     Random random = new Random();
 
@@ -29,7 +33,9 @@ public class GameSession {
         this.startTime = System.currentTimeMillis();
 
         //10문제 카운트
-        this.questionCounter = 10;
+        this.questionNums = 10;
+        this.questionCounter=questionNums;
+
         question = new GesturePair();
         correctAnswer = new GesturePair();
     }
@@ -39,37 +45,47 @@ public class GameSession {
     }
     public void nextProblem() {
         Gesture[] rspGestures = {Gesture.ROCK, Gesture.TWO, Gesture.FIVE};
+        switch(gameType){
+            case COPY:
+                questionType=0;
+                break;
+            case RSP:
+                questionType= random.nextInt(2)+1;
+                break;
+            case CALC:
+                questionType=3;
+                break;
+            case RANDOM:
+                questionType=random.nextInt(4);
+                break;
+        }
+        switch(questionType){
+            case 0: //따라하기
+                getCopyQuestion();
+                break;
 
-        //기본 따라하기 - 랜덤으로 따라할 동작 2개 뽑아서 반환
-        if(!isRandomGame){
-            questionType = 0;
-            getCopyQuestion();
+            case 1: //이기는,지는 가위바위보: 문제랑 이기는/지는만 알면 문제랑 답 비교해서 정답인지 알 수 있음. 정답 따로 저장 X
+            case 2:
+                question.setFirst(rspGestures[random.nextInt(rspGestures.length)]);
+                question.setSecond(rspGestures[random.nextInt(rspGestures.length)]);
+                break;
 
-        }else{
-            //따라하기, 지는/이기는 가위바위보, 숫자 계산
-            questionType = random.nextInt(4);
-            switch(questionType){
-                case 0: //따라하기
-                    getCopyQuestion();
-                    break;
-
-                case 1: //지는/이기는 가위바위보
-                case 2:
-                    question.setFirst(rspGestures[random.nextInt(rspGestures.length)]);
-                    question.setSecond(rspGestures[random.nextInt(rspGestures.length)]);
-                    break;
-                    
-                case 3: //숫자 계산
-                    calcQuestion = random.nextInt(11);
-                    break;
-            }
+            case 3: //숫자 계산
+                calcQuestion = random.nextInt(11);
+                break;
         }
         questionCounter-=1;
     }
 
     public boolean isAnswer(GesturePair userAnswer){
         return switch(questionType){
-            case 0 -> (question.getFirst()==userAnswer.getFirst() && question.getSecond()==userAnswer.getSecond());
+            case 0 -> {
+                if (userAnswer.getFirst() == Gesture.HEART_TWO_HANDS || userAnswer.getSecond() == Gesture.HEART_TWO_HANDS) {
+                    yield question.getFirst() == userAnswer.getFirst() || question.getSecond() == userAnswer.getSecond();
+                } else {
+                    yield question.getFirst() == userAnswer.getFirst() && question.getSecond() == userAnswer.getSecond();
+                }
+            }
             case 1 -> Gesture.rspWin(question,userAnswer);
             case 2 -> Gesture.rspLose(question,userAnswer);
             case 3 -> Gesture.calcHand(calcQuestion,userAnswer);
@@ -102,6 +118,12 @@ public class GameSession {
         int prob = random.nextInt(3);
         Gesture[] rsp = {Gesture.ROCK,Gesture.TWO,Gesture.FIVE};
         return rsp[prob].getGestureCode();
+    }
+    public void addReactionTime(int reactionTime){
+        this.reactionTimeSum += reactionTime;
+    }
+    public int getReactionTimeAverage(){
+        return this.reactionTimeSum / this.questionNums;
     }
 
 }

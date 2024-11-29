@@ -1,45 +1,30 @@
 package com.example.myapplication.adapters
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.myapplication.R
-import com.example.myapplication.util.Music
-
-// ViewHolder 클래스
-class SongViewHolder(itemView: View, private val musics: List<Music>, private val onMusicSelected: (Int) -> Unit) : RecyclerView.ViewHolder(itemView) {
-    val songButton: AppCompatButton = itemView.findViewById(R.id.songButton)
-    init {
-        // 버튼 클릭 시 콜백 호출
-        songButton.setOnClickListener {
-            val musicId = musics[bindingAdapterPosition].id
-            onMusicSelected(musicId) // 콜백을 통해 음악 ID 전달
-        }
-    }
-}
+import com.example.myapplication.ViewHolder.MusicViewHolder
+import com.example.myapplication.util.dataClass.Music
 
 // Adapter 클래스
 class MusicAdapter(
     private var musics: List<Music>,
-    private val onMusicSelected: (Int) -> Unit
-) : RecyclerView.Adapter<SongViewHolder>() {
-
+    private val onMusicSelected: (Music) -> Unit,
+) : RecyclerView.Adapter<MusicViewHolder>() {
 
     private var selectedPosition: Int = RecyclerView.NO_POSITION // 선택된 아이템 위치를 저장하는 변수
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SongViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MusicViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.item_music, parent, false)
-        return SongViewHolder(itemView,musics,onMusicSelected)
+        return MusicViewHolder(itemView, musics, onMusicSelected)
     }
 
-    override fun onBindViewHolder(holder: SongViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MusicViewHolder, position: Int) {
         val song = musics[position]
         val songDetails = "${song.title} - ${song.artist} - ${song.duration}"
 
-        // 버튼 텍스트 설정
         holder.songButton.text = songDetails
 
         // 선택된 버튼에 대해 색 변경
@@ -60,11 +45,14 @@ class MusicAdapter(
 
             val previousPosition = selectedPosition
             selectedPosition = adapterPosition
-
+            ////선택된 버튼을 맨 위쪽으로 보이게 스크롤하는 ㅋ드
+            //val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+            //layoutManager.scrollToPositionWithOffset(selectedPosition , 0)
             // RecyclerView 업데이트
             notifyItemChanged(previousPosition) // 이전 선택된 아이템 업데이트
             notifyItemChanged(selectedPosition) // 현재 선택된 아이템 업데이트
-            onMusicSelected(song.id)
+            onMusicSelected(song)
+
         }
     }
 

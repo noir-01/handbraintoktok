@@ -47,6 +47,7 @@ class RecordActivity : AppCompatActivity(){
                     averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
                 )
             }
+
             withContext(Dispatchers.Main){
                 setupChart(chart, dailyList, "Daily Average Reaction Time")
             }
@@ -134,6 +135,7 @@ class RecordActivity : AppCompatActivity(){
 
 
 
+
         // Set up the data for the chart
         val lineData = LineData(dataSet)
         chart.data = lineData
@@ -146,6 +148,7 @@ class RecordActivity : AppCompatActivity(){
             setScaleEnabled(false) // 확대/축소 비활성화
             setPinchZoom(false) // 핀치 줌 비활성화
             isDoubleTapToZoomEnabled = false // 더블 탭 줌 비활성화
+
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM
                 valueFormatter = object : ValueFormatter() {
@@ -168,6 +171,7 @@ class RecordActivity : AppCompatActivity(){
             invalidate() // Refresh the chart
         }
     }
+
     // Use this function for daily, weekly, and monthly buttons
     fun showDailyData() {
         setupChart(chart, dailyList, "Daily Average Reaction Time")

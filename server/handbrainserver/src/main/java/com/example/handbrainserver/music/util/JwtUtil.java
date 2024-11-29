@@ -3,36 +3,47 @@ package com.example.handbrainserver.music.util;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import org.springframework.stereotype.Component;
-
+import org.springframework.beans.factory.annotation.Value;
+import jakarta.annotation.PostConstruct;
 import java.util.Date;
-import javax.crypto.SecretKey;
+
 @Component
 public class JwtUtil {
-    private final String secretKey = "cx1UbIeH6FD+1oSjYSB5bgRk6RV/21AYpu4/ILn1bJo=";
-    private long expirationTime = 86400000; // 1일
+    
 
-    public String generateToken(String username) {
+    private static String SECRET_KEY;
+    @Value("${jwt.secretKey}")
+    private String secret_key;
+
+    @PostConstruct
+    public void init() {
+        this.SECRET_KEY = secret_key;
+    }
+    
+
+    private long expirationTime = 15839520000L; // 180일
+
+    public String generateToken(Long userId) {
         return Jwts.builder()
-                .setSubject(username)
+                .setSubject(userId.toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(SignatureAlgorithm.HS256, secretKey)
+                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
                 .compact();
     }
 
-    public boolean validateToken(String token, String username) {
-        final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username) && !isTokenExpired(token));
+    public boolean validateToken(String token, String phoneNum) {
+        final String extractedUsername = extractUserId(token);
+        return (extractedUsername.equals(phoneNum) && !isTokenExpired(token));
     }
 
-    public String extractUsername(String token) {
+    public String extractUserId(String token) {
         return extractAllClaims(token).getSubject();
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
     }
 
     public boolean isTokenExpired(String token) {

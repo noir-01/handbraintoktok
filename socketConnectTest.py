@@ -24,7 +24,7 @@ def on_open(ws):
     threading.Thread(target=run).start()
 
 if __name__ == "__main__":
-    websocket_url = "wss://whiskeygallery-review.com:38443/ws"  # 서버 주소를 변경하세요
+    websocket_url = "wss://handbraintoktok.duckdns.org:8080/ws"
     ws = websocket.WebSocketApp(websocket_url,
                                 on_message=on_message,
                                 on_error=on_error,

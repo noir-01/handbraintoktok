@@ -10,11 +10,5 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" /> <!-- 남은 공간을 다 차지 -->
-    <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/startRhythmGameButton"
-        android:layout_width="match_parent"
-        android:layout_height="80dp"
-        android:text="게임 시작"
-        android:background="@color/teal_200" />
 
 </LinearLayout>
