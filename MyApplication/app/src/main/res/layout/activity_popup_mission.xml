@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@drawable/todo_image"
+    android:padding="20dp">
+
+    <TextView
+        android:layout_width="100dp"
+        android:layout_height="80dp"
+        android:text="할일"
+        android:textSize="50dp"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:textColor="@color/black"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical"
+        android:gravity="left">
+
+        <!-- 버튼: 손동작 따라하기 -->
+        <Button
+            android:id="@+id/btnHandGesture"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="#85FFFFFF"
+            android:textColor="#000000"
+            android:text="손동작 따라하기"
+            android:textSize="40dp"
+            android:textStyle="bold" />
+
+        <!-- 버튼: 리듬게임 -->
+        <Button
+            android:id="@+id/btnRhythmGame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="#85FFFFFF"
+            android:textColor="#000000"
+            android:text="리듬게임"
+            android:textSize="40dp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/btnClose"
+        android:layout_width="100dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center_horizontal|bottom"
+        android:background="#85FFFFFF"
+        android:textColor="@color/black"
+        android:text="닫기"
+        android:textSize="40dp"
+        android:textStyle="bold"
+        android:layout_marginBottom="20dp" />
+
+</LinearLayout>
