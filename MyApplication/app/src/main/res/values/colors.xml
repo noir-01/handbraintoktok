@@ -9,10 +9,14 @@
     <color name="white">#FFFFFFFF</color>
     <color name="faded_white">#57FFFFFF</color>
     <color name="faded_black">#57000000</color>
-    <color name="light_green">#3AAE09</color>
-    <color name="yellow">#EAE78F</color>
-    <color name="red">#E82039</color>
+    <color name="light_green">#803AAE09</color>
+    <color name="yellow">#80EAE78F</color>
+    <color name="red">#80E82039</color>
+    <color name="green">#80C8E6C9</color>
     <color name="gray">#B0BEC5</color>
     <color name="dark_gray">#455A64</color>
+
+
+
 
 </resources>
