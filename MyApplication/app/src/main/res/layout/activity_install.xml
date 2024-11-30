@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@drawable/main_background"
     tools:context=".InstallActivity">
 
     <!-- Top section for the back button -->
@@ -17,7 +18,7 @@
             android:id="@+id/button_back"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/back"
+            android:background="@drawable/btn_back"
             android:contentDescription="Back button"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"/>
@@ -48,14 +49,14 @@
                 android:id="@+id/playButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/play"
+                android:background="@drawable/btn_install_start"
                 android:contentDescription="Play Button" />
 
             <ImageButton
                 android:id="@+id/pauseButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@drawable/stop"
+                android:background="@drawable/btn_install_stop"
                 android:layout_marginStart="16dp"
                 android:contentDescription="Pause Button"/>
         </LinearLayout>

@@ -6,14 +6,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:layout_gravity="center"
-    android:background="@color/white"
+    android:background="@drawable/main_background"
     >
 
     <ImageButton
         android:id="@+id/button_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/back"
+        android:background="@drawable/btn_back"
         android:contentDescription="back button"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
@@ -28,7 +28,7 @@
         android:id="@+id/button_install"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/install"
+        android:background="@drawable/btn_install"
         android:padding="16dp"/>
 
     <Space
@@ -41,7 +41,7 @@
         android:id="@+id/button_tutorial"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/tutorial"
+        android:background="@drawable/btn_practice_game"
         android:padding="16dp"
         />
 

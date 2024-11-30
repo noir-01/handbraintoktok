@@ -4,13 +4,13 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:background="#80FECDCD">  <!-- 배경색 설정 -->
+    android:background="#00FF0080">  <!-- 배경색 설정 -->
 
     <!-- 로고 이미지뷰 -->
     <ImageView
         android:id="@+id/logoImageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/logo2"
+        android:src="@drawable/logo_new"
         android:contentDescription="@string/app_name"/>
 </LinearLayout>

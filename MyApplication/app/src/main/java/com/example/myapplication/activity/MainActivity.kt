@@ -10,7 +10,6 @@ import android.widget.ImageButton
 import androidx.core.content.ContextCompat
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.OnBackPressedCallback
-import com.example.myapplication.activity.game.GameStartActivity
 
 class MainActivity : BaseActivity() {
     private var selectedGameName: String? = null
