@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- 소리 크기 설정 -->
+    <TextView
+        android:id="@+id/soundVolumeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="소리 크기 설정"
+        android:textSize="18sp"
+        android:paddingBottom="10dp"/>
+
+    <SeekBar
+        android:id="@+id/soundVolumeSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="100"
+        android:progress="50" />
+
+    <!-- 소리 크기 값 표시 -->
+    <TextView
+        android:id="@+id/soundVolumeValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="50"
+        android:textSize="16sp"
+        android:paddingBottom="20dp"/>
+
+    <!-- 글자 크기 설정 -->
+    <TextView
+        android:id="@+id/textSizeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="글자 크기 설정"
+        android:textSize="18sp"
+        android:paddingBottom="10dp"/>
+
+    <SeekBar
+        android:id="@+id/textSizeSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:min="20"
+        android:max="40"
+        android:progress="20" />
+
+    <!-- 글자 크기 값 표시 -->
+    <TextView
+        android:id="@+id/textSizeValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20sp"
+        android:textSize="16sp"
+        android:paddingBottom="20dp"/>
+
+    <!-- 저장 버튼 -->
+    <Button
+        android:id="@+id/saveSettingsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="설정 저장"
+        android:layout_gravity="center"
+        android:padding="10dp"/>
+</LinearLayout>

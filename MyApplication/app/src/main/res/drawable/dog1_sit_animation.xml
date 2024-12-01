@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animation-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/dog1_sit_01" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_02" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_03" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_04" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_05" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_06" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_07" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_08" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_09" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_10" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_11" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_12" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_13" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_14" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_15" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_16" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_17" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_18" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_19" android:duration="100"/>
+    <item android:drawable="@drawable/dog1_sit_20" android:duration="100"/>
+</animation-list>
