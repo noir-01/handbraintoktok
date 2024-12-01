@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <Button
+        android:id="@+id/button_mimic_hands"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:textSize="24sp"
+        android:text="mimic"
+        android:onClick="onButtonClick"/>
+
+    <Button
+        android:id="@+id/button_rock_paper_scissor"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:textSize="24sp"
+        android:text="rps"
+        android:onClick="onButtonClick"/>
+
+    <Button
+        android:id="@+id/button_blue_white_flag"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:textSize="24sp"
+        android:text="bwf"
+        android:onClick="onButtonClick"/>
+
+    <Button
+        android:id="@+id/button_random_game"
+        android:layout_width="200dp"
+        android:layout_height="100dp"
+        android:textSize="24sp"
+        android:text="random"
+        android:onClick="onButtonClick"/>
+
+</LinearLayout>

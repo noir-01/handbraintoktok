@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp"
+    android:background="#FAFAFA">
+
+    <!-- 질문 텍스트 -->
+    <TextView
+        android:id="@+id/tv_question"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="앱이 처음이신가요?"
+        android:textSize="24sp"
+        android:textColor="#333"
+        android:gravity="center"
+        android:layout_marginBottom="24dp" />
+
+    <!-- 버튼 그룹 -->
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center">
+
+        <!-- 예(회원가입) 버튼 -->
+        <Button
+            android:id="@+id/btn_signup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="예 (회원가입)"
+            android:backgroundTint="#4CAF50"
+            android:textColor="#FFF"
+            android:layout_marginEnd="8dp"
+            android:padding="12dp" />
+
+        <!-- 아니오(인증하기) 버튼 -->
+        <Button
+            android:id="@+id/btn_authenticate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="아니오 (인증하기)"
+            android:backgroundTint="#2196F3"
+            android:textColor="#FFF"
+            android:padding="12dp" />
+
+    </LinearLayout>
+
+</LinearLayout>
