@@ -11,9 +11,11 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.AppCompatImageButton
 import androidx.transition.Visibility
 import com.example.myapplication.util.dataClass.NumDto
 import com.example.myapplication.util.dataClass.VerificationRequest
@@ -48,7 +50,7 @@ class RegisterActivity : AppCompatActivity() {
 
 
         val phoneEditText = findViewById<EditText>(R.id.phoneEditText)
-        val verifyButton = findViewById<Button>(R.id.verifyButton)
+        val verifyButton: ImageButton = findViewById(R.id.verifyButton)
         val otpEditText = findViewById<EditText>(R.id.otpEditText)
         val startButton = findViewById<Button>(R.id.startButton)
         val nameText = findViewById<EditText>(R.id.nameEditText)
@@ -67,12 +69,12 @@ class RegisterActivity : AppCompatActivity() {
             val countDownTimer = object : CountDownTimer(5000, 1000) {
                 @SuppressLint("SetTextI18n")
                 override fun onTick(millisUntilFinished: Long) {
-                    verifyButton.text = "${millisUntilFinished / 1000}초"
+                    //verifyButton.text = "${millisUntilFinished / 1000}초"
                 }
 
                 override fun onFinish() {
                     verifyButton.isEnabled = true
-                    verifyButton.text = "인증번호 전송"
+                    //verifyButton.text = "인증번호 전송"
                 }
             }
             countDownTimer.start()
