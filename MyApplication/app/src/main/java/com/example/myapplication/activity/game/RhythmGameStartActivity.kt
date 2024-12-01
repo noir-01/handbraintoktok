@@ -15,6 +15,11 @@ import androidx.appcompat.app.AppCompatActivity
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.Size
+import android.webkit.ConsoleMessage
+import android.webkit.JavascriptInterface
+import android.webkit.WebChromeClient
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -38,6 +43,7 @@ import com.example.myapplication.util.mediapipe.difficulty
 import com.example.myapplication.util.network.durationToSec
 import com.example.myapplication.util.mediapipe.gestureLabels
 import com.example.myapplication.util.mediapipe.reversedGestureLabels
+import com.example.myapplication.util.network.MyHttpServer
 import com.example.myapplication.util.network.RetrofitClient
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import kotlinx.coroutines.CoroutineScope
@@ -50,8 +56,15 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import kotlin.math.ceil
 import kotlin.random.Random
+import android.media.MediaMetadataRetriever
+import android.os.Handler
+import android.os.Looper
+import android.view.View
 
 class RhythmGameStartActivity: AppCompatActivity() {
+    //mp3 보내줄 로컬 서버
+    private lateinit var server :MyHttpServer
+    
     private val apiService = RetrofitClient.apiService
     private lateinit var musicDownloader: MusicDownloader
 
@@ -79,8 +92,10 @@ class RhythmGameStartActivity: AppCompatActivity() {
 
     private lateinit var leftHandImageView: ImageView
     private lateinit var rightHandImageView: ImageView
+    private lateinit var middleImageView: ImageView
     private lateinit var comboTextView: TextView
     private lateinit var scoreTextView: TextView
+    private lateinit var webView:WebView
 
     //콤보, 해당 회차 맞췄는지 확인하는 플래그
     private var combo = 0
@@ -92,6 +107,11 @@ class RhythmGameStartActivity: AppCompatActivity() {
     private var difficultyInt = 0
     private var difficultyString = "EASY"
 
+    //직접 musicFinishHandler 구현
+    private var musicStartTime = 0.0
+    private var duration = 0.0
+    private val handler = Handler(Looper.getMainLooper())
+    private var musicId = 0
 
     //음악 재생
     private var mediaPlayer: MediaPlayer? = null
@@ -111,11 +131,32 @@ class RhythmGameStartActivity: AppCompatActivity() {
 
         leftHandImageView = findViewById(R.id.leftHandImageView)
         rightHandImageView = findViewById(R.id.rightHandImageView)
+        //middleImageView = findViewById(R.id.middleImageView)
         comboTextView = findViewById(R.id.comboTextView)
         scoreTextView = findViewById(R.id.scoreTextView)
 
+
+        //MP3 로드해주는 로컬 웹서버 시작
+        CoroutineScope(Dispatchers.IO).launch {
+            server = MyHttpServer(this@RhythmGameStartActivity, 8080)
+            server.start()
+        }
+
+        webView = findViewById(R.id.webView)
+        //webView.settings.allowContentAccess=true
+        webView.settings.allowFileAccess=true
+        webView.settings.allowContentAccess=true
+        webView.settings.javaScriptEnabled = true
+        webView.setInitialScale(70)
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(message: ConsoleMessage?): Boolean {
+                Log.d("WebViewLog", message?.message() ?: "No message") // Log JavaScript console output
+                return super.onConsoleMessage(message)
+            }
+        }
+
         //RhythmGameSelectActivity에서 전달받은 music_id
-        val musicId = intent.getIntExtra("MUSIC_ID", -1)
+        musicId = intent.getIntExtra("MUSIC_ID", -1)
         val musicLength = durationToSec(intent.getStringExtra("DURATION")?:"00:00:00")
         difficultyString = intent.getStringExtra("DIFFICULTY")?:"EASY"
         difficultyInt = difficulty[difficultyString]?:0
@@ -152,7 +193,8 @@ class RhythmGameStartActivity: AppCompatActivity() {
                                 makeGameBeatsEasy(beats,bps)
                             }
                         }
-                        playMusic(musicId) // 음악 재생을 메인 스레드에서 실행
+                        //음악 재생 및 배경 파형 생성
+                        playMusicHtml()
                     }
 
                 } catch (e: Exception) {
@@ -170,13 +212,80 @@ class RhythmGameStartActivity: AppCompatActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+
+    fun playMusicHtml(){
+        val musicFile = File(getExternalFilesDir(null), "$musicId.mp3")
+        val retriever = MediaMetadataRetriever()
+
+        retriever.setDataSource(musicFile.absolutePath)
+        val durationString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+        duration = durationString?.toLong()?.toDouble()?.div(1000) ?: 0.0
+        Log.d("check","$duration")
+
+        val musicFilePath = "http://localhost:8080/mp3/$musicId.mp3"
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                // You can call evaluateJavascript here, after the page has loaded
+                CoroutineScope(Dispatchers.Main).launch {
+                    super.onPageFinished(view, url)
+                    webView.evaluateJavascript("loadAudio('$musicFilePath');", null)
+                    delay(1000)
+                    webView.evaluateJavascript("playMusic();", null)
+                    musicStartTime=System.currentTimeMillis()/1000.0
+                    trackMusicTime2()
+                    handler.postDelayed(checkRunnable, 300)
+                }
+            }
+        }
+        webView.loadUrl("file:///android_asset/index.html")
+    }
+
+    private val checkRunnable = object : Runnable {
+        override fun run() {
+            val currentTime = System.currentTimeMillis() / 1000.0 // 현재 시간 (초 단위)
+            val elapsedTime = currentTime - musicStartTime // 음악 시작 이후 경과 시간 (초 단위)
+            // 만약 경과 시간이 음악의 총 길이를 넘으면 종료된 것으로 판단
+            if (elapsedTime >= duration) {
+                Log.d("check","elapsed: $elapsedTime")
+                Log.d("check","total: $duration")
+                onMusicFinished() // 음악 종료 처리
+            } else {
+                // 계속해서 체크
+                handler.postDelayed(this, 300)
+            }
+        }
+    }
+    private fun onMusicFinished() {
+        // 음악이 끝났을 때 해야 할 작업을 여기에 추가
+        CoroutineScope(Dispatchers.IO).launch {
+            apiService.uploadRhythmGameHistory(
+                RhythmGamePostDto(musicId, difficultyString,combo,totalScore)
+            )
+            withContext(Dispatchers.Main){
+                val intent = Intent(this@RhythmGameStartActivity, RhythmGameResultActivity::class.java)
+                intent.putExtra("MUSIC_ID", musicId)
+                intent.putExtra("DIFFICULTY", difficultyString)
+                intent.putExtra("SCORE",totalScore)
+                intent.putExtra("COMBO",combo)
+                startActivity(intent)
+                finish()
+            }
+        }
+        handler.removeCallbacks(checkRunnable) // 주기적 체크 중지
+    }
+
+
     fun playMusic(musicId: Int) {
+
         val musicFile = File(getExternalFilesDir(null), "$musicId.mp3")
         mediaPlayer = MediaPlayer().apply {
             setDataSource(musicFile.absolutePath)
             prepareAsync() // 비동기 준비
             setOnPreparedListener {
                 start()
+
+                //WebView로 배경에 waveFlow 띄우기
+
                 trackMusicTime()
             }
             setOnCompletionListener {
@@ -190,13 +299,58 @@ class RhythmGameStartActivity: AppCompatActivity() {
                         intent.putExtra("DIFFICULTY", difficultyString)
                         intent.putExtra("SCORE",totalScore)
                         intent.putExtra("COMBO",combo)
+                        startActivity(intent)
                         finish()
                     }
                 }
-
             }
         }
     }
+
+
+    fun trackMusicTime2(){
+        lifecycleScope.launch(Dispatchers.IO) {
+            var leftBeatIdx = 0
+            var rightBeatIdx = 0
+            //현재 음악 위치한 시간
+            var currentTime = System.currentTimeMillis()/1000.0 - musicStartTime
+
+            while (currentTime<duration) {
+                currentTime = System.currentTimeMillis()/1000.0 - musicStartTime
+                // Main Thread에서 UI 수정
+                withContext(Dispatchers.Main) {
+                    //현재 시간이 비트 시간을 넘어갔으면 다음 비트로 이동.
+                    if(leftBeatIdx<leftBeats.size)
+                        updateImage2(true, leftHandImageView, currentTime, leftBeatIdx, leftHandIndex)
+                    if(rightBeatIdx<rightBeats.size)
+                        updateImage2(false, rightHandImageView, currentTime, rightBeatIdx, rightHandIndex)
+
+                    //적당한 시간 안에 맞췄으면(플래그=true) 콤보, 점수 올리고 플래그 초기화
+                    if(leftBeatIdx<leftBeats.size && currentTime>leftBeats[leftBeatIdx]+delayTime){
+                        leftBeatIdx++
+                        //콤보는 20까지만 증가
+                        if(answerFlag && combo<21) combo++
+                        else if (!answerFlag) combo = 0
+                        //점수는 기본 점수* 콤보 배열을 더해서 계산.
+                        totalScore += correctScore[difficultyInt]*combo
+                        answerFlag=false
+                    }
+                    //오른손
+                    if(rightBeatIdx<rightBeats.size && currentTime>rightBeats[rightBeatIdx]+delayTime){
+                        rightBeatIdx++
+                        if(answerFlag && combo<21) combo++
+                        else if (!answerFlag) combo = 0
+                        totalScore += correctScore[difficultyInt]*combo
+                        answerFlag=false
+                    }
+                    updateScoreAndCombo()
+                    delay(30)  // Delay
+                }
+            }
+        }
+    }
+
+
 
     fun trackMusicTime() {
         // Use lifecycleScope.launch to start a coroutine
@@ -247,6 +401,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
         when(isLeft){
             true->{
                 if (currentTime >= leftBeats[beatIdx] - imageShowTime && currentTime < leftBeats[beatIdx]+ 0.2f) {
+                    Log.d("check",leftImages[beatIdx])
                     showImage(imageView,leftImages[beatIdx],currentTime,leftBeats[beatIdx],predictIdx==leftAnswers[beatIdx])
                 }else{
                     hideImage(imageView)
@@ -262,18 +417,11 @@ class RhythmGameStartActivity: AppCompatActivity() {
             }
         }
     }
-
-    fun updateImage(imageView: ImageView, beats: List<Float>, images: List<String>, currentTime: Double, answers: List<Int>, predictIdx: Int?) {
-        for (i in beats.indices) {
-            if (currentTime >= beats[i] - imageShowTime && currentTime < beats[i]+ delayTime) {
-                //showImageWithRectangle(imageView, images[i], currentTime, beats[i])  // 이미지 표시
-                val isAnswer = answers[i]==predictIdx
-                showImage(imageView,images[i],currentTime,beats[i],true)
-            } else if (currentTime >= beats[i]) {
-                hideImage(imageView)  // 이미지 숨기기
-            }
-        }
+    fun showImage2(imageView: ImageView, imageName: String, currentTime:Double, beatTime:Float,isAnswer: Boolean) {
+        imageView.setImageResource(imageResources[imageName]!!)
+        imageView.bringToFront()
     }
+
     fun showImage(imageView: ImageView, imageName: String, currentTime:Double, beatTime:Float,isAnswer: Boolean) {
         val resourceId = imageResources[imageName] ?: return // 리소스 ID가 없다면 return
 
@@ -321,6 +469,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
         }
 
         imageView.setImageBitmap(bitmapWithBorder)
+        imageView.bringToFront()
     }
 
     fun hideImage(imageView: ImageView) {
@@ -331,6 +480,8 @@ class RhythmGameStartActivity: AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         mediaPlayer?.release()  // 액티비티 종료 시 MediaPlayer 해제
+        server.stop()
+        webView.evaluateJavascript("stopMusic();", null)
     }
 
     fun gameStart(handImages: Pair<List<String>,List<String>>, gameBeats: Pair<List<Float>,List<Float>>){
@@ -382,7 +533,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
                     }
                 }
             )
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.Default){
                 startCamera()
             }
         }
