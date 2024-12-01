@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/main_background">
+
+    <!-- 배경 위에 스크롤 뷰와 툴바를 겹치게 배치 -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@android:color/transparent"
+        app:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:paddingTop="16dp"
+            android:layout_width="match_parent"
+            android:layout_height="88dp"
+            android:background="@android:color/transparent"
+            app:elevation="0dp">
+
+            <ImageButton
+                android:id="@+id/button_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_back"
+                android:contentDescription="back button"
+                android:padding="8dp" />
+
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <!-- ScrollView for game buttons -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="16dp">
+
+            <!-- Game Buttons -->
+            <ImageButton
+                android:id="@+id/button_puppy_game"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_puppy_game"
+                android:contentDescription="puppy_game"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.15"
+                app:layout_constraintDimensionRatio="2:1"
+                android:layout_marginTop="20dp"/>
+
+            <ImageButton
+                android:id="@+id/button_rhythm_game"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_rhythm_game"
+                android:contentDescription="rhythm game button"
+                app:layout_constraintTop_toBottomOf="@id/button_puppy_game"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.15"
+                app:layout_constraintDimensionRatio="2:1"
+                android:layout_marginTop="20dp"/>
+
+            <ImageButton
+                android:id="@+id/button_random_game"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_random_game"
+                android:contentDescription="random_game button"
+                app:layout_constraintTop_toBottomOf="@id/button_rhythm_game"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.15"
+                app:layout_constraintDimensionRatio="2:1"
+                android:layout_marginTop="20dp"/>
+
+            <ImageButton
+                android:id="@+id/button_copy_game"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_copy_game"
+                android:contentDescription="copy game button"
+                app:layout_constraintTop_toBottomOf="@id/button_random_game"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.15"
+                app:layout_constraintDimensionRatio="2:1"
+                android:layout_marginTop="20dp"/>
+
+            <ImageButton
+                android:id="@+id/button_rsp_game"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_rsp_game"
+                android:contentDescription="rsp_game button"
+                app:layout_constraintTop_toBottomOf="@id/button_copy_game"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.15"
+                app:layout_constraintDimensionRatio="2:1"
+                android:layout_marginTop="20dp"/>
+
+            <ImageButton
+                android:id="@+id/button_calc_game"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_calc"
+                android:contentDescription="calc_game button"
+                app:layout_constraintTop_toBottomOf="@id/button_rsp_game"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.15"
+                app:layout_constraintDimensionRatio="2:1"
+                android:layout_marginTop="20dp"/>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
