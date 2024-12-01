@@ -1,53 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="16dp"
-    android:background="@color/white"
-    android:weightSum="3"
-    tools:context=".MainActivity">
+    android:background="@drawable/main_background">
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="30dp" />
 
+    <!-- Start Game Button -->
     <ImageButton
-        android:layout_weight="1"
         android:id="@+id/button_start_game"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/start_game"
-        android:contentDescription="start game button"/>
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/btn_start_game"
+        android:contentDescription="start game button"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/button_records"
+        app:layout_constraintHeight_percent="0.25"
+        app:layout_constraintDimensionRatio="2:1"
+        />
 
-
-
+    <!-- Records Button -->
     <ImageButton
-        android:layout_weight="1"
         android:id="@+id/button_records"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/record"
-        android:contentDescription="record button"/>
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/btn_history"
+        android:contentDescription="record button"
+        app:layout_constraintTop_toBottomOf="@id/button_start_game"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/button_method"
+        app:layout_constraintHeight_percent="0.25"
+        app:layout_constraintDimensionRatio="2:1"
+         />
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="10dp" />
-
+    <!-- Method Button -->
     <ImageButton
-        android:layout_weight="1"
         android:id="@+id/button_method"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/method"
-        android:contentDescription="method button"/>
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/btn_game_method"
+        android:contentDescription="method button"
+        app:layout_constraintTop_toBottomOf="@id/button_records"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHeight_percent="0.25"
+        app:layout_constraintDimensionRatio="2:1"
+        />
 
 
-
-
-
-
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
