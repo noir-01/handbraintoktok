@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.os.Bundle
+import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.myapplication.util.dataClass.RandomGameHistoryDto
@@ -35,6 +36,7 @@ class RecordActivity : AppCompatActivity(){
 
         val apiService = RetrofitClient.apiService
         chart = findViewById(R.id.chart)
+
         CoroutineScope(Dispatchers.IO).launch{
             dailyList = apiService.getRandomHistory("COPY","DAILY")
             weeklyList = apiService.getRandomHistory("COPY","WEEKLY")
@@ -184,5 +186,7 @@ class RecordActivity : AppCompatActivity(){
     fun showMonthlyData() {
         setupChart(chart, monthlyList, "Monthly Average Reaction Time")
     }
+
+
 
 }
