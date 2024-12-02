@@ -2,9 +2,44 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <!-- backButton-->
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_back"
+        android:contentDescription="back button"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        />
+
+    <!-- LineChart -->
     <com.github.mikephil.charting.charts.LineChart
+        android:layout_marginTop="150dp"
         android:id="@+id/chart"
         android:layout_width="match_parent"
         android:layout_height="300dp" />
 
+    <!-- Button -->
+    <ImageButton
+        android:id="@+id/recordRhythm"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/chart"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/record_rhythm_game"
+        android:contentDescription="record of rhythm game" />
+
+    <ImageButton
+        android:id="@+id/recordAnother"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/recordRhythm"
+        android:layout_marginTop="20dp"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/record_another_game"
+        android:contentDescription="record of another game" />
+
 </RelativeLayout>
+
+
