@@ -43,7 +43,10 @@ class WebViewTestActivity : AppCompatActivity() {
         //webView.settings.allowContentAccess=true
         webView.settings.allowFileAccess=true
         webView.settings.allowContentAccess=true
-        webView.settings.javaScriptEnabled = true
+        webView.settings.apply {
+            javaScriptEnabled = true
+            mediaPlaybackRequiresUserGesture = false
+        }
 
         webView.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(message: ConsoleMessage?): Boolean {
@@ -61,13 +64,13 @@ class WebViewTestActivity : AppCompatActivity() {
                 // You can call evaluateJavascript here, after the page has loaded
                 CoroutineScope(Dispatchers.Main).launch {
                     super.onPageFinished(view, url)
-                    webView.evaluateJavascript("loadAudio('$musicFilePath');", null)
+                    webView.evaluateJavascript("loadAudio('$musicFilePath');",null)
                     delay(1000)
-                    webView.evaluateJavascript("playMusic();", null)
+                    webView.evaluateJavascript("playAudio();", null)
                 }
             }
         }
-        webView.loadUrl("file:///android_asset/index.html")
+        webView.loadUrl("file:///android_asset/index2.html")
     }
 
     override fun onDestroy() {

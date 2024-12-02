@@ -146,7 +146,10 @@ class RhythmGameStartActivity: AppCompatActivity() {
         //webView.settings.allowContentAccess=true
         webView.settings.allowFileAccess=true
         webView.settings.allowContentAccess=true
-        webView.settings.javaScriptEnabled = true
+        webView.settings.apply {
+            javaScriptEnabled = true
+            mediaPlaybackRequiresUserGesture = false
+        }
         webView.setInitialScale(70)
         webView.webChromeClient = object : WebChromeClient() {
             override fun onConsoleMessage(message: ConsoleMessage?): Boolean {
@@ -228,16 +231,16 @@ class RhythmGameStartActivity: AppCompatActivity() {
                 // You can call evaluateJavascript here, after the page has loaded
                 CoroutineScope(Dispatchers.Main).launch {
                     super.onPageFinished(view, url)
-                    webView.evaluateJavascript("loadAudio('$musicFilePath');", null)
+                    webView.evaluateJavascript("loadAudio('$musicFilePath');",null)
                     delay(1000)
-                    webView.evaluateJavascript("playMusic();", null)
+                    webView.evaluateJavascript("playAudio();", null)
                     musicStartTime=System.currentTimeMillis()/1000.0
                     trackMusicTime2()
                     handler.postDelayed(checkRunnable, 300)
                 }
             }
         }
-        webView.loadUrl("file:///android_asset/index.html")
+        webView.loadUrl("file:///android_asset/index2.html")
     }
 
     private val checkRunnable = object : Runnable {
@@ -434,7 +437,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
         canvas.drawBitmap(originalBitmap, 0f, originalHeight*0.5f, null)  // 원본 이미지를 먼저 그립니다.
 
         val borderPaint = Paint()
-        borderPaint.color = Color.BLACK
+        borderPaint.color = Color.WHITE
         borderPaint.strokeWidth = 50f
         borderPaint.style = Paint.Style.STROKE
         //정답일 경우 초록색으로 그림

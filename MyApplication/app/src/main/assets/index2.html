@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #canvas {
+          position: fixed;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+        }
+    </style>
+    <script>
+        let audio, context, src, analyser, canvas, ctx;
+        let bufferLength, dataArray, WIDTH, HEIGHT, barWidth;
+
+        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        function loadAudio(musicUri) {
+            audio = document.getElementById("audio");
+            audio.crossOrigin = "anonymous"; // This can allow the audio to be loaded without CORS issues
+            audio.src = musicUri;
+            audio.load();
+
+          // 오디오 컨텍스트 및 분석기 설정
+          context = new AudioContext();
+          src = context.createMediaElementSource(audio);
+          analyser = context.createAnalyser();
+
+          // 캔버스 설정
+          canvas = document.getElementById("canvas");
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          ctx = canvas.getContext("2d");
+
+          // 연결 및 설정
+          src.connect(analyser);
+          analyser.connect(context.destination);
+          analyser.fftSize = 64;
+
+          // 초기화 파라미터
+          bufferLength = analyser.frequencyBinCount;
+          dataArray = new Uint8Array(bufferLength);
+          WIDTH = canvas.width;
+          HEIGHT = canvas.height;
+          barWidth = (WIDTH / bufferLength) * 2.5;
+        }
+
+        function playAudio() {
+          if (!audio || !analyser) {
+            console.error("오디오가 로드되지 않았습니다.");
+            return;
+          }
+          console.log("Hello world!")
+
+          audio.play();
+          renderFrame();
+        }
+
+        function renderFrame() {
+          requestAnimationFrame(renderFrame);
+
+          let x = 0;
+          analyser.getByteFrequencyData(dataArray);
+
+          // 배경 지우기
+          ctx.fillStyle = "#000";
+          ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+          // 주파수 바 그리기
+          for (let i = 0; i < bufferLength; i++) {
+            let barHeight = dataArray[i];
+
+            // 색상 계산
+            //let r = barHeight + (25 * (i/bufferLength));
+            //let g = 250 * (i/bufferLength);
+            //let b = 50;
+            let r = Math.min(255, barHeight + (100 * (i / bufferLength))); // Adding more variation for red
+        // Green (g): Using sine function for smooth green transition
+        let g = Math.min(255, 200 * Math.sin(i / bufferLength * Math.PI)); // Smooth transition for green
+        // Blue (b): Using cosine for subtle variation in blue
+        let b = Math.min(255, 150 * Math.cos(i / bufferLength * Math.PI));
+
+            ctx.fillStyle = `rgb(${r},${g},${b})`;
+            ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight*2);
+            x += barWidth + 1;
+          }
+        }
+    </script>
+</head>
+<body>
+<div id="content">
+    <canvas id="canvas"></canvas>
+    <audio id="audio"></audio>
+</div>
+</body>
+</html>
