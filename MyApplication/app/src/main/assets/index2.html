@@ -36,7 +36,7 @@
           // 연결 및 설정
           src.connect(analyser);
           analyser.connect(context.destination);
-          analyser.fftSize = 256;
+          analyser.fftSize = 64;
 
           // 초기화 파라미터
           bufferLength = analyser.frequencyBinCount;
