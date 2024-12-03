@@ -23,7 +23,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
 
-
 class RecordActivity : AppCompatActivity(){
     private lateinit var dailyList: List<RandomGameHistoryDto>
     private lateinit var weeklyList: List<RandomGameHistoryDto>
@@ -37,6 +36,51 @@ class RecordActivity : AppCompatActivity(){
         val apiService = RetrofitClient.apiService
         chart = findViewById(R.id.chart)
 
+
+        // 버튼 초기화
+        val backButton: ImageButton = findViewById(R.id.backButton)
+        val dailyButton: ImageButton = findViewById(R.id.dailyButton)
+        val weeklyButton: ImageButton = findViewById(R.id.weeklyButton)
+        val monthlyButton: ImageButton = findViewById(R.id.monthlyButton)
+        val recordRhythmButton: ImageButton = findViewById(R.id.recordRhythm)
+        val recordMimicButton: ImageButton = findViewById(R.id.recordMimic)
+        val recordRspButton: ImageButton = findViewById(R.id.recordRsp)
+        val recordCalculatorButton: ImageButton = findViewById(R.id.recordCalculator)
+
+        recordRhythmButton.setOnClickListener {
+            // 리듬 게임 기록 보여주기
+        }
+
+        recordMimicButton.setOnClickListener {
+            // 따라하기 게임 기록 보여주기
+        }
+
+        recordRspButton.setOnClickListener {
+            // 가위바위보 게임 기록 보여주기
+        }
+
+        recordCalculatorButton.setOnClickListener{
+            // 계산하기 게임 기록 보여주기
+        }
+
+
+        // 뒤로가기 버튼 클릭 이벤트
+        backButton.setOnClickListener {
+            finish() // 현재 액티비티 종료
+        }
+
+        // 버튼 클릭 이벤트 설정
+        dailyButton.setOnClickListener {
+            showDailyData()
+        }
+
+        weeklyButton.setOnClickListener {
+            showWeeklyData()
+        }
+
+        monthlyButton.setOnClickListener {
+            showMonthlyData()
+        }
         CoroutineScope(Dispatchers.IO).launch{
             dailyList = apiService.getRandomHistory("COPY","DAILY")
             weeklyList = apiService.getRandomHistory("COPY","WEEKLY")
@@ -56,12 +100,17 @@ class RecordActivity : AppCompatActivity(){
         }
     }
 
-    // backgroundColors 함수
     fun setBackgroundColors(chart: LineChart) {
         chart.setDrawGridBackground(false)
         chart.renderer = object : LineChartRenderer(chart, chart.animator, chart.viewPortHandler) {
-            override fun drawExtras(c: Canvas?) {
-                super.drawExtras(c)
+            override fun drawData(c: Canvas?) {
+                // 배경을 먼저 그립니다
+                drawBackgroundColors(c)
+                // 그런 다음 데이터를 그립니다
+                super.drawData(c)
+            }
+
+            private fun drawBackgroundColors(c: Canvas?) {
                 if (c != null) {
                     val viewPort = chart.viewPortHandler.contentRect
 
@@ -106,7 +155,14 @@ class RecordActivity : AppCompatActivity(){
         }
     }
 
+
     fun setupChart(chart: LineChart, dataList: List<RandomGameHistoryDto>, label: String) {
+        if (dataList.isEmpty()) {
+            chart.clear()
+            chart.data = null
+            chart.invalidate()
+            return
+        }
         val entries = mutableListOf<Entry>()
 
         // Prepare entries for the chart (x-axis: day/week/month, y-axis: averageReactionTime)
@@ -173,7 +229,7 @@ class RecordActivity : AppCompatActivity(){
             invalidate() // Refresh the chart
         }
     }
-
+//
     // Use this function for daily, weekly, and monthly buttons
     fun showDailyData() {
         setupChart(chart, dailyList, "Daily Average Reaction Time")

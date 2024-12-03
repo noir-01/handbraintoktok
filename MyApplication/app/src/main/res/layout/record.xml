@@ -1,45 +1,133 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <!-- backButton-->
-    <ImageButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/btn_back"
-        android:contentDescription="back button"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        />
+    android:layout_height="match_parent"
+    android:fillViewport="true">
 
-    <!-- LineChart -->
-    <com.github.mikephil.charting.charts.LineChart
-        android:layout_marginTop="150dp"
-        android:id="@+id/chart"
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp" />
-
-    <!-- Button -->
-    <ImageButton
-        android:id="@+id/recordRhythm"
-        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/chart"
-        android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/record_rhythm_game"
-        android:contentDescription="record of rhythm game" />
+        android:background="@drawable/main_background">
 
-    <ImageButton
-        android:id="@+id/recordAnother"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/recordRhythm"
-        android:layout_marginTop="20dp"
-        android:layout_centerHorizontal="true"
-        android:background="@drawable/record_another_game"
-        android:contentDescription="record of another game" />
+        <!-- Back Button -->
+        <ImageButton
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/btn_back"
+            android:contentDescription="back_button"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp" />
 
-</RelativeLayout>
+        <!-- LineChart -->
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_marginTop="150dp" />
 
+        <!-- Daily, Weekly, Monthly Buttons -->
+        <LinearLayout
+            android:id="@+id/filterButtonsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/chart"
+            android:gravity="center"
+            android:layout_marginTop="20dp"
+            android:layout_marginHorizontal="16dp">
 
+            <ImageButton
+                android:id="@+id/dailyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/daily"
+                android:layout_margin="8dp"
+                android:contentDescription="daily button"/>
+
+            <ImageButton
+                android:id="@+id/weeklyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/weekly"
+                android:layout_margin="8dp"
+                android:contentDescription="weekly button"/>
+
+            <ImageButton
+                android:id="@+id/monthlyButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/monthly"
+                android:layout_margin="8dp"
+                android:contentDescription="monthly button"/>
+        </LinearLayout>
+
+        <!-- Container for Record Rhythm and Mimic Buttons -->
+        <LinearLayout
+            android:id="@+id/recordButtonsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/filterButtonsContainer"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:layout_marginHorizontal="16dp">
+
+            <!-- Record Rhythm Button -->
+            <ImageButton
+                android:id="@+id/recordRhythm"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/record_rhythm_game"
+                android:contentDescription="record_rhythm_game"
+                android:layout_marginHorizontal="8dp" />
+
+            <!-- Mimic Game Button -->
+            <ImageButton
+                android:id="@+id/recordMimic"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/record_mimic_game"
+                android:contentDescription="record_mimic_game"
+                android:layout_marginHorizontal="8dp" />
+        </LinearLayout>
+
+        <!-- Container for RSP and Calculate Buttons -->
+        <LinearLayout
+            android:id="@+id/rspCalculateButtonsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_below="@id/recordButtonsContainer"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:layout_marginHorizontal="16dp">
+
+            <!-- Rock-Paper-Scissors Game Button -->
+            <ImageButton
+                android:id="@+id/recordRsp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/record_rsp_game"
+                android:contentDescription="record_rsp_game"
+                android:layout_marginHorizontal="8dp" />
+
+            <!-- Calculate Game Button -->
+            <ImageButton
+                android:id="@+id/recordCalculator"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/record_calculator_game"
+                android:contentDescription="record_calculator_game"
+                android:layout_marginHorizontal="8dp" />
+        </LinearLayout>
+
+    </RelativeLayout>
+</ScrollView>

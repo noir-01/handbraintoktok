@@ -22,31 +22,38 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:layout_marginBottom="10dp"
-        android:gravity="center">
+        android:gravity="center"
+        android:weightSum="3">
 
 
         <ImageButton
             android:id="@+id/easyButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:scaleType="centerInside"
             android:background="@drawable/easy"
             android:contentDescription="easy button"
+            android:layout_weight="1"
             />
 
         <ImageButton
             android:id="@+id/normalButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:scaleType="centerInside"
             android:background="@drawable/normal"
             android:contentDescription="normal button"
+            android:layout_weight="1"
             />
 
         <ImageButton
             android:id="@+id/hardButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:scaleType="centerInside"
             android:background="@drawable/hard"
             android:contentDescription="hard button"
+            android:layout_weight="1"
             />
 
     </LinearLayout>
