@@ -36,7 +36,7 @@
           // 연결 및 설정
           src.connect(analyser);
           analyser.connect(context.destination);
-          analyser.fftSize = 64;
+          analyser.fftSize = 256;
 
           // 초기화 파라미터
           bufferLength = analyser.frequencyBinCount;
@@ -51,10 +51,11 @@
             console.error("오디오가 로드되지 않았습니다.");
             return;
           }
-          console.log("Hello world!")
-
           audio.play();
           renderFrame();
+        }
+        function pauseAudio(){
+            audio.pause();
         }
 
         function renderFrame() {
@@ -69,20 +70,30 @@
 
           // 주파수 바 그리기
           for (let i = 0; i < bufferLength; i++) {
-            let barHeight = dataArray[i];
+            let barHeight = dataArray[i]*1.5;
 
             // 색상 계산
             //let r = barHeight + (25 * (i/bufferLength));
             //let g = 250 * (i/bufferLength);
             //let b = 50;
             let r = Math.min(255, barHeight + (100 * (i / bufferLength))); // Adding more variation for red
-        // Green (g): Using sine function for smooth green transition
-        let g = Math.min(255, 200 * Math.sin(i / bufferLength * Math.PI)); // Smooth transition for green
-        // Blue (b): Using cosine for subtle variation in blue
-        let b = Math.min(255, 150 * Math.cos(i / bufferLength * Math.PI));
+            // Green (g): Using sine function for smooth green transition
+            let g = Math.min(255, 200 * Math.sin(i / bufferLength * Math.PI)); // Smooth transition for green
+            // Blue (b): Using cosine for subtle variation in blue
+            let b = Math.min(255, 150 * Math.cos(i / bufferLength * Math.PI));
 
             ctx.fillStyle = `rgb(${r},${g},${b})`;
-            ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight*2);
+
+            //RGB => HSL
+            var hue = (i / bufferLength) * 30; // 전체 색상 범위 사용
+            //var saturation = 70 + (barHeight / 255) * 30; // 높이에 따라 채도 조정
+            //var lightness = 50; // 밝기 고정
+            //var saturation = 70 + (barHeight   / 255) * 30;
+            //var lightness = 45 + (i / bufferLength) * 10;
+            //ctx.fillStyle = `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+
+
+            ctx.fillRect(x, HEIGHT - barHeight, barWidth, barHeight);
             x += barWidth + 1;
           }
         }
