@@ -24,7 +24,7 @@ class InstallActivity : AppCompatActivity() {
 
         // Set up video URI with a try-catch block
         try {
-            val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.sample_video)
+            val videoUri = Uri.parse("android.resource://" + packageName + "/" + R.raw.how_to_make_phone_holder)
             videoView.setVideoURI(videoUri)
         } catch (e: Exception) {
             Toast.makeText(this, "Error loading video", Toast.LENGTH_SHORT).show()
