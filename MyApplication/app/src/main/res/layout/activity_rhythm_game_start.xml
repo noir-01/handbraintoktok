@@ -56,6 +56,22 @@
         app:layout_constraintHeight_percent="0.45" />
 
     <ImageView
+        android:id="@+id/leftXImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="Left X Image"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@id/combo_score_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/rightHandImageView"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintHeight_percent="0.45"
+        android:background="@drawable/wrong"
+        app:layout_constraintDimensionRatio="1:1"
+        android:layout_marginTop="40dp"
+        android:visibility="gone" />
+
+    <ImageView
         android:id="@+id/rightHandImageView"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -66,6 +82,22 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintWidth_percent="0.5"
         app:layout_constraintHeight_percent="0.45" />
+
+    <ImageView
+        android:id="@+id/rightXImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="Right Game Image"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@id/combo_score_layout"
+        app:layout_constraintStart_toEndOf="@id/leftHandImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintHeight_percent="0.45"
+        android:background="@drawable/wrong"
+        android:layout_marginTop="40dp"
+        app:layout_constraintDimensionRatio="1:1"
+        android:visibility="gone" />
 
     <!-- Center Game Image (On Top of Left/Right Images) -->
     <ImageView
