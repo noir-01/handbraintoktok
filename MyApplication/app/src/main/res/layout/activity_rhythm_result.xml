@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:background="@drawable/main_background">
 
     <!-- 점수 및 콤보 -->
     <TextView
@@ -35,13 +36,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp" />
 
-    <Button
+    <ImageButton
         android:id="@+id/confirmButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:text="확인"
-        android:backgroundTint="#2196F3"
+        android:layout_marginTop="190dp"
+        android:background="@drawable/confirm"
         android:textColor="#FFFFFF" />
 
 </LinearLayout>

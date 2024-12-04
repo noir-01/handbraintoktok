@@ -99,7 +99,7 @@
         android:id="@+id/button_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/back"
+        android:background="@drawable/btn_back"
         android:contentDescription="Back button"
         android:layout_margin="16dp"
         app:layout_constraintStart_toStartOf="parent"

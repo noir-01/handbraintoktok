@@ -7,6 +7,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.camera.view.PreviewView
 import android.util.Log
+import android.widget.ImageButton
 import androidx.appcompat.widget.AppCompatButton
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
@@ -167,11 +168,11 @@ class RhythmGameSelectActivity : BaseActivity(){
                     )
 
                     // 난이도 버튼
-                    val easyButton = dialogView.findViewById<AppCompatButton>(R.id.easyButton)
-                    val normalButton = dialogView.findViewById<AppCompatButton>(R.id.normalButton)
-                    val hardButton = dialogView.findViewById<AppCompatButton>(R.id.hardButton)
+                    val easyButton = dialogView.findViewById<ImageButton>(R.id.easyButton)
+                    val normalButton = dialogView.findViewById<ImageButton>(R.id.normalButton)
+                    val hardButton = dialogView.findViewById<ImageButton>(R.id.hardButton)
                     val buttons = listOf(easyButton, normalButton, hardButton)
-                    val startButton = dialogView.findViewById<AppCompatButton>(R.id.startRhythmGameButton)
+                    val startButton = dialogView.findViewById<ImageButton>(R.id.startRhythmGameButton)
                     startButton.setOnClickListener {
                         selectedMusic?.let { music ->
                             val intent = Intent(this@RhythmGameSelectActivity, RhythmGameStartActivity::class.java)
@@ -196,57 +197,53 @@ class RhythmGameSelectActivity : BaseActivity(){
                             Log.d("Start Game", "Start")
                         }
                     }
-                    fun updateButtonStyles(selectedButton: AppCompatButton?) {
+                    fun updateButtonStyles(
+                        selectedButton: ImageButton?,
+                        buttons: List<ImageButton>,
+                    ) {
                         buttons.forEach { button ->
-                            if (button == selectedButton) {
-                                button.setBackgroundColor(
-                                    ContextCompat.getColor(
-                                        context,
-                                        R.color.teal_700
-                                    )
-                                ) // 선택된 색상
-                                button.setTextColor(
-                                    ContextCompat.getColor(
-                                        context,
-                                        R.color.white
-                                    )
-                                ) // 텍스트 색상
-                            } else {
-                                button.setBackgroundColor(
-                                    ContextCompat.getColor(
-                                        context,
-                                        R.color.teal_200
-                                    )
-                                ) // 기본 색상
-                                button.setTextColor(
-                                    ContextCompat.getColor(
-                                        context,
-                                        R.color.teal_700
-                                    )
-                                ) // 기본 텍스트 색상
+                            when (button) {
+                                selectedButton -> {
+                                    // 선택된 버튼에 대한 이미지 및 배경 설정
+                                    when (button.id) {
+                                        R.id.easyButton -> button.setImageResource(R.drawable.easy_selected)
+                                        R.id.normalButton -> button.setImageResource(R.drawable.normal_selected)
+                                        R.id.hardButton -> button.setImageResource(R.drawable.hard_selected)
+                                    }
+                                }
+                                else -> {
+                                    // 선택되지 않은 버튼에 대한 이미지 및 배경 설정
+                                    when (button.id) {
+                                        R.id.easyButton -> button.setImageResource(R.drawable.easy)
+                                        R.id.normalButton -> button.setImageResource(R.drawable.normal)
+                                        R.id.hardButton -> button.setImageResource(R.drawable.hard)
+                                    }
+                                }
                             }
                         }
                     }
+
+
 
                     // 난이도 버튼 클릭 리스너
                     easyButton.setOnClickListener {
                         rankingList = rankMap["EASY"] ?: emptyList()
                         adapter.updateData(rankingList) // 어댑터 데이터 갱신
-                        updateButtonStyles(easyButton)
+                        updateButtonStyles(easyButton,buttons)
                         selectedDifficulty = "EASY"
                     }
 
                     normalButton.setOnClickListener {
                         rankingList = rankMap["NORMAL"] ?: emptyList()
                         adapter.updateData(rankingList)
-                        updateButtonStyles(normalButton)
+                        updateButtonStyles(normalButton,buttons)
                         selectedDifficulty = "NORMAL"
                     }
 
                     hardButton.setOnClickListener {
                         rankingList = rankMap["HARD"] ?: emptyList()
                         adapter.updateData(rankingList)
-                        updateButtonStyles(hardButton)
+                        updateButtonStyles(hardButton,buttons)
                         selectedDifficulty = "HARD"
                     }
                 }

@@ -6,13 +6,14 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TutorialActivity">
+    tools:context=".TutorialActivity"
+    android:background="@drawable/main_background">
 
     <ImageButton
         android:id="@+id/button_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/back"
+        android:background="@drawable/btn_back"
         android:contentDescription="back button"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"/>
