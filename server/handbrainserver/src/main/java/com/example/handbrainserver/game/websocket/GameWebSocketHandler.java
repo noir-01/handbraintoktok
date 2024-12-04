@@ -142,7 +142,7 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
                     ;
                     historyService.saveRandomGameHistory(historyDto);
 
-                    session.sendMessage(new TextMessage("end"));
+                    session.sendMessage(new TextMessage("end,"+Integer.toString(gameSession.getReactionTimeAverage())));
                 } else {
                     //gameMessage 만들어서 전송
                     session.sendMessage(new TextMessage(nextGameMessage(gameSession)));
