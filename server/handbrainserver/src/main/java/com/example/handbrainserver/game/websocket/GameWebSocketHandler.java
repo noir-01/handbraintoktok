@@ -24,8 +24,8 @@ import java.util.Map;
 public class GameWebSocketHandler extends TextWebSocketHandler {
     //sessionId, GameSession
     private final Map<String, GameSession> gameSessions = new HashMap<>();
-    @Autowired
-    private JwtUtil jwtUtil;
+    
+    private JwtUtil jwtUtil = new JwtUtil();
     @Autowired
     private UserService userService;
     @Autowired
@@ -44,14 +44,15 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
 
         String payload = message.getPayload();
 
-        if (gameSession.getUserId() == null) {
+        if (gameSession!=null && gameSession.getUserId() == null) {
             // JSON 메시지 파싱
             String[] inputs = payload.split(","); // ","로 구분된 문자열로 입력을 처리
 
             if (inputs.length == 2) { // 두 개의 값이 있는 경우
                 //처음에 token 전송으로 유저 찾아야 함.
-                String token = inputs[0].trim(); // 첫 번째 값: token, token=>phoneNum=>id
+                String token = inputs[0].trim(); // 첫 번째 값: token, token=>id
                 Long userId = Long.parseLong(jwtUtil.extractUserId(token));
+                System.out.println("userId: "+userId.toString());
 
                 String gameTypeString = inputs[1].trim();
                 switch(gameTypeString){
@@ -107,16 +108,19 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
 
         if(firstAnswer!=null){
             userAnswer.setFirst(Gesture.fromCode(firstAnswer));
+            System.out.println(firstAnswer.toString());
         }
         if(secondAnswer!=null){
             userAnswer.setSecond(Gesture.fromCode(secondAnswer));
+            System.out.println(secondAnswer.toString());
         }
 
         // 정답 판단 및 문제 출제
         boolean isCorrect = gameSession.isAnswer(userAnswer);
+        gameSession.setUserAnswer(userAnswer);
         try {
             if (isCorrect) {
-                //System.out.println(inputs[2]);
+                System.out.println("answer");
                 // 정답일 경우 반응속도 더해놓기 (나중에 평균내서 저장)
                 gameSession.addReactionTime(reactionTime);
                 gameSession.nextProblem();
@@ -143,6 +147,8 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
                     //gameMessage 만들어서 전송
                     session.sendMessage(new TextMessage(nextGameMessage(gameSession)));
                 }
+            }else{
+                System.out.println("False");
             }
         } catch (IOException e) {
             // 오류 처리 로직 (예: 로그 기록, 클라이언트 연결 종료 등)
