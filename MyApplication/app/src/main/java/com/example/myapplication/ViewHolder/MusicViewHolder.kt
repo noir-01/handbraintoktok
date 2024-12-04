@@ -17,16 +17,4 @@ class MusicViewHolder(itemView: View, private val musics: List<Music>, private v
             onMusicSelected(music) // 콜백을 통해 음악 ID 전달
         }
     }
-    fun bind(music: Music, isSelected: Boolean) {
-        songButton.text = "${music.title} - ${music.artist} - ${music.duration}"
-
-        val context = itemView.context
-        if (isSelected) {
-            songButton.setBackgroundColor(ContextCompat.getColor(context, R.color.dark_gray))
-            songButton.setTextColor(ContextCompat.getColor(context, R.color.white))
-        } else {
-            songButton.setBackgroundColor(ContextCompat.getColor(context, R.color.gray))
-            songButton.setTextColor(ContextCompat.getColor(context, R.color.black))
-        }
-    }
 }

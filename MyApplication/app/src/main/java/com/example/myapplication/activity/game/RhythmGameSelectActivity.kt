@@ -122,10 +122,14 @@ class RhythmGameSelectActivity : BaseActivity(){
     fun showRankingDialog(context: Context, musicId:Int) {
         var selectedDifficulty: String? = null
         val dialogView = layoutInflater.inflate(R.layout.dialog_ranking, null)
-
         // 1. IO 스레드에서 순위 받아옴
         CoroutineScope(Dispatchers.IO).launch {
             val rhythmGameHistoryList = apiService.getRhythmRecords(musicId)
+            val myRankingList = listOf(
+                (apiService.getRhythmMyRank(musicId,"EASY").body()?.get("ranking") as? Double)?.toInt()?:-1,
+                (apiService.getRhythmMyRank(musicId,"NORMAL").body()?.get("ranking") as? Double)?.toInt()?:-1,
+                (apiService.getRhythmMyRank(musicId,"HARD").body()?.get("ranking") as? Double)?.toInt()?:-1,)
+
             // 2. Default 스레드에서 rankMap 만듦.
             withContext(Dispatchers.Default){
                 val groupedByDifficulty = rhythmGameHistoryList.groupBy { it.difficulty }
@@ -150,7 +154,7 @@ class RhythmGameSelectActivity : BaseActivity(){
                     // RecyclerView에 어댑터 설정
                     val recyclerView =
                         dialogView.findViewById<RecyclerView>(R.id.rankingRecyclerView)
-                    val adapter = RankingAdapter(rankingList)
+                    val adapter = RankingAdapter(rankingList,myRankingList[0])
                     recyclerView.layoutManager = LinearLayoutManager(context)
                     recyclerView.adapter = adapter
                     val divider = DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
@@ -228,21 +232,21 @@ class RhythmGameSelectActivity : BaseActivity(){
                     // 난이도 버튼 클릭 리스너
                     easyButton.setOnClickListener {
                         rankingList = rankMap["EASY"] ?: emptyList()
-                        adapter.updateData(rankingList) // 어댑터 데이터 갱신
+                        adapter.updateData(rankingList,myRankingList[0]) // 어댑터 데이터 갱신
                         updateButtonStyles(easyButton,buttons)
                         selectedDifficulty = "EASY"
                     }
 
                     normalButton.setOnClickListener {
                         rankingList = rankMap["NORMAL"] ?: emptyList()
-                        adapter.updateData(rankingList)
+                        adapter.updateData(rankingList,myRankingList[1])
                         updateButtonStyles(normalButton,buttons)
                         selectedDifficulty = "NORMAL"
                     }
 
                     hardButton.setOnClickListener {
                         rankingList = rankMap["HARD"] ?: emptyList()
-                        adapter.updateData(rankingList)
+                        adapter.updateData(rankingList,myRankingList[2])
                         updateButtonStyles(hardButton,buttons)
                         selectedDifficulty = "HARD"
                     }

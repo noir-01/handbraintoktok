@@ -30,11 +30,11 @@ class MusicAdapter(
         // 선택된 버튼에 대해 색 변경
         if (holder.bindingAdapterPosition == selectedPosition) {
             // 선택된 버튼의 배경색을 진하게 설정
-            holder.songButton.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.dark_gray))
+            holder.songButton.setBackgroundResource(R.drawable.btn_item_music_selected)
             holder.songButton.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.white)) // 텍스트 색 변경 (선택된 상태)
         } else {
             // 선택되지 않은 버튼은 기본 색상으로 설정
-            holder.songButton.setBackgroundColor(ContextCompat.getColor(holder.itemView.context, R.color.gray))
+            holder.songButton.setBackgroundResource(R.drawable.btn_item_music)
             holder.songButton.setTextColor(ContextCompat.getColor(holder.itemView.context, R.color.black)) // 기본 텍스트 색
         }
 
