@@ -143,7 +143,7 @@ public class  HistoryController {
         }
     }
     //전체 기간동안 유저 평균 보여주기, age=me / all로 내 연령대 or 전체 연령대 평균 return
-    @GetMapping("/history/random/get")
+    @GetMapping("/history/random/get/average")
     public ResponseEntity<?> getRandomAverage(
             @RequestHeader("Authorization") String token,
             @RequestParam GameType gameType,
