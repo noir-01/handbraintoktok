@@ -108,7 +108,7 @@ public class GameSession {
         }
         
         //이전 문제 정답이 이번 문제 정답이랑 같은 경우 다시 뽑아야 함
-        if(userAnswer!=null && isAnswer(userAnswer)){
+        if(userAnswer!=null && isAnswer(userAnswer) || (firstValue==0 || secondValue==0)){
             //한번 더 뽑고 종료
             System.out.println("one more");
             nextCopyQuestion();
