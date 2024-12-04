@@ -52,6 +52,7 @@ public class SmsController {
         private String phoneNumber;
         private String code;
         private String name;
+        private Integer birthYear;
     }
 
     //인증번호 검증, 검증 성공 시 회원가입까지.
@@ -60,9 +61,11 @@ public class SmsController {
         String phoneNumber = verificationRequest.getPhoneNumber();
         String code = verificationRequest.getCode();
         String name = verificationRequest.getName();
+        Integer birthYear = verificationRequest.getBirthYear();
+
         Map<String, String> response = new HashMap<>();
         if (smsService.verifyCode(phoneNumber, code)) {
-            Long userId = userService.saveUser(new UserDto.UserDtoWithOutId(name, phoneNumber));
+            Long userId = userService.saveUser(new UserDto.UserDtoWithOutId(name, phoneNumber,birthYear));
             System.out.println("userid: "+userId.toString());
             if (userId != -1 && userId!=-2) {
                 return ResponseEntity.ok(Map.of("token", jwtUtil.generateToken(userId))); // 성공적인 경우 JSON 응답 반환

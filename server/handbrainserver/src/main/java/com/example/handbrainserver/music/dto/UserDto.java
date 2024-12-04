@@ -11,15 +11,17 @@ public class UserDto {
     private Long userId;
     private String name;
     private String phoneNumberHashed;
+    private Integer birthYear;
 
     public static UserDto from(User user){
-        return new UserDto(user.getId(),user.getName(),user.getPhoneNumberHash());
+        return new UserDto(user.getId(),user.getName(),user.getPhoneNumberHash(), user.getBirthYear());
     }
 
     @Getter @Setter @AllArgsConstructor @NoArgsConstructor
     public static class UserDtoWithOutId{
         private String name;
         private String phoneNumber;
+        private Integer birthYear;
     }
     @Getter @Setter @AllArgsConstructor @NoArgsConstructor
     public static class UserDtoWithIdAndName{
