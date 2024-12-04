@@ -34,6 +34,12 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="31">
         <activity
+            android:name=".activity.game.GameResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.game.WebViewTestActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.game.RhythmGameResultActivity"
             android:exported="false" />
         <activity

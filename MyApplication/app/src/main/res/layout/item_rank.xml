@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:id="@+id/recyclerView"
     android:padding="10dp">
 
     <!-- 순위 표시 (rankPosition) -->
@@ -17,28 +20,41 @@
         android:layout_marginEnd="16dp" />
 
     <!-- 사용자 이름과 점수를 수직으로 배치하는 LinearLayout -->
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical">
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <!-- 이름 -->
         <TextView
             android:id="@+id/rankName"
-            android:layout_width="wrap_content"
+            android:layout_width="100dp"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/poor_story"
+            android:textStyle="bold"
             android:text="User Name"
-            android:textSize="18sp"
-            android:layout_marginBottom="8dp" />
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            app:layout_constraintEnd_toStartOf="@id/rankScore"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="0.3"
+            app:layout_constraintWidth_default="wrap"
+            tools:ignore="MissingConstraints" />
 
         <!-- 점수 -->
         <TextView
             android:id="@+id/rankScore"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="500 points"
-            android:textSize="18sp" />
-    </LinearLayout>
+            android:layout_marginEnd="48dp"
+            android:fontFamily="@font/poor_story"
+            android:text="25500 points"
+            android:textColor="@color/black"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </LinearLayout>

@@ -26,6 +26,7 @@ public class UserService {
                 return -1L;
             }
             user.setPhoneNumberHash(phoneNumberHash);
+            user.setBirthYear(userDtoWithOutId.getBirthYear());
             user = userRepository.save(user);
             return user.getId();
 
@@ -34,6 +35,10 @@ public class UserService {
             return -2L;
         }
     }
+    public boolean isUserExistsById(Long userId){
+        return userRepository.existsById(userId);
+    }
+
     public UserDto getUserById(Long userId){
         return UserDto.from(userRepository.findById(userId).get());
     }

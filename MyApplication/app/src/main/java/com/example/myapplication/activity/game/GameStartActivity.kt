@@ -3,6 +3,7 @@ package com.example.myapplication.activity.game
 import android.Manifest
 import android.app.AlertDialog
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.MediaPlayer
 import android.os.Bundle
@@ -94,13 +95,20 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
                 }
                 isFirstProb=false
                 startTime = System.currentTimeMillis()
-            }else if (message.startsWith("end")) {
+            }else if (message.startsWith("end,")) {
+                val avgReactionTime = message.substringAfter("end,").toIntOrNull()
+
                 withContext(Dispatchers.Main) {
                     checkImageView.setImageResource(R.drawable.checkmark)
                     checkImageView.bringToFront()
                     checkImageView.visibility = View.VISIBLE
                     delay(1500)
                     checkImageView.visibility = View.GONE
+
+                    val intent = Intent(this@GameStartActivity,GameResultActivity::class.java)
+                    intent.putExtra("REACTION",avgReactionTime?:0)
+                    //결과 창 띄우고 게임 종료
+                    startActivity(intent)
                     finish()
                 }
             }

@@ -9,6 +9,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.R
 import android.app.Dialog
+import android.content.Intent
 import android.view.View
 import android.widget.GridLayout
 import android.widget.ImageView
@@ -354,6 +355,9 @@ class DoggyActivity : AppCompatActivity() {
         // 버튼 클릭 이벤트 설정
         btnHandGesture.setOnClickListener {
             // 손동작 따라하기 동작
+            val intent = Intent(this,GameStartActivity::class.java)
+            intent.putExtra("MODE", "COPY")
+            startActivity(intent)
             food = (food + 1).coerceAtMost(10)
             saveState()
             updateUI()

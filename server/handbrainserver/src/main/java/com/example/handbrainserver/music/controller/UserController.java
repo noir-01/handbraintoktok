@@ -40,8 +40,14 @@ public class UserController {
         try {
             String processedToken = token.replace("Bearer ", ""); // Bearer 제거
             Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
-            response.put("state","success");
-            return ResponseEntity.ok(response);
+            
+            if(userService.isUserExistsById(userId)){
+                return ResponseEntity.ok(Map.of("state","success"));
+            }else{
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
+                    Map.of("state","failed")
+                );
+            }
         }catch(Exception e){
             e.printStackTrace();
             response.put("state","token expired");

@@ -1,74 +1,154 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
+    <!-- Camera Preview (45% of height) -->
     <androidx.camera.view.PreviewView
         android:id="@+id/rhythmGameCameraView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.45" />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="16dp">
-
-        <!-- 콤보 텍스트 -->
-        <TextView
-            android:id="@+id/comboTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Combo: 0      "
-            android:textSize="18sp"
-            android:textColor="@android:color/black"
-            android:layout_gravity="center" />
-
-        <!-- 점수 텍스트 -->
-        <TextView
-            android:id="@+id/scoreTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="     Score: 0"
-            android:textSize="18sp"
-            android:textColor="@android:color/black"
-            android:layout_gravity="center" />
-    </LinearLayout>
-
-    <!-- 아래쪽 절반 -->
-    <LinearLayout
+        android:id="@+id/combo_score_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/rhythmGameCameraView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.10">
 
-        <!-- 왼쪽 이미지 -->
-        <FrameLayout
+        <TextView
+            android:id="@+id/comboTextView"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1">
-            <ImageView
-                android:id="@+id/leftHandImageView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="fitCenter" />
-        </FrameLayout>
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Combo" />
 
-        <!-- 오른쪽 이미지 -->
-        <FrameLayout
+        <TextView
+            android:id="@+id/scoreTextView"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="1">
-            <ImageView
-                android:id="@+id/rightHandImageView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:scaleType="fitCenter" />
-        </FrameLayout>
-
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Score" />
     </LinearLayout>
 
-</LinearLayout>
+    <!-- Left and Right Game Images -->
+    <ImageView
+        android:id="@+id/leftHandImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="Left Game Image"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@id/combo_score_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/rightHandImageView"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintHeight_percent="0.45" />
+
+    <ImageView
+        android:id="@+id/leftXImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="Left X Image"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@id/combo_score_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/rightHandImageView"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintHeight_percent="0.45"
+        android:background="@drawable/wrong_200"
+        app:layout_constraintDimensionRatio="1:1"
+        android:layout_marginTop="120dp"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/rightHandImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="Right Game Image"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@id/combo_score_layout"
+        app:layout_constraintStart_toEndOf="@id/leftHandImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintHeight_percent="0.45" />
+
+    <ImageView
+        android:id="@+id/rightXImageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:contentDescription="Right Game Image"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@id/combo_score_layout"
+        app:layout_constraintStart_toEndOf="@id/leftHandImageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintWidth_percent="0.5"
+        app:layout_constraintHeight_percent="0.45"
+        android:background="@drawable/wrong_200"
+        android:layout_marginTop="120dp"
+        app:layout_constraintDimensionRatio="1:1"
+        android:visibility="gone" />
+
+    <!-- Center Game Image (On Top of Left/Right Images) -->
+    <ImageView
+        android:id="@+id/gameImageCenterView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:contentDescription="Center Game Image"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@id/combo_score_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.45"
+        />
+
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toBottomOf="@id/combo_score_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.45"
+        />
+
+    <!-- Check ImageView (Centered and Overlaid) -->
+    <ImageView
+        android:id="@+id/checkImageView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="Check Image"
+        android:scaleType="centerInside"
+        android:src="@drawable/checkmark"
+        app:layout_constraintWidth_percent="0.4"
+        app:layout_constraintHeight_percent="0.4"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone"
+        />
+
+    <!-- Back Button -->
+    <ImageButton
+        android:id="@+id/button_back"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/back"
+        android:contentDescription="Back button"
+        android:layout_margin="16dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

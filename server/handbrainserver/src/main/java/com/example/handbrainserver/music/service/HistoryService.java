@@ -171,4 +171,16 @@ public class HistoryService {
         return date.with(TemporalAdjusters.nextOrSame(DayOfWeek.SUNDAY));
     }
 
+    public Float getAllAgeAverageRandomGame(GameType gameType){
+        return randomGameHistoryRepo.findAverageReactionTimeByGameTypeAllAge(gameType);
+    }
+
+    public Float getMyAgeAverageRandomGame(GameType gameType,int myAge){
+        int minAge = (myAge/10) * 10;
+        int maxAge = minAge + 9;
+        return randomGameHistoryRepo.findAverageReactionTimeByGameTypeAndAgeGroup(
+                gameType,minAge,maxAge);
+
+    }
+
 }

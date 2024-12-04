@@ -15,6 +15,10 @@ import androidx.appcompat.app.AppCompatActivity
 import android.graphics.Color
 import android.graphics.Paint
 import android.util.Size
+import android.webkit.ConsoleMessage
+import android.webkit.WebChromeClient
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
@@ -28,7 +32,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.R
-import com.example.myapplication.util.network.ApiService
 import com.example.myapplication.util.mediapipe.GestureRecognition
 import com.example.myapplication.util.mediapipe.HandLandMarkHelper
 import com.example.myapplication.util.MusicDownloader
@@ -38,6 +41,7 @@ import com.example.myapplication.util.mediapipe.difficulty
 import com.example.myapplication.util.network.durationToSec
 import com.example.myapplication.util.mediapipe.gestureLabels
 import com.example.myapplication.util.mediapipe.reversedGestureLabels
+import com.example.myapplication.util.network.MyHttpServer
 import com.example.myapplication.util.network.RetrofitClient
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import kotlinx.coroutines.CoroutineScope
@@ -45,13 +49,18 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 import kotlin.math.ceil
 import kotlin.random.Random
+import android.media.MediaMetadataRetriever
+import android.os.Handler
+import android.os.Looper
+import android.view.View
 
 class RhythmGameStartActivity: AppCompatActivity() {
+    //mp3 보내줄 로컬 서버
+    private lateinit var server :MyHttpServer
+    
     private val apiService = RetrofitClient.apiService
     private lateinit var musicDownloader: MusicDownloader
 
@@ -79,18 +88,30 @@ class RhythmGameStartActivity: AppCompatActivity() {
 
     private lateinit var leftHandImageView: ImageView
     private lateinit var rightHandImageView: ImageView
+    private lateinit var middleImageView: ImageView
     private lateinit var comboTextView: TextView
     private lateinit var scoreTextView: TextView
+    private lateinit var webView:WebView
+    private lateinit var leftXImageView: ImageView
+    private lateinit var rightXImageView: ImageView
 
     //콤보, 해당 회차 맞췄는지 확인하는 플래그
     private var combo = 0
-    private var answerFlag = false
+    private var leftAnswerFlag = false
+    private var rightAnswerFlag = false
     //총점 및 한번 맞췄을 때 점수
     //점수는 기본 점수*콤보 배열을 더해서 계산.
     private var totalScore = 0
     private val correctScore = listOf(100,150,200)
     private var difficultyInt = 0
     private var difficultyString = "EASY"
+
+    //직접 musicFinishHandler 구현
+    private var musicStartTime = 0.0
+    private var duration = 0.0
+    private val handler = Handler(Looper.getMainLooper())
+    private var musicId = 0
+
 
 
     //음악 재생
@@ -111,11 +132,40 @@ class RhythmGameStartActivity: AppCompatActivity() {
 
         leftHandImageView = findViewById(R.id.leftHandImageView)
         rightHandImageView = findViewById(R.id.rightHandImageView)
+        middleImageView = findViewById(R.id.gameImageCenterView)
         comboTextView = findViewById(R.id.comboTextView)
         scoreTextView = findViewById(R.id.scoreTextView)
 
+        leftXImageView = findViewById(R.id.leftXImageView)
+        leftXImageView.visibility=View.GONE
+        rightXImageView = findViewById(R.id.rightXImageView)
+        rightXImageView.visibility=View.GONE
+
+
+        //MP3 로드해주는 로컬 웹서버 시작
+        CoroutineScope(Dispatchers.IO).launch {
+            server = MyHttpServer(this@RhythmGameStartActivity, 8080)
+            server.start()
+        }
+
+        webView = findViewById(R.id.webView)
+        //webView.settings.allowContentAccess=true
+        webView.settings.allowFileAccess=true
+        webView.settings.allowContentAccess=true
+        webView.settings.apply {
+            javaScriptEnabled = true
+            mediaPlaybackRequiresUserGesture = false
+        }
+        webView.setInitialScale(70)
+        webView.webChromeClient = object : WebChromeClient() {
+            override fun onConsoleMessage(message: ConsoleMessage?): Boolean {
+                Log.d("WebViewLog", message?.message() ?: "No message") // Log JavaScript console output
+                return super.onConsoleMessage(message)
+            }
+        }
+
         //RhythmGameSelectActivity에서 전달받은 music_id
-        val musicId = intent.getIntExtra("MUSIC_ID", -1)
+        musicId = intent.getIntExtra("MUSIC_ID", -1)
         val musicLength = durationToSec(intent.getStringExtra("DURATION")?:"00:00:00")
         difficultyString = intent.getStringExtra("DIFFICULTY")?:"EASY"
         difficultyInt = difficulty[difficultyString]?:0
@@ -142,7 +192,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
                             }
                             "NORMAL"->{
                                 makeGameBeatsNormal(beats,bps)
-                                imageShowTime=1.5f
+                                imageShowTime=1.8f
                             }
                             "HARD"->{
                                 makeGameBeatsHard(beats,bps)
@@ -152,7 +202,8 @@ class RhythmGameStartActivity: AppCompatActivity() {
                                 makeGameBeatsEasy(beats,bps)
                             }
                         }
-                        playMusic(musicId) // 음악 재생을 메인 스레드에서 실행
+                        //음악 재생 및 배경 파형 생성
+                        playMusicHtml()
                     }
 
                 } catch (e: Exception) {
@@ -170,110 +221,235 @@ class RhythmGameStartActivity: AppCompatActivity() {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    fun playMusic(musicId: Int) {
-        val musicFile = File(getExternalFilesDir(null), "$musicId.mp3")
-        mediaPlayer = MediaPlayer().apply {
-            setDataSource(musicFile.absolutePath)
-            prepareAsync() // 비동기 준비
-            setOnPreparedListener {
-                start()
-                trackMusicTime()
-            }
-            setOnCompletionListener {
-                CoroutineScope(Dispatchers.IO).launch {
-                    apiService.uploadRhythmGameHistory(
-                        RhythmGamePostDto(musicId, difficultyString,combo,totalScore)
-                    )
-                    withContext(Dispatchers.Main){
-                        val intent = Intent(this@RhythmGameStartActivity, RhythmGameResultActivity::class.java)
-                        intent.putExtra("MUSIC_ID", musicId)
-                        intent.putExtra("DIFFICULTY", difficultyString)
-                        intent.putExtra("SCORE",totalScore)
-                        intent.putExtra("COMBO",combo)
-                        finish()
-                    }
-                }
 
+    fun playMusicHtml(){
+        val musicFile = File(getExternalFilesDir(null), "$musicId.mp3")
+        val retriever = MediaMetadataRetriever()
+
+        retriever.setDataSource(musicFile.absolutePath)
+        val durationString = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+        duration = durationString?.toLong()?.toDouble()?.div(1000) ?: 0.0
+        Log.d("check","$duration")
+
+        val musicFilePath = "http://localhost:8080/mp3/$musicId.mp3"
+        webView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                // You can call evaluateJavascript here, after the page has loaded
+                CoroutineScope(Dispatchers.Main).launch {
+                    super.onPageFinished(view, url)
+                    webView.evaluateJavascript("loadAudio('$musicFilePath');",null)
+                    delay(1000)
+                    webView.evaluateJavascript("playAudio();", null)
+                    musicStartTime=System.currentTimeMillis()/1000.0
+                    trackMusicTimeByHtml()
+                    handler.postDelayed(checkRunnable, 300)
+                }
+            }
+        }
+        webView.loadUrl("file:///android_asset/index2.html")
+    }
+
+    private val checkRunnable = object : Runnable {
+        override fun run() {
+            val currentTime = System.currentTimeMillis() / 1000.0 // 현재 시간 (초 단위)
+            val elapsedTime = currentTime - musicStartTime // 음악 시작 이후 경과 시간 (초 단위)
+            // 만약 경과 시간이 음악의 총 길이를 넘으면 종료된 것으로 판단
+            if (elapsedTime >= duration) {
+                Log.d("check","elapsed: $elapsedTime")
+                Log.d("check","total: $duration")
+                onMusicFinished() // 음악 종료 처리
+            } else {
+                // 계속해서 체크
+                handler.postDelayed(this, 300)
             }
         }
     }
+    private fun onMusicFinished() {
+        // 음악이 끝났을 때 해야 할 작업을 여기에 추가
+        CoroutineScope(Dispatchers.IO).launch {
+            apiService.uploadRhythmGameHistory(
+                RhythmGamePostDto(musicId, difficultyString,combo,totalScore)
+            )
+            withContext(Dispatchers.Main){
+                val intent = Intent(this@RhythmGameStartActivity, RhythmGameResultActivity::class.java)
+                intent.putExtra("MUSIC_ID", musicId)
+                intent.putExtra("DIFFICULTY", difficultyString)
+                intent.putExtra("SCORE",totalScore)
+                intent.putExtra("COMBO",combo)
+                startActivity(intent)
+                finish()
+            }
+        }
+        handler.removeCallbacks(checkRunnable) // 주기적 체크 중지
+    }
 
-    fun trackMusicTime() {
-        // Use lifecycleScope.launch to start a coroutine
+//    //기존 mp3 파일로 재생할 경우
+//    fun playMusic(musicId: Int) {
+//
+//        val musicFile = File(getExternalFilesDir(null), "$musicId.mp3")
+//        mediaPlayer = MediaPlayer().apply {
+//            setDataSource(musicFile.absolutePath)
+//            prepareAsync() // 비동기 준비
+//            setOnPreparedListener {
+//                start()
+//                trackMusicTime()
+//            }
+//            setOnCompletionListener {
+//                CoroutineScope(Dispatchers.IO).launch {
+//                    apiService.uploadRhythmGameHistory(
+//                        RhythmGamePostDto(musicId, difficultyString,combo,totalScore)
+//                    )
+//                    withContext(Dispatchers.Main){
+//                        val intent = Intent(this@RhythmGameStartActivity, RhythmGameResultActivity::class.java)
+//                        intent.putExtra("MUSIC_ID", musicId)
+//                        intent.putExtra("DIFFICULTY", difficultyString)
+//                        intent.putExtra("SCORE",totalScore)
+//                        intent.putExtra("COMBO",combo)
+//                        startActivity(intent)
+//                        finish()
+//                    }
+//                }
+//            }
+//        }
+//    }
+//    //기존 mp3 파일로 재생할 경우 trackMusicTime
+//    fun trackMusicTime() {
+//        // Use lifecycleScope.launch to start a coroutine
+//        lifecycleScope.launch(Dispatchers.IO) {
+//            var leftBeatIdx = 0
+//            var rightBeatIdx = 0
+//
+//            while (mediaPlayer?.isPlaying == true) {
+//                val currentTime = getCurrentMusicTime()
+//
+//                // Main Thread에서 UI 수정
+//                withContext(Dispatchers.Main) {
+//                    //현재 시간이 비트 시간을 넘어갔으면 다음 비트로 이동.
+//                    if(leftBeatIdx<leftBeats.size)
+//                        updateImage(true, leftHandImageView, currentTime, leftBeatIdx, leftHandIndex)
+//                    if(rightBeatIdx<rightBeats.size)
+//                        updateImage(false, rightHandImageView, currentTime, rightBeatIdx, rightHandIndex)
+//
+//                    //적당한 시간 안에 맞췄으면(플래그=true) 콤보, 점수 올리고 플래그 초기화
+//                    if(leftBeatIdx<leftBeats.size && currentTime>leftBeats[leftBeatIdx]+delayTime){
+//                        leftBeatIdx++
+//                        //콤보는 20까지만 증가
+//                        if(answerFlag && combo<21) combo++
+//                        else if (!answerFlag) combo = 0
+//                        //점수는 기본 점수* 콤보 배열을 더해서 계산.
+//                        totalScore += correctScore[difficultyInt]*combo
+//                        answerFlag=false
+//                    }
+//                    //오른손
+//                    if(rightBeatIdx<rightBeats.size && currentTime>rightBeats[rightBeatIdx]+delayTime){
+//                        rightBeatIdx++
+//                        if(answerFlag && combo<21) combo++
+//                        else if (!answerFlag) combo = 0
+//                        totalScore += correctScore[difficultyInt]*combo
+//                        answerFlag=false
+//                    }
+//                    updateScoreAndCombo()
+//                    delay(30)  // Delay
+//                }
+//            }
+//        }
+//    }
+//    fun getCurrentMusicTime(): Double {
+//        return mediaPlayer?.currentPosition?.toDouble()?.div(1000) ?: 0.0
+//    }
+
+
+    fun trackMusicTimeByHtml(){
         lifecycleScope.launch(Dispatchers.IO) {
             var leftBeatIdx = 0
             var rightBeatIdx = 0
+            //현재 음악 위치한 시간
+            var currentTime = System.currentTimeMillis()/1000.0 - musicStartTime
 
-            while (mediaPlayer?.isPlaying == true) {
-                val currentTime = getCurrentMusicTime()
-
+            while (currentTime<duration) {
+                currentTime = System.currentTimeMillis()/1000.0 - musicStartTime
                 // Main Thread에서 UI 수정
                 withContext(Dispatchers.Main) {
                     //현재 시간이 비트 시간을 넘어갔으면 다음 비트로 이동.
                     if(leftBeatIdx<leftBeats.size)
-                        updateImage2(true, leftHandImageView, currentTime, leftBeatIdx, leftHandIndex)
+                        updateImage(true, leftHandImageView, currentTime, leftBeatIdx, leftHandIndex)
                     if(rightBeatIdx<rightBeats.size)
-                        updateImage2(false, rightHandImageView, currentTime, rightBeatIdx, rightHandIndex)
+                        updateImage(false, rightHandImageView, currentTime, rightBeatIdx, rightHandIndex)
 
                     //적당한 시간 안에 맞췄으면(플래그=true) 콤보, 점수 올리고 플래그 초기화
                     if(leftBeatIdx<leftBeats.size && currentTime>leftBeats[leftBeatIdx]+delayTime){
                         leftBeatIdx++
                         //콤보는 20까지만 증가
-                        if(answerFlag && combo<21) combo++
-                        else if (!answerFlag) combo = 0
+                        if(leftAnswerFlag && combo<21) combo++
+                        //틀렸을 경우 콤보 초기화 및 X 이미지 표시
+                        else if (!leftAnswerFlag) {
+                            combo = 0
+                            showXImage(leftXImageView)
+                        }
                         //점수는 기본 점수* 콤보 배열을 더해서 계산.
                         totalScore += correctScore[difficultyInt]*combo
-                        answerFlag=false
+                        leftAnswerFlag=false
                     }
                     //오른손
                     if(rightBeatIdx<rightBeats.size && currentTime>rightBeats[rightBeatIdx]+delayTime){
                         rightBeatIdx++
-                        if(answerFlag && combo<21) combo++
-                        else if (!answerFlag) combo = 0
+                        if(rightAnswerFlag && combo<21) combo++
+                        //틀렸을 경우 콤보 초기화 및 X 이미지 표시
+                        else if (!rightAnswerFlag){
+                            combo = 0
+                            showXImage(rightXImageView)
+                        }
                         totalScore += correctScore[difficultyInt]*combo
-                        answerFlag=false
+                        rightAnswerFlag=false
                     }
                     updateScoreAndCombo()
-                    delay(30)  // Delay
+                    delay(50)  // Delay
                 }
             }
         }
     }
-    fun getCurrentMusicTime(): Double {
-        return mediaPlayer?.currentPosition?.toDouble()?.div(1000) ?: 0.0
-    }
 
-    fun updateImage2(isLeft:Boolean, imageView: ImageView, currentTime: Double, beatIdx:Int, predictIdx: Int?){
+    //틀렸을 경우 전달받은 뷰에 x 표시 잠깐 표시
+    fun showXImage(xImageView: ImageView){
+        CoroutineScope(Dispatchers.Main).launch{
+            xImageView.visibility= View.VISIBLE
+            xImageView.bringToFront()
+            Log.d("showXImage","X")
+            delay(500)
+            xImageView.visibility= View.GONE
+        }
+    }
+    fun updateImage(isLeft:Boolean, imageView: ImageView, currentTime: Double, beatIdx:Int, predictIdx: Int?){
         when(isLeft){
             true->{
+                if(leftImages[beatIdx]=="hand_heart_twohands_l"){
+                    leftImages[beatIdx]="hand_heart_twohands"
+                }
                 if (currentTime >= leftBeats[beatIdx] - imageShowTime && currentTime < leftBeats[beatIdx]+ 0.2f) {
                     showImage(imageView,leftImages[beatIdx],currentTime,leftBeats[beatIdx],predictIdx==leftAnswers[beatIdx])
+
+                    Log.d("Update Imgae",leftImages[beatIdx])
                 }else{
                     hideImage(imageView)
                 }
             }
             false->{
-                if (currentTime >= rightBeats[beatIdx] - imageShowTime && currentTime < rightBeats[beatIdx]+ 0.2f) {
+                if(rightImages[beatIdx]=="hand_heart_twohands_r"){
+                    rightImages[beatIdx]="hand_heart_twohands"
+                }
+                else if (currentTime >= rightBeats[beatIdx] - imageShowTime && currentTime < rightBeats[beatIdx]+ 0.2f) {
                     showImage(imageView,rightImages[beatIdx],currentTime,rightBeats[beatIdx],predictIdx==rightAnswers[beatIdx])
+                    middleImageView.visibility=View.GONE
+                    Log.d("Update Imgae",rightImages[beatIdx])
                 }
                 else{
+                    middleImageView.visibility=View.GONE
                     hideImage(imageView)
                 }
             }
         }
     }
 
-    fun updateImage(imageView: ImageView, beats: List<Float>, images: List<String>, currentTime: Double, answers: List<Int>, predictIdx: Int?) {
-        for (i in beats.indices) {
-            if (currentTime >= beats[i] - imageShowTime && currentTime < beats[i]+ delayTime) {
-                //showImageWithRectangle(imageView, images[i], currentTime, beats[i])  // 이미지 표시
-                val isAnswer = answers[i]==predictIdx
-                showImage(imageView,images[i],currentTime,beats[i],true)
-            } else if (currentTime >= beats[i]) {
-                hideImage(imageView)  // 이미지 숨기기
-            }
-        }
-    }
     fun showImage(imageView: ImageView, imageName: String, currentTime:Double, beatTime:Float,isAnswer: Boolean) {
         val resourceId = imageResources[imageName] ?: return // 리소스 ID가 없다면 return
 
@@ -286,13 +462,19 @@ class RhythmGameStartActivity: AppCompatActivity() {
         canvas.drawBitmap(originalBitmap, 0f, originalHeight*0.5f, null)  // 원본 이미지를 먼저 그립니다.
 
         val borderPaint = Paint()
-        borderPaint.color = Color.BLACK
+        borderPaint.color = Color.WHITE
         borderPaint.strokeWidth = 50f
         borderPaint.style = Paint.Style.STROKE
         //정답일 경우 초록색으로 그림
         if(currentTime >= beatTime - 0.2f  && currentTime < beatTime+delayTime && isAnswer){
             borderPaint.color = Color.GREEN
-            answerFlag = true
+            if(imageView == leftHandImageView){
+                Log.d("is answer","left true")
+                leftAnswerFlag=true
+            }else if (imageView == rightHandImageView){
+                rightAnswerFlag=true
+                Log.d("is answer","right true")
+            }
             Log.d("RhythmGame","answer")
         }
         // 테두리 그리기 (이미지 크기에 맞춰 사각형 테두리 추가)
@@ -321,6 +503,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
         }
 
         imageView.setImageBitmap(bitmapWithBorder)
+        imageView.bringToFront()
     }
 
     fun hideImage(imageView: ImageView) {
@@ -331,11 +514,8 @@ class RhythmGameStartActivity: AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         mediaPlayer?.release()  // 액티비티 종료 시 MediaPlayer 해제
-    }
-
-    fun gameStart(handImages: Pair<List<String>,List<String>>, gameBeats: Pair<List<Float>,List<Float>>){
-        var (leftHandImages,rightHandImages) = handImages
-        var (leftHandBeats, rightHandBeats) = gameBeats
+        server.stop()
+        webView.evaluateJavascript("pauseAudio();", null)
     }
 
     private fun initializeMediaPipe() {
@@ -359,12 +539,14 @@ class RhythmGameStartActivity: AppCompatActivity() {
 
                         for (result in resultBundle.results) {
                             if (result.landmarks().isNotEmpty()) {
-
-
                                 for (idx in result.landmarks().indices) {
                                     val handedness = result.handedness()[idx][0]
                                     val predictedIndex = gestureRecognition.predictByResult(result, idx)
-                                    if (predictedIndex >= 0 && predictedIndex <= gestureLabels.size) {
+                                    if(predictedIndex==2){
+                                        rightHandIndex=2
+                                        leftHandIndex=2
+                                    }
+                                    else if (predictedIndex >= 0 && predictedIndex <= gestureLabels.size) {
                                         //Log.d("HandActivity", "Predicted index: " + gestureLabels[predictedIndex])
                                         if (handedness.categoryName() == "Left") {
                                             rightHandIndex = predictedIndex
@@ -382,7 +564,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
                     }
                 }
             )
-            withContext(Dispatchers.IO){
+            withContext(Dispatchers.Default){
                 startCamera()
             }
         }
@@ -439,13 +621,16 @@ class RhythmGameStartActivity: AppCompatActivity() {
         var i = 0
 
         //가운데, alien, seven, wolf
-        val numbersToExclude = listOf(
+        val numbersToExclude = setOf(
             reversedGestureLabels["middle_finger"],
             reversedGestureLabels["heart"],
             reversedGestureLabels["seven"],
             reversedGestureLabels["eight"],
             reversedGestureLabels["wolf"],
             reversedGestureLabels["alien"],
+            reversedGestureLabels["mandoo"],
+            reversedGestureLabels["call"],
+
         )
         val handIndexes = (0..21).toList() - numbersToExclude
 
@@ -477,8 +662,11 @@ class RhythmGameStartActivity: AppCompatActivity() {
         var i = 0
 
         //가운데, alien, seven, wolf
-        val numbersToExclude = listOf(
-            reversedGestureLabels["middle_finger"]
+        val numbersToExclude = setOf(
+            reversedGestureLabels["middle_finger"],
+            reversedGestureLabels["mandoo"],
+            reversedGestureLabels["wolf"],
+            reversedGestureLabels["call"],
         )
         val handIndexes = (0..21).toList() - numbersToExclude
         while(i<beatsSize){
@@ -493,11 +681,13 @@ class RhythmGameStartActivity: AppCompatActivity() {
                 leftBeats.add(value)
                 val nextGestureIdx = handIndexes.random()!!
                 leftImages.add("hand_"+ gestureLabels[nextGestureIdx]+"_l")
+                //leftImages.add("hand_heart_twohands_l")
                 leftAnswers.add(nextGestureIdx)
             }else{
                 rightBeats.add(value)
                 val nextGestureIdx = handIndexes.random()!!
                 rightImages.add("hand_"+ gestureLabels[nextGestureIdx]+"_r")
+                //rightImages.add("hand_heart_twohands_r")
                 rightAnswers.add(nextGestureIdx)
             }
         }
@@ -508,8 +698,10 @@ class RhythmGameStartActivity: AppCompatActivity() {
         var i = 0
 
         //가운데, alien, seven, wolf
-        val numbersToExclude = listOf(
-            reversedGestureLabels["middle_finger"]
+        val numbersToExclude = setOf(
+            reversedGestureLabels["middle_finger"],
+            reversedGestureLabels["wolf"],
+            reversedGestureLabels["call"],
         )
         var handIndexes = (0..21).toList() - numbersToExclude
         //일단 왼쪽에 몰아주기

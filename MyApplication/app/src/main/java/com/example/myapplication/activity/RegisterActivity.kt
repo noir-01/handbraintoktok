@@ -12,6 +12,8 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.NumberPicker
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +24,8 @@ import com.example.myapplication.util.dataClass.VerificationRequest
 import com.example.myapplication.util.network.ApiService
 import com.example.myapplication.util.network.RetrofitClient
 import com.example.myapplication.util.network.TokenManager
+import dagger.hilt.android.AndroidEntryPoint
+import jakarta.inject.Inject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -31,11 +35,12 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlinx.coroutines.async
 
+
 class RegisterActivity : AppCompatActivity() {
 
     val tokenManager = RetrofitClient.getTokenManager()
     val apiService = RetrofitClient.apiService
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
 
         super.onCreate(savedInstanceState)
@@ -45,7 +50,7 @@ class RegisterActivity : AppCompatActivity() {
         // RegisterOrNotActivity에서 Extra로 mode(Register/Auth) 전달
 
         val mode = intent.getStringExtra("mode")
-
+        
         //////////////////////////////////////////////////////////////
 
 
@@ -54,9 +59,16 @@ class RegisterActivity : AppCompatActivity() {
         val otpEditText = findViewById<EditText>(R.id.otpEditText)
         val startButton = findViewById<Button>(R.id.startButton)
         val nameText = findViewById<EditText>(R.id.nameEditText)
+        val labelYear = findViewById<TextView>(R.id.labelYear)
+        val yearPicker = findViewById<NumberPicker>(R.id.yearPicker)
+        var birthYear: Int = 2000
 
-        //Auth에선 이름 칸 안보이게
-        if(mode=="Auth") nameText.visibility= View.GONE
+        //Auth에선 이름, 출생년도 칸 안보이게
+        if(mode=="Auth") {
+            nameText.visibility= View.GONE
+            labelYear.visibility=View.GONE
+            yearPicker.visibility=View.GONE
+        }
 
         val serverDomain = getString(R.string.server_domain)
 
@@ -92,6 +104,20 @@ class RegisterActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {}
         })
 
+        //생년 값 범위 설정
+        val currentYear = java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)
+        // NumberPicker 설정
+        yearPicker.minValue = 1900  // 최소 연도
+        yearPicker.maxValue = currentYear // 현재 연도까지 선택 가능
+        yearPicker.value = currentYear // 기본값: 현재 연도
+
+        yearPicker.setOnValueChangedListener { _, _, newVal ->
+            birthYear=newVal
+            //시작 버튼 활성화
+            startButton.isEnabled = true
+        }
+
+
         // 인증하기 버튼 클릭 시 인증번호 입력 칸과 시작하기 버튼 활성화
         verifyButton.setOnClickListener {
             val phoneNumber = phoneEditText.text.toString()
@@ -115,7 +141,7 @@ class RegisterActivity : AppCompatActivity() {
             }
 
             otpEditText.isEnabled = true
-            startButton.isEnabled = true
+            //startButton.isEnabled = true
         }
 
 
@@ -128,12 +154,13 @@ class RegisterActivity : AppCompatActivity() {
                 when(mode){
                     "Register" ->{
                         response = apiService.verifyCode(
-                            VerificationRequest(phoneNumber, code, name)
+                            VerificationRequest(phoneNumber, code, name, birthYear)
                         )
                     }
                     "Auth" ->{
                         response = apiService.verifyRefresh(
-                            VerificationRequest(phoneNumber, code, "")
+                            //같은 dto 사용, 서버에선 phoneNum과 code만 이용
+                            VerificationRequest(phoneNumber, code, "",0)
                         )
                     }
                 }

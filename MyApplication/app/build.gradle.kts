@@ -16,6 +16,12 @@ android {
     buildFeatures.dataBinding = true
     buildFeatures.viewBinding = true
 
+    sourceSets {
+        getByName("main") {
+            jniLibs.srcDirs("src/main/jniLibs")
+        }
+    }
+
     defaultConfig {
         applicationId = "com.example.myapplication"
         minSdk = 26
@@ -145,4 +151,6 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     //chart
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    //local server run
+    implementation("org.nanohttpd:nanohttpd-webserver:2.3.1")
 }

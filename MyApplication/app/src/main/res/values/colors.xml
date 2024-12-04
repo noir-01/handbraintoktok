@@ -15,6 +15,15 @@
     <color name="green">#80C8E6C9</color>
     <color name="gray">#B0BEC5</color>
     <color name="dark_gray">#455A64</color>
+    <color name="bright_yellow">#FFEB3B</color>
+    <color name="dark_yellow">#F4DF65</color>
+    <color name="orange">#FF8A65</color>
+    <color name="dark_orange">#FF7043</color>
+    <color name="light_yellow_transparent">#99FFFF00</color>
+    <color name="very_light_yellow_transparent">#33FFFF00</color>
+
+
+
 
 
 

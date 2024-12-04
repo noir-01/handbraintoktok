@@ -35,4 +35,20 @@ public interface RandomGameHistoryRepository extends JpaRepository<RandomGameHis
             "GROUP BY FUNCTION('DATE_FORMAT', r.date, '%Y-%m') " +
             "ORDER BY FUNCTION('DATE_FORMAT', r.date, '%Y-%m')")
     List<Tuple> findMonthlyAverages(Long userId, GameType gameType, LocalDate startDate);
+
+    @Query("SELECT AVG(r.reactionTime) FROM RandomGameHistory r WHERE r.gameType = :gameType")
+    Float findAverageReactionTimeByGameTypeAllAge(@Param("gameType") GameType gameType);
+
+    @Query("""
+        SELECT AVG(r.reactionTime) 
+        FROM RandomGameHistory r
+        JOIN r.user u
+        WHERE r.gameType = :gameType 
+          AND YEAR(CURRENT_DATE) - u.birthYear BETWEEN :minAge AND :maxAge
+    """)
+    Float findAverageReactionTimeByGameTypeAndAgeGroup(
+            @Param("gameType") GameType gameType,
+            @Param("minAge") int minAge,
+            @Param("maxAge") int maxAge
+    );
 }

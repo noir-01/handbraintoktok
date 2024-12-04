@@ -1,42 +1,45 @@
 package com.example.myapplication.util.network
 
 import android.content.Context
-import android.content.SharedPreferences
+import android.security.keystore.KeyGenParameterSpec
+import android.security.keystore.KeyProperties
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import java.security.GeneralSecurityException
+import java.security.SecureRandom
 
 class TokenManager(private val context: Context) {
-    private val encryptedSharedPrefs by lazy {
-        createEncryptedSharedPrefs()
-    }
-
-    companion object {
-        private const val PREFS_NAME = "secure_prefs"
-        private const val KEY_AUTH_TOKEN = "auth_token"
-    }
-
-    private fun createEncryptedSharedPrefs(): SharedPreferences {
-        return EncryptedSharedPreferences.create(
-            context,
-            PREFS_NAME,
-            MasterKey.Builder(context)
-                .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                .build(),
-            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    private val masterKey = MasterKey.Builder(context)
+        .setKeyGenParameterSpec(
+            KeyGenParameterSpec.Builder(
+                MasterKey.DEFAULT_MASTER_KEY_ALIAS,
+                KeyProperties.PURPOSE_ENCRYPT or KeyProperties.PURPOSE_DECRYPT
+            )
+                .setBlockModes(KeyProperties.BLOCK_MODE_GCM)
+                .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_NONE)
+                .setKeySize(MasterKey.DEFAULT_AES_GCM_MASTER_KEY_SIZE)
+                .build()
         )
-    }
+        .build()
+
+    private val sharedPreferences = EncryptedSharedPreferences.create(
+        context,
+        "secure_tokens",
+        masterKey,
+        EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+        EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+    )
 
     fun saveToken(token: String) {
-        encryptedSharedPrefs.edit().putString(KEY_AUTH_TOKEN, token).apply()
+        sharedPreferences.edit().putString("auth_token", token).apply()
     }
 
     fun getToken(): String? {
-        return encryptedSharedPrefs.getString(KEY_AUTH_TOKEN, null)
+        return sharedPreferences.getString("auth_token", null)
     }
 
     fun clearToken() {
-        encryptedSharedPrefs.edit().remove(KEY_AUTH_TOKEN).apply()
+        sharedPreferences.edit().remove("auth_token").apply()
     }
 }
 

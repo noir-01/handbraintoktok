@@ -3,13 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="5dp">
+    android:padding="10dp">
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/songButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="83dp"
+        android:background="@drawable/btn_item_music"
+        android:fontFamily="@font/sb_aggro"
         android:text="Song Title - Artist Name - Duration"
-        android:textSize="16sp" />
+        android:textSize="20sp" />
 
 </LinearLayout>
