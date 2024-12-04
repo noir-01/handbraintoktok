@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/main_background">
+
+
+    <!-- 반응속도 텍스트 -->
+    <TextView
+        android:id="@+id/reactionSpeedText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="반응속도"
+        android:textSize="80sp"
+        android:layout_centerHorizontal="true"
+        android:fontFamily="@font/sb_aggro_bold"
+        android:layout_marginTop="100dp"
+        android:gravity="center"/>
+
+    <!-- 게임 선택 버튼 -->
+    <Button
+        android:id="@+id/selectGameButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_result_game_option"
+        android:layout_below="@id/reactionSpeedText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="130dp" />
+
+    <!-- 기록 보기 버튼 -->
+    <Button
+        android:id="@+id/viewRecordsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_result_see_history"
+        android:layout_below="@id/selectGameButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp" />
+</RelativeLayout>
