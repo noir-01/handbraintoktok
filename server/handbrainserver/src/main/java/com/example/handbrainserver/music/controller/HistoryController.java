@@ -142,4 +142,22 @@ public class  HistoryController {
             ));
         }
     }
+    //전체 기간동안 유저 평균 보여주기, age=me / all로 내 연령대 or 전체 연령대 평균 return
+    @GetMapping("/history/random/get")
+    public ResponseEntity<?> getRandomAverage(
+            @RequestHeader("Authorization") String token,
+            @RequestParam GameType gameType,
+            @RequestParam String age
+    ){
+        String processedToken = token.replace("Bearer ", ""); // Bearer 제거
+        Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
+        int myAge = LocalDate.now().getYear() - userService.getUserById(userId).getBirthYear();
+        float result=0;
+        if(age.equals("me")){
+            result = historyService.getMyAgeAverageRandomGame(gameType,myAge);
+        }else{
+            result = historyService.getAllAgeAverageRandomGame(gameType);
+        }
+        return ResponseEntity.ok(Map.of("result",result));
+    }
 }
