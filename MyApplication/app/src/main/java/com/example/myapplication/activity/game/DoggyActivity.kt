@@ -12,6 +12,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.view.View
 import android.widget.GridLayout
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -141,6 +142,15 @@ class DoggyActivity : AppCompatActivity() {
         findViewById<ImageView>(R.id.dog).setOnClickListener{
             // 강아지 클릭 동작
         }
+
+        val backButton = findViewById<ImageButton>(R.id.back_button)
+        backButton.setOnClickListener {
+            bgmPlayer.stop()
+            saveState()
+            finish()
+
+        }
+
     }
     private fun initBGM() {
         // MediaPlayer 초기화
@@ -354,21 +364,24 @@ class DoggyActivity : AppCompatActivity() {
 
         // 버튼 클릭 이벤트 설정
         btnHandGesture.setOnClickListener {
+            //음악 끄기
+            bgmPlayer.stop()
             // 손동작 따라하기 동작
             val intent = Intent(this,GameStartActivity::class.java)
             intent.putExtra("MODE", "COPY")
             startActivity(intent)
-            food = (food + 1).coerceAtMost(10)
+            food = (food + 3).coerceAtMost(10)
             saveState()
             updateUI()
             dialog.dismiss()
         }
 
         btnRhythmGame.setOnClickListener {
+            bgmPlayer.stop()
             // 리듬게임 1회 실행
         }
 
-        btnClose.setOnClickListener {
+        btnClose.setOnClickListener {git
             // 닫기 버튼 클릭 시 팝업 닫기
             dialog.dismiss()
         }
