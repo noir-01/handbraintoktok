@@ -59,7 +59,7 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
     private lateinit var handLandmarkerHelper: HandLandMarkHelper
     private lateinit var webSocketClient: WebSocketClient
 
-    private var startTime = 0L
+    private var startTime = System.currentTimeMillis()
     private var lastMessage: String? = null
     private var isFirstProb = true
     private var probNum = AtomicInteger(0)
@@ -168,8 +168,9 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
 
                 // WebSocket 연결은 IO 스레드에서 실행
                 CoroutineScope(Dispatchers.IO).launch {
+                    delay(500)
                     webSocketClient.connect()  // WebSocket 연결
-
+                    delay(500)
                     webSocketClient.sendMessage(socketInitMessage)  // 메시지 전송
                 }
             }
@@ -242,6 +243,16 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
         }
     }
 
+    override fun finish() {
+        CoroutineScope(Dispatchers.IO).launch {
+            webSocketClient.disconnect()
+            withContext(Dispatchers.Main){
+                super.finish()
+            }
+        }
+
+
+    }
     override fun onBackPressed() {
         super.onBackPressed()
         mediaPlayer?.release()
