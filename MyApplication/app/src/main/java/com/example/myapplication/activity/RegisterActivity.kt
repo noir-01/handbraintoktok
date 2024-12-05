@@ -141,7 +141,10 @@ class RegisterActivity : AppCompatActivity() {
             }
 
             otpEditText.isEnabled = true
-            //startButton.isEnabled = true
+            //Auth에선 바로 활성화
+            if(mode=="Auth"){
+                startButton.isEnabled = true  
+            }
         }
 
 
