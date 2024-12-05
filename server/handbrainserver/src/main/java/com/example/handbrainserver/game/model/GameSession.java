@@ -8,8 +8,7 @@ import lombok.Setter;
 
 import java.util.Random;
 
-@Setter
-@Getter
+@Setter @Getter
 public class GameSession {
 
     private Long userId;
@@ -25,6 +24,10 @@ public class GameSession {
 
     private int reactionTimeSum = 0;
     private int questionNums;
+
+    private boolean isTutorial=false;
+    public boolean getIsTutorial(){return isTutorial;}
+    public void setIsTutorial(boolean isTutorial){this.isTutorial=isTutorial;}
     
     Random random = new Random();
 
@@ -94,7 +97,7 @@ public class GameSession {
         };
     }
 
-    private void nextCopyQuestion(){
+    public void nextCopyQuestion(){
         int firstValue = random.nextInt(Gesture.values().length);
         int secondValue = random.nextInt(Gesture.values().length);
         
@@ -115,7 +118,7 @@ public class GameSession {
         }
     }
 
-    private void nextRspQuestion(){
+    public void nextRspQuestion(){
         Gesture[] rspGestures = {Gesture.ROCK, Gesture.TWO, Gesture.FIVE};
         Gesture firstGesture = rspGestures[random.nextInt(rspGestures.length)];
         Gesture secondGesture= rspGestures[random.nextInt(rspGestures.length)];
@@ -131,7 +134,7 @@ public class GameSession {
     }
 
 
-    private void nextCalcQuestion(){
+    public void nextCalcQuestion(){
         calcQuestion = random.nextInt(11);
         if(userAnswer!=null && isAnswer(userAnswer)){
             nextCalcQuestion();
