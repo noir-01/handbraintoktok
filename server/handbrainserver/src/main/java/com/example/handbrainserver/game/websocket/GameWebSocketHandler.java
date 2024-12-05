@@ -14,6 +14,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import java.util.concurrent.ConcurrentHashMap;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -23,7 +24,7 @@ import java.util.Map;
 @Component
 public class GameWebSocketHandler extends TextWebSocketHandler {
     //sessionId, GameSession
-    private final Map<String, GameSession> gameSessions = new HashMap<>();
+    private final Map<String, GameSession> gameSessions = new ConcurrentHashMap<>();
     
     private JwtUtil jwtUtil = new JwtUtil();
     @Autowired
@@ -108,11 +109,9 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
 
         if(firstAnswer!=null){
             userAnswer.setFirst(Gesture.fromCode(firstAnswer));
-            System.out.println(firstAnswer.toString());
         }
         if(secondAnswer!=null){
             userAnswer.setSecond(Gesture.fromCode(secondAnswer));
-            System.out.println(secondAnswer.toString());
         }
 
         // 정답 판단 및 문제 출제
@@ -120,7 +119,6 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
         gameSession.setUserAnswer(userAnswer);
         try {
             if (isCorrect) {
-                System.out.println("answer");
                 // 정답일 경우 반응속도 더해놓기 (나중에 평균내서 저장)
                 gameSession.addReactionTime(reactionTime);
                 gameSession.nextProblem();
@@ -147,8 +145,6 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
                     //gameMessage 만들어서 전송
                     session.sendMessage(new TextMessage(nextGameMessage(gameSession)));
                 }
-            }else{
-                System.out.println("False");
             }
         } catch (IOException e) {
             // 오류 처리 로직 (예: 로그 기록, 클라이언트 연결 종료 등)
