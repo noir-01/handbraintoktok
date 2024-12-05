@@ -14,6 +14,7 @@ import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
+import java.util.concurrent.ConcurrentHashMap;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -23,7 +24,7 @@ import java.util.Map;
 @Component
 public class GameWebSocketHandler extends TextWebSocketHandler {
     //sessionId, GameSession
-    private final Map<String, GameSession> gameSessions = new HashMap<>();
+    private final Map<String, GameSession> gameSessions = new ConcurrentHashMap<>();
     
     private JwtUtil jwtUtil = new JwtUtil();
     @Autowired
@@ -79,11 +80,23 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
                 session.sendMessage(new TextMessage(nextGameMessage(gameSession)));
 
             } else {
-                session.sendMessage(new TextMessage("잘못된 첫 번째 메시지입니다."));
+                //튜토리얼은 처음에 3개 보내기
+                String token = inputs[0].trim(); // 첫 번째 값: token, token=>id
+                Long userId = Long.parseLong(jwtUtil.extractUserId(token));
+                System.out.println("userId: "+userId.toString());
+                gameSession.setUserId(userId);
+                gameSession.setIsTutorial(true);
+                //첫문제: 따라하기 출제
+                gameSession.setGameType(GameType.COPY);
+                //따라하기 - 가위바위보 이기기 - 지기 - 계산하기 순서대로 4문제 출제
+                gameSession.setQuestionNums(4);
+                gameSession.nextProblem();
+                session.sendMessage(new TextMessage(nextGameMessage(gameSession)));
             }
 
         } else {
             // 이후 메시지: 사용자 응답을 문자열로 처리
+            assert gameSession != null;
             handleGameMessage(session, payload);
         }
     }
@@ -108,25 +121,47 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
 
         if(firstAnswer!=null){
             userAnswer.setFirst(Gesture.fromCode(firstAnswer));
-            System.out.println(firstAnswer.toString());
         }
         if(secondAnswer!=null){
             userAnswer.setSecond(Gesture.fromCode(secondAnswer));
-            System.out.println(secondAnswer.toString());
         }
-
         // 정답 판단 및 문제 출제
         boolean isCorrect = gameSession.isAnswer(userAnswer);
         gameSession.setUserAnswer(userAnswer);
         try {
             if (isCorrect) {
-                System.out.println("answer");
                 // 정답일 경우 반응속도 더해놓기 (나중에 평균내서 저장)
                 gameSession.addReactionTime(reactionTime);
-                gameSession.nextProblem();
+
+                if(gameSession.getIsTutorial()){
+                    switch(gameSession.getQuestionCounter()){
+                        case 3: //이기는 가위바위보
+                            gameSession.setGameType(GameType.RSP);
+                            gameSession.setQuestionType(1);
+                            gameSession.nextRspQuestion();
+                            gameSession.setQuestionCounter(2);
+                            break;
+                        case 2: //지는 가위바위보
+                            gameSession.setGameType(GameType.RSP);
+                            gameSession.setQuestionType(2);
+                            gameSession.nextRspQuestion();
+                            gameSession.setQuestionCounter(1);
+                            break;
+                        case 1: //계산 (끝)
+                            gameSession.setGameType(GameType.CALC);
+                            gameSession.nextCalcQuestion();
+                            gameSession.setQuestionCounter(0);
+                            break;
+                        case 0:
+                            gameSession.setQuestionCounter(-1);
+                            break;
+                    }
+                }else{
+                    gameSession.nextProblem();
+                }
 
                 session.sendMessage(new TextMessage("correct"));
-                
+
                 //마지막 문제면 반응속도 기록
                 if (gameSession.isEnd()) {
                     HistoryDto.RandomGameHistoryDto historyDto = new HistoryDto.RandomGameHistoryDto();
@@ -147,8 +182,6 @@ public class GameWebSocketHandler extends TextWebSocketHandler {
                     //gameMessage 만들어서 전송
                     session.sendMessage(new TextMessage(nextGameMessage(gameSession)));
                 }
-            }else{
-                System.out.println("False");
             }
         } catch (IOException e) {
             // 오류 처리 로직 (예: 로그 기록, 클라이언트 연결 종료 등)

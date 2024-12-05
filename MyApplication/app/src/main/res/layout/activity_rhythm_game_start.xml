@@ -26,20 +26,43 @@
         app:layout_constraintHeight_percent="0.10">
 
         <TextView
+            android:id="@+id/scoreTextView"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:fontFamily="@font/sb_aggro_bold"
+            android:textSize="25sp"
+            android:textColor="@color/white"
+            android:background="@color/black"
+            android:gravity="center"
+            android:text="점수"
+            />
+
+        <TextView
+            android:id="@+id/addScoreView"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0"
+            android:background="@color/black"
+            android:fontFamily="@font/sb_aggro_bold"
+            android:gravity="center_vertical"
+            android:text="점수"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            />
+
+        <TextView
             android:id="@+id/comboTextView"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center"
-            android:text="Combo" />
-
-        <TextView
-            android:id="@+id/scoreTextView"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center"
-            android:text="Score" />
+            android:textSize="25sp"
+            android:fontFamily="@font/sb_aggro_bold"
+            android:textColor="@color/white"
+            android:background="@color/black"
+            android:text="콤보"
+            />
     </LinearLayout>
 
     <!-- Left and Right Game Images -->
@@ -145,7 +168,7 @@
         android:id="@+id/button_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:background="@drawable/back"
+        android:background="@drawable/btn_back"
         android:contentDescription="Back button"
         android:layout_margin="16dp"
         app:layout_constraintStart_toStartOf="parent"

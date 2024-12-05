@@ -1,6 +1,8 @@
 package com.example.myapplication.activity.game
 
 import android.Manifest
+import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -14,6 +16,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.util.Size
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
@@ -55,7 +58,14 @@ import kotlin.random.Random
 import android.media.MediaMetadataRetriever
 import android.os.Handler
 import android.os.Looper
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import android.view.View
+import android.view.animation.AlphaAnimation
+import android.view.animation.AnimationSet
+import android.view.animation.LinearInterpolator
+import android.widget.ImageButton
 
 class RhythmGameStartActivity: AppCompatActivity() {
     //mp3 보내줄 로컬 서버
@@ -94,9 +104,11 @@ class RhythmGameStartActivity: AppCompatActivity() {
     private lateinit var webView:WebView
     private lateinit var leftXImageView: ImageView
     private lateinit var rightXImageView: ImageView
+    private lateinit var addScoreView: TextView
 
     //콤보, 해당 회차 맞췄는지 확인하는 플래그
     private var combo = 0
+    private var maxCombo = 0
     private var leftAnswerFlag = false
     private var rightAnswerFlag = false
     //총점 및 한번 맞췄을 때 점수
@@ -135,6 +147,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
         middleImageView = findViewById(R.id.gameImageCenterView)
         comboTextView = findViewById(R.id.comboTextView)
         scoreTextView = findViewById(R.id.scoreTextView)
+        addScoreView = findViewById<TextView>(R.id.addScoreView)
 
         leftXImageView = findViewById(R.id.leftXImageView)
         leftXImageView.visibility=View.GONE
@@ -214,6 +227,11 @@ class RhythmGameStartActivity: AppCompatActivity() {
             // musicId가 유효하지 않을 경우의 처리
             Toast.makeText(this, "음악 ID가 유효하지 않습니다.", Toast.LENGTH_SHORT).show()
         }
+
+        val backButton = findViewById<ImageButton>(R.id.button_back)
+        backButton.setOnClickListener {
+            finish()
+        }
     }
     private fun allPermissionsGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
@@ -275,7 +293,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
                 intent.putExtra("MUSIC_ID", musicId)
                 intent.putExtra("DIFFICULTY", difficultyString)
                 intent.putExtra("SCORE",totalScore)
-                intent.putExtra("COMBO",combo)
+                intent.putExtra("COMBO",maxCombo)
                 startActivity(intent)
                 finish()
             }
@@ -375,34 +393,42 @@ class RhythmGameStartActivity: AppCompatActivity() {
                         updateImage(true, leftHandImageView, currentTime, leftBeatIdx, leftHandIndex)
                     if(rightBeatIdx<rightBeats.size)
                         updateImage(false, rightHandImageView, currentTime, rightBeatIdx, rightHandIndex)
-
+                    var addScore=0
                     //적당한 시간 안에 맞췄으면(플래그=true) 콤보, 점수 올리고 플래그 초기화
                     if(leftBeatIdx<leftBeats.size && currentTime>leftBeats[leftBeatIdx]+delayTime){
                         leftBeatIdx++
                         //콤보는 20까지만 증가
-                        if(leftAnswerFlag && combo<21) combo++
+                        if(leftAnswerFlag && combo<20) {
+                            combo++
+                            if(combo>maxCombo) maxCombo = combo
+                        }
                         //틀렸을 경우 콤보 초기화 및 X 이미지 표시
                         else if (!leftAnswerFlag) {
                             combo = 0
                             showXImage(leftXImageView)
                         }
                         //점수는 기본 점수* 콤보 배열을 더해서 계산.
-                        totalScore += correctScore[difficultyInt]*combo
+                        addScore = correctScore[difficultyInt]*combo
                         leftAnswerFlag=false
                     }
                     //오른손
                     if(rightBeatIdx<rightBeats.size && currentTime>rightBeats[rightBeatIdx]+delayTime){
                         rightBeatIdx++
-                        if(rightAnswerFlag && combo<21) combo++
+                        if(rightAnswerFlag && combo<21) {
+                            combo++
+                            if(combo>maxCombo) maxCombo = combo
+                        }
                         //틀렸을 경우 콤보 초기화 및 X 이미지 표시
                         else if (!rightAnswerFlag){
                             combo = 0
                             showXImage(rightXImageView)
                         }
-                        totalScore += correctScore[difficultyInt]*combo
+                        addScore = correctScore[difficultyInt]*combo
                         rightAnswerFlag=false
                     }
-                    updateScoreAndCombo()
+                    updateScore(totalScore,addScore)
+                    updateCombo()
+
                     delay(50)  // Delay
                 }
             }
@@ -463,11 +489,13 @@ class RhythmGameStartActivity: AppCompatActivity() {
 
         val borderPaint = Paint()
         borderPaint.color = Color.WHITE
-        borderPaint.strokeWidth = 50f
+        borderPaint.strokeWidth = 100f
         borderPaint.style = Paint.Style.STROKE
-        //정답일 경우 초록색으로 그림
+
+        //정답일 경우 초록색으로 그림, 두께 조금 더 두껍게
         if(currentTime >= beatTime - 0.2f  && currentTime < beatTime+delayTime && isAnswer){
             borderPaint.color = Color.GREEN
+            borderPaint.strokeWidth = 150f
             if(imageView == leftHandImageView){
                 Log.d("is answer","left true")
                 leftAnswerFlag=true
@@ -611,9 +639,23 @@ class RhythmGameStartActivity: AppCompatActivity() {
             }
         }, ContextCompat.getMainExecutor(this))
     }
-    fun updateScoreAndCombo(){
-        comboTextView.text = "Combo: $combo     " // 콤보 텍스트 업데이트
-        scoreTextView.text = "     Score: $totalScore" // 점수 텍스트 업데이트
+    private fun updateScore(fromScore: Int, addScore: Int) {
+        CoroutineScope(Dispatchers.Main).launch{
+            scoreTextView.text = "점수: $totalScore"
+            if(addScore!=0){
+                addScoreView.text= "+$addScore"
+                addScoreView.setTextColor(getColor(R.color.bright_yellow) )
+                delay(500)
+                addScoreView.setTextColor(getColor(R.color.black))
+                totalScore+=addScore
+                scoreTextView.text = "점수: $totalScore"
+            }
+        }
+    }
+
+    fun updateCombo(){
+        if(combo!=0)
+            comboTextView.text = "콤보: $combo     " // 콤보 텍스트 업데이트
     }
     //Easy: 번갈아서? 시간 넉넉하게, 어려운 손동작 빼기. [왼손/오른손 이미지 이름, 왼손/오른손 비트 시간 반환]
     fun makeGameBeatsEasy(beats: List<Float>, bps:Float): Pair<Pair<List<String>, List<String>>, Pair<List<Float>, List<Float>>>{

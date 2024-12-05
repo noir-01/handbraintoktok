@@ -1,4 +1,4 @@
-package com.example.myapplication.activity.game
+package com.example.myapplication.activity.tutorial
 
 import android.Manifest
 import android.app.AlertDialog
@@ -13,7 +13,12 @@ import android.util.Log
 import android.util.Size
 import android.view.Gravity
 import android.view.View
-import android.widget.*
+import android.widget.Button
+import android.widget.ImageButton
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageAnalysis
 import androidx.camera.core.Preview
@@ -25,14 +30,13 @@ import androidx.camera.view.PreviewView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
-import com.example.myapplication.BaseActivity
 import com.example.myapplication.R
+import com.example.myapplication.activity.game.GameResultActivity
+import com.example.myapplication.util.ResourceUtils.imageResources
 import com.example.myapplication.util.mediapipe.GestureRecognition
 import com.example.myapplication.util.mediapipe.HandLandMarkHelper
-import com.example.myapplication.util.ResourceUtils.imageResources
-import com.example.myapplication.util.network.WebSocketClient
 import com.example.myapplication.util.mediapipe.gestureLabels
-import com.example.myapplication.util.network.RetrofitClient
+import com.example.myapplication.util.network.WebSocketClient
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,12 +46,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.atomic.AtomicInteger
 
-class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
+//리듬게임 제외 게임들 설명: 각 2문제씩 출제?
+class TutorialGameActivity: AppCompatActivity() {
+
     private lateinit var previewView: PreviewView
     private val CAMERA_REQUEST_CODE = 1001
 
-    private lateinit var countdownImageView: ImageView
-    private lateinit var startImageView: ImageView
+    private lateinit var mainView: View
     private lateinit var gameNextImageView: ImageView
     private lateinit var checkImageView: ImageView
     private lateinit var gameImageLeftView: ImageView
@@ -57,80 +62,90 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
     private var mediaPlayer: MediaPlayer? = null
     private lateinit var gestureRecognition: GestureRecognition
     private lateinit var handLandmarkerHelper: HandLandMarkHelper
-    private lateinit var webSocketClient: WebSocketClient
-
-    private var startTime = System.currentTimeMillis()
-    private var lastMessage: String? = null
-    private var isFirstProb = true
-    private var probNum = AtomicInteger(0)
+    private var probNum = 0
     private var countDownJob: Job?=null
-    val tokenManager = RetrofitClient.getTokenManager()
-    var socketInitMessage = tokenManager.getToken() + ","
-    private var isTutorial = false
-
-
-    //websocket interface
-    override fun onMessageReceived(message: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            if (message == lastMessage) {
-                return@launch // 이전 메시지와 같으면 무시
-            }
-            lastMessage = message
-            if (message.startsWith("next:")) {
-                val problemInfo = message.substringAfter("next:")
-                probNum.incrementAndGet()
-                //정답이면(다음 문제 오면) 체크 표시 띄우고 잠시 멈췄다가 다음 문제 띄우기
-                withContext(Dispatchers.Main) {
-                    //첫번째 출제가 아닐때만 보이게
-                    if(probNum.get()>1) {
-                        checkImageView.setImageResource(R.drawable.checkmark)
-                        checkImageView.bringToFront()
-                        checkImageView.visibility = View.VISIBLE
-                        delay(1500)
-                        checkImageView.visibility = View.GONE
-                    }
-                    if (countDownJob?.isActive == true) {
-                        Log.d("job","waiting")
-                        countDownJob?.join()
-                    }
-                    handleNextProblem(problemInfo)
-                }
-                isFirstProb=false
-                startTime = System.currentTimeMillis()
-            }else if (message.startsWith("end,")) {
-                val avgReactionTime = message.substringAfter("end,").toIntOrNull()
-
-                withContext(Dispatchers.Main) {
-                    checkImageView.setImageResource(R.drawable.checkmark)
-                    checkImageView.bringToFront()
-                    checkImageView.visibility = View.VISIBLE
-                    delay(1500)
-                    checkImageView.visibility = View.GONE
-
-                    val intent = Intent(this@GameStartActivity,GameResultActivity::class.java)
-                    intent.putExtra("REACTION",avgReactionTime?:0)
-                    //결과 창 띄우고 게임 종료
-                    startActivity(intent)
-                    finish()
-                }
-            }
-        }
-    }
+    private var startTime = System.currentTimeMillis()
+    private lateinit var questions: MutableList<String>
+    private lateinit var answers: MutableList<String>
+    private lateinit var images: MutableList<Int>
+    private var mode = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_start)
-        
-        //gameOptionActivity에서 putExtra로 전달
-        val mode = intent.getStringExtra("MODE")
-        //게임 모드를 initMessage에 붙여서 전송(COPY/RSP/CALC/RANDOM)
-        socketInitMessage+=mode
 
-        if(intent.getBooleanExtra("TUTORIAL",false)){
-            isTutorial=true
-            //튜토리얼은 3글자로 보내야 됨
-            socketInitMessage+=",1,1"
+        //gameOptionActivity에서 putExtra로 전달
+        mode = intent.getStringExtra("MODE")?:""
+        when(mode){
+            "COPY"->{
+                questions=mutableListOf("0,8,9","0,3,20")
+                images= mutableListOf(
+                    R.drawable.tutorial_copy_1,
+                    R.drawable.tutorial_copy_2,
+                )
+            }
+            "RSP"->{
+                questions=mutableListOf("1,13,17","2,13,17")
+                //바위 보 이김: 답은 보 가위
+                //바위 보 짐: 답=바위 가위
+                images= mutableListOf(
+                    R.drawable.tutorial_rsp_win,
+                    R.drawable.tutorial_rsp_lose,
+                )
+            }
+            "CALC"->{
+                questions=mutableListOf("3,9,0","3,6,0")
+                images= mutableListOf(R.drawable.tutorial_calc)
+            }
+            "RANDOM"->{
+                questions=mutableListOf("0,8,9","2,17,13")
+                images= mutableListOf(R.drawable.tutorial_random)
+            }
         }
+        mainView=findViewById(R.id.myConstraintView)
+        mainView.setBackgroundColor(getColor(R.color.black))
+
+        val tutorialImageView = findViewById<ImageView>(R.id.tutorialImageView)
+        tutorialImageView.bringToFront()
+        val nextButton = findViewById<Button>(R.id.nextButton)
+        val beforeButton = findViewById<Button>(R.id.beforeButton)
+        var currentIndex = 0
+
+        // 첫 번째 이미지 설정
+        tutorialImageView.setImageResource(images[currentIndex])
+        nextButton.visibility=View.VISIBLE
+        nextButton.bringToFront()
+        // 'Next' 버튼 클릭 이벤트
+        nextButton.setOnClickListener {
+            if (currentIndex < images.size - 1) {
+                currentIndex++
+                tutorialImageView.setImageResource(images[currentIndex])
+            } else {
+                // 마지막 이미지에서 버튼 비활성화 or 다른 작업
+                nextButton.isEnabled = false
+                nextButton.visibility=View.GONE
+                beforeButton.visibility=View.GONE
+                tutorialImageView.visibility=View.GONE
+
+                showPopup{
+                    mainView.setBackgroundResource(R.drawable.main_background)
+                    handleNextProblem(questions[0])
+                }
+            }
+        }
+        beforeButton.visibility=View.VISIBLE
+        beforeButton.bringToFront()
+        // 'Next' 버튼 클릭 이벤트
+        beforeButton.setOnClickListener {
+            if (currentIndex > -1) {
+                currentIndex--
+                if(currentIndex>-1)
+                    tutorialImageView.setImageResource(images[currentIndex])
+            }
+        }
+
+
+        //게임 모드를 initMessage에 붙여서 전송(COPY/RSP/CALC/RANDOM)
 
         gameImageLeftView = findViewById<ImageView>(R.id.gameImageLeftView)
         gameImageCenterView = findViewById<ImageView>(R.id.gameImageCenterView)
@@ -150,15 +165,6 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
         gameImageCenterView.visibility = View.GONE
         previewView = findViewById(R.id.camera_previewView)
 
-        showPopupThenWebsocketConnect()
-
-        // WebSocket
-//        val serverDomain = getString(R.string.server_domain)
-//        webSocketClient = WebSocketClient("wss://$serverDomain/ws", this)
-//        CoroutineScope(Dispatchers.IO).launch{
-//            webSocketClient.connect()
-//            webSocketClient.sendMessage("8,true")
-//        }
 
         if (allPermissionsGranted()) {
             initializeMediaPipe()
@@ -168,29 +174,13 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
             )
         }
     }
-    private fun showPopupThenWebsocketConnect(){
-        CoroutineScope(Dispatchers.Main).launch {
-            showPopup {
-                val serverDomain = getString(R.string.server_domain)
-                webSocketClient = WebSocketClient("wss://$serverDomain/ws", this@GameStartActivity)
 
-                // WebSocket 연결은 IO 스레드에서 실행
-                CoroutineScope(Dispatchers.IO).launch {
-                    delay(500)
-                    webSocketClient.connect()  // WebSocket 연결
-                    delay(500)
-                    webSocketClient.sendMessage(socketInitMessage)  // 메시지 전송
-                }
-            }
-        }
-    }
     private fun showPopup(onComplete: () -> Unit) {
         val alertDialog = AlertDialog.Builder(this)
             .setTitle("Game Start")
             .setMessage("핸드폰을 흔들리지 않게 세워주세요.")
             .setPositiveButton("확인") { _, _ ->
                 CoroutineScope(Dispatchers.Main).launch {
-                    startCountdown()
                     onComplete() // 카운트다운 완료 후에 호출
                 }
             }
@@ -205,62 +195,78 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
         alertDialog.show()
     }
 
-    private fun startCountdown() {
-        gameImageCenterView.visibility = View.VISIBLE
+    fun isAnswerAndCheckAndNext(answer1:Int, answer2: Int){
+        CoroutineScope(Dispatchers.Main).launch {
+            if(isAnswer(answer1,answer2)){
+                probNum++
+                checkImageView.setImageResource(R.drawable.checkmark)
+                checkImageView.bringToFront()
+                checkImageView.visibility = View.VISIBLE
+                delay(1500)
+                checkImageView.visibility = View.GONE
+                if(probNum<2)
+                    handleNextProblem(questions[probNum])
+                else
+                    finish()
+            }
+        }
 
-        val countdownImages = arrayOf(
-            R.drawable.three,
-            R.drawable.two,
-            R.drawable.one
-        )
-        val handler = Handler(Looper.getMainLooper())
-        var currentIndex = 0
+    }
+    fun isAnswer(answer1:Int, answer2: Int): Boolean{
+        when(mode) {
+            //questions = mutableListOf("0,8,9", "0,3,20")
+            "COPY" -> {
+                if(probNum==0){
+                    return (answer1==8) && (answer2==9)
+                }else{
+                    return (answer1==3) && (answer2==20)
+                }
+            }
+            "RSP" -> {
+                //questions = mutableListOf("1,13,17", "2,13,17")
+                //바위 보 이김: 답은 보 가위
+                //바위 보 짐: 답=바위 가위
+                if(probNum==0){
+                    return (answer1==17) && ((answer2==4)||(answer2==15))
+                }else{
+                    return ((answer1==4)||(answer1==15)) && (answer2==13)
+                }
+            }
 
-        countDownJob = CoroutineScope(Dispatchers.Main).launch {
-            while (currentIndex < countdownImages.size) {
-                // 이미지 업데이트
-                gameImageCenterView.setImageResource(countdownImages[currentIndex])
-                gameImageCenterView.visibility = View.VISIBLE
-                gameImageCenterView.bringToFront()
+            "CALC" -> {
+                //questions = mutableListOf("3,9,0", "3,4,0")
+                if(probNum==0){
+                    return defaultIntMapping(answer1) + defaultIntMapping(answer2) == 9
+                }else{
+                    return defaultIntMapping(answer1) + defaultIntMapping(answer2) == 6
+                }
+            }
 
-                // 첫 번째 이미지일 때 소리 재생
-                if (currentIndex == 0) {
-                    playCountdownSound()
+            "RANDOM" -> {
+                //questions = mutableListOf("0,8,9", "2,17,13")
+                if(probNum==0){
+                    return (answer1==8) && (answer2==9)
+                }else{
+                    return (answer1==13) && ((answer2==4)||(answer2==15))
                 }
 
-                currentIndex++
-                delay(1000L) // 1초 대기
-            }
-            // 카운트다운 완료 처리
-            gameImageCenterView.setImageResource(R.drawable.start)
-            gameImageCenterView.visibility = View.VISIBLE
-
-            // 1초 후 게임 이미지를 숨김
-            delay(1000L)
-            gameImageCenterView.visibility = View.GONE
-        }
-    }
-
-    private fun playCountdownSound() {
-        mediaPlayer?.release()
-        mediaPlayer = MediaPlayer.create(this, R.raw.start)
-        mediaPlayer?.start()
-        mediaPlayer?.setOnCompletionListener {
-            it.release()
-            mediaPlayer = null
-        }
-    }
-
-    override fun finish() {
-        CoroutineScope(Dispatchers.IO).launch {
-            webSocketClient.disconnect()
-            withContext(Dispatchers.Main){
-                super.finish()
             }
         }
-
-
+        return false
     }
+
+    fun defaultIntMapping(input: Int): Int {
+        return when (gestureLabels[input]) {
+            "rock" -> 0
+            "one", "thumb_up" -> 1
+            "v", "two" -> 2
+            "three", "six" -> 3
+            "four" -> 4
+            "five" -> 5
+            else -> -1
+        }
+    }
+
     override fun onBackPressed() {
         super.onBackPressed()
         mediaPlayer?.release()
@@ -293,11 +299,15 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
         ) == PackageManager.PERMISSION_GRANTED
     }
 
+    private fun isCorrect(): Boolean{
+        return true
+    }
+
     private fun initializeMediaPipe() {
         lifecycleScope.launch(Dispatchers.Default) {
-            gestureRecognition = GestureRecognition(this@GameStartActivity)
+            gestureRecognition = GestureRecognition(this@TutorialGameActivity)
             handLandmarkerHelper = HandLandMarkHelper(
-                context = this@GameStartActivity,
+                context = this@TutorialGameActivity,
                 runningMode = RunningMode.LIVE_STREAM,
                 handLandmarkerHelperListener = object : HandLandMarkHelper.LandmarkerListener {
                     override fun onError(error: String, errorCode: Int) {
@@ -336,10 +346,8 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
                             //reactionTime: 문제 출제했던 시간이 있음.
                             val reactionTime = System.currentTimeMillis() - startTime - inferenceTime
                             message = "$message,$reactionTime"
+                            isAnswerAndCheckAndNext(predictedIndices[0],predictedIndices[1])
                             Log.d("reaction",message)
-                            CoroutineScope(Dispatchers.IO).launch{
-                                webSocketClient.sendMessage(message)
-                            }
                         }
                     }
                 }
@@ -370,7 +378,7 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
                                 ResolutionStrategy.FALLBACK_RULE_CLOSEST_LOWER_THEN_HIGHER
                             )
                         )
-                    .build()
+                        .build()
                 )
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
@@ -393,7 +401,7 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
         }, ContextCompat.getMainExecutor(this))
     }
 
-    private suspend fun handleNextProblem(problemInfo: String) {
+    private fun handleNextProblem(problemInfo: String) {
         val problemNumbers = problemInfo.split(",").map { it.trim().toIntOrNull() }
         val gameType = problemNumbers.getOrNull(0)
         when(gameType) {
@@ -417,7 +425,7 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
                 gameImageLeftView.visibility = View.GONE
                 gameImageRightView.visibility = View.GONE
                 gameImageCenterView.setImageResource(resourceId as Int)
-                gameImageCenterView.visibility=View.VISIBLE
+                gameImageCenterView.visibility= View.VISIBLE
                 gameImageCenterView.bringToFront()
             }
 
@@ -455,4 +463,6 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
             }
         }
     }
+
+
 }
