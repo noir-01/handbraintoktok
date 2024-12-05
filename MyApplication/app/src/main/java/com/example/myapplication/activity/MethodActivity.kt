@@ -7,6 +7,7 @@ import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.myapplication.activity.tutorial.TutorialActivity
 
 class MethodActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,10 +28,14 @@ class MethodActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.button_install).setOnClickListener {
             val intent = Intent(this, InstallActivity::class.java)
             startActivity(intent)
+            //finish 넣어서 종료 시 메인으로 이동
+            finish()
         }
         findViewById<ImageButton>(R.id.button_tutorial).setOnClickListener {
             val intent = Intent(this, TutorialActivity::class.java)
             startActivity(intent)
+            //finish 넣어서 종료 시 메인으로 이동
+            finish()
         }
 
     }
