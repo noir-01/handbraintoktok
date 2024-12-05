@@ -135,8 +135,7 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
         gameImageLeftView = findViewById<ImageView>(R.id.gameImageLeftView)
         gameImageCenterView = findViewById<ImageView>(R.id.gameImageCenterView)
         gameImageRightView = findViewById<ImageView>(R.id.gameImageRightView)
-
-//        countdownImageView = findViewById(R.id.countdownImageView)
+        countdownImageView = findViewById(R.id.countDownImageView)
 //        startImageView = findViewById(R.id.startImageView)
         gameNextImageView = findViewById(R.id.gameNextImageView)
         checkImageView = findViewById(R.id.checkImageView)
@@ -148,7 +147,9 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
         //countdownImageView.visibility = View.GONE
         //startImageView.visibility = View.GONE
         gameImageCenterView.visibility = View.GONE
+        countdownImageView.visibility = View.GONE
         previewView = findViewById(R.id.camera_previewView)
+
 
         showPopupThenWebsocketConnect()
 
@@ -206,44 +207,41 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
     }
 
     private fun startCountdown() {
-        gameImageCenterView.visibility = View.VISIBLE
+        countdownImageView.visibility = View.VISIBLE
 
         val countdownImages = arrayOf(
-            R.drawable.three,
-            R.drawable.two,
-            R.drawable.one
+            R.drawable.ani_three,
+            R.drawable.ani_two,
+            R.drawable.ani_one,
         )
-        val handler = Handler(Looper.getMainLooper())
+
         var currentIndex = 0
 
         countDownJob = CoroutineScope(Dispatchers.Main).launch {
             while (currentIndex < countdownImages.size) {
                 // 이미지 업데이트
-                gameImageCenterView.setImageResource(countdownImages[currentIndex])
-                gameImageCenterView.visibility = View.VISIBLE
-                gameImageCenterView.bringToFront()
+                countdownImageView.setImageResource(countdownImages[currentIndex])
+                countdownImageView.bringToFront()
 
-                // 첫 번째 이미지일 때 소리 재생
-                if (currentIndex == 0) {
-                    playCountdownSound()
-                }
+                playCountdownSound(R.raw.countdown)
 
                 currentIndex++
                 delay(1000L) // 1초 대기
             }
             // 카운트다운 완료 처리
-            gameImageCenterView.setImageResource(R.drawable.start)
-            gameImageCenterView.visibility = View.VISIBLE
+            countdownImageView.setImageResource(R.drawable.start)
+            countdownImageView.visibility = View.VISIBLE
+            playCountdownSound(R.raw.start_sound)
 
             // 1초 후 게임 이미지를 숨김
             delay(1000L)
-            gameImageCenterView.visibility = View.GONE
+            countdownImageView.visibility = View.GONE
         }
     }
 
-    private fun playCountdownSound() {
+    private fun playCountdownSound(res: Int) {
         mediaPlayer?.release()
-        mediaPlayer = MediaPlayer.create(this, R.raw.start)
+        mediaPlayer = MediaPlayer.create(this, res)
         mediaPlayer?.start()
         mediaPlayer?.setOnCompletionListener {
             it.release()
@@ -255,6 +253,9 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
         CoroutineScope(Dispatchers.IO).launch {
             webSocketClient.disconnect()
             withContext(Dispatchers.Main){
+                if(mediaPlayer!!.isPlaying) {
+                    mediaPlayer!!.stop()
+                }
                 super.finish()
             }
         }

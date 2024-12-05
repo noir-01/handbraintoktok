@@ -13,8 +13,7 @@
         android:id="@+id/tv_question"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="저희 게임이
-         처음이신가요?"
+        android:text="저희 게임이\n처음이신가요?"
         android:textSize="50sp"
         android:textColor="#333"
         android:gravity="center"
