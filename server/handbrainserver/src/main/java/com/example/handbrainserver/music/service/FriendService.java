@@ -49,7 +49,7 @@ public class FriendService {
         return matchedUsers.size();
     }
     public List<Long> getFriendIds(Long userId) {
-        List<Friend> friends = friendRepository.findByUserId(userId);
+        List<Friend> friends = friendRepository.findByUserIdAndVisibleTrue(userId);
         return friends.stream()
                 .map(friend -> friend.getUserId().equals(userId) ? friend.getFriendId() : friend.getUserId())
                 .collect(Collectors.toList());

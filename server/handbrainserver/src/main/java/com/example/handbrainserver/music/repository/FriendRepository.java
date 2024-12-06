@@ -15,7 +15,7 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
     // 친구 관계 확인
     boolean existsByUserIdAndFriendId(Long userId, Long friendId);
     // 특정 유저의 모든 친구 가져오기
-    List<Friend> findByUserId(Long userId);
+    List<Friend> findByUserIdAndVisibleTrue(Long userId);
 
     //unlink 1: 내 id 친구에게 안보이게
     @Modifying
