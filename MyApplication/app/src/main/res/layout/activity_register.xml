@@ -24,6 +24,7 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginBottom="16dp">
+
             <EditText
                 android:id="@+id/phoneEditText"
                 android:layout_width="0dp"
@@ -31,7 +32,10 @@
                 android:layout_weight="1"
                 android:hint="전화번호"
                 android:inputType="phone"
-                android:maxLength="11"/>
+                android:maxLength="11"
+                android:fontFamily="@font/sb_aggro"
+                android:textSize="30sp" />
+
             <ImageButton
                 android:id="@+id/verifyButton"
                 android:background="@drawable/btn_auth"
@@ -46,7 +50,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="이름"
+            android:textSize="30sp"
             android:layout_marginBottom="16dp"
+            android:maxLength="11"
+            android:fontFamily="@font/sb_aggro"
             android:inputType="text"/>
 
         <EditText
@@ -54,8 +61,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="인증번호"
+            android:textSize="30sp"
             android:layout_marginBottom="16dp"
             android:inputType="number"
+            android:fontFamily="@font/sb_aggro"
             android:enabled="false"/>
 
         <LinearLayout
@@ -69,25 +78,28 @@
                 android:id="@+id/labelYear"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="출생년도"
-                android:textSize="18sp"
+                android:text="출생연도"
+                android:textSize="30sp"
+                android:fontFamily="@font/sb_aggro"
                 android:layout_marginRight="40dp"/>
 
             <NumberPicker
                 android:id="@+id/yearPicker"
+                android:textSize="30sp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
         </LinearLayout>
 
 
-
-        <Button
+        <ImageButton
             android:id="@+id/startButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="시작하기"
-            android:enabled="false"/>
+            android:layout_marginTop="50dp"
+            android:layout_width="248dp"
+            android:layout_height="112dp"
+            android:background="@drawable/btn_register_start"
+            android:enabled="false"
+            android:text="시작하기" />
 
     </LinearLayout>
 

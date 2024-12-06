@@ -288,6 +288,7 @@ class TutorialGameActivity: AppCompatActivity() {
                 startCamera()
             } else {
                 Toast.makeText(this, "카메라 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+
                 finish()
             }
         }
