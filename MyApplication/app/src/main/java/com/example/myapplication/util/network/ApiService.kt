@@ -53,6 +53,14 @@ interface ApiService {
     // Response<200>,{"message" : "success"}
     @POST("/sms/send")
     suspend fun sendSms(@Body numDto: NumDto): Response<Unit>
+    
+    //연동 해제
+    @POST("/friend/unlink")
+    suspend fun unlink(): Response<Map<String,Any>>
+    
+    //계정 탈퇴
+    @POST("/user/deactivate")
+    suspend fun deactivate(): Response<Map<String,Any>>
 
     /* 응답 꼴
     * Response<200>, {"token"  : "...."}

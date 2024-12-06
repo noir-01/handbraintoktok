@@ -126,11 +126,10 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
         //게임 모드를 initMessage에 붙여서 전송(COPY/RSP/CALC/RANDOM)
         socketInitMessage+=mode
 
-        if(intent.getBooleanExtra("TUTORIAL",false)){
-            isTutorial=true
-            //튜토리얼은 3글자로 보내야 됨
-            socketInitMessage+=",1,1"
-        }
+        val nextButton = findViewById<Button>(R.id.nextButton)
+        val beforeButton = findViewById<Button>(R.id.beforeButton)
+        nextButton.visibility=View.GONE
+        beforeButton.visibility=View.GONE
 
         gameImageLeftView = findViewById<ImageView>(R.id.gameImageLeftView)
         gameImageCenterView = findViewById<ImageView>(R.id.gameImageCenterView)
@@ -253,8 +252,10 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
         CoroutineScope(Dispatchers.IO).launch {
             webSocketClient.disconnect()
             withContext(Dispatchers.Main){
-                if(mediaPlayer!!.isPlaying) {
-                    mediaPlayer!!.stop()
+                mediaPlayer?.let {
+                    if (it.isPlaying) {
+                        it.stop()
+                    }
                 }
                 super.finish()
             }

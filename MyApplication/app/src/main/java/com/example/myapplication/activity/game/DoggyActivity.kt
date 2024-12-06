@@ -381,7 +381,7 @@ class DoggyActivity : AppCompatActivity() {
             // 리듬게임 1회 실행
         }
 
-        btnClose.setOnClickListener {git
+        btnClose.setOnClickListener {
             // 닫기 버튼 클릭 시 팝업 닫기
             dialog.dismiss()
         }
