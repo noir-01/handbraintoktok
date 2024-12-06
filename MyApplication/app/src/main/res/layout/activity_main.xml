@@ -6,7 +6,6 @@
     android:layout_height="match_parent"
     android:background="@drawable/main_background">
 
-
     <!-- Start Game Button -->
     <ImageButton
         android:id="@+id/button_start_game"
@@ -17,10 +16,9 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/button_records"
-        app:layout_constraintHeight_percent="0.25"
+        app:layout_constraintHeight_percent="0.22"
         app:layout_constraintDimensionRatio="2:1"
-        />
+        app:layout_constraintBottom_toTopOf="@id/button_records"/>
 
     <!-- Records Button -->
     <ImageButton
@@ -32,10 +30,9 @@
         app:layout_constraintTop_toBottomOf="@id/button_start_game"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/button_method"
-        app:layout_constraintHeight_percent="0.25"
+        app:layout_constraintHeight_percent="0.22"
         app:layout_constraintDimensionRatio="2:1"
-         />
+        app:layout_constraintBottom_toTopOf="@id/button_method"/>
 
     <!-- Method Button -->
     <ImageButton
@@ -47,10 +44,21 @@
         app:layout_constraintTop_toBottomOf="@id/button_records"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintHeight_percent="0.25"
+        app:layout_constraintHeight_percent="0.22"
         app:layout_constraintDimensionRatio="2:1"
-        />
+        app:layout_constraintBottom_toTopOf="@id/button_account"/>
 
+    <!-- 계정 버튼 (작은 크기) -->
+    <ImageButton
+        android:id="@+id/button_account"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/btn_main_account"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintDimensionRatio="2.4:1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_percent="0.12"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/button_method" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

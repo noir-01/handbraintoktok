@@ -10,6 +10,7 @@ import android.widget.ImageButton
 import androidx.core.content.ContextCompat
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.OnBackPressedCallback
+import com.example.myapplication.activity.AccountActivity
 
 class MainActivity : BaseActivity() {
     private var selectedGameName: String? = null
@@ -26,6 +27,7 @@ class MainActivity : BaseActivity() {
         buttonStartGame=findViewById(R.id.button_start_game)
         buttonRecords = findViewById(R.id.button_records)
         buttonMethod = findViewById(R.id.button_method)
+        val accountButton = findViewById<ImageButton>(R.id.button_account)
 
 
         // Set up button click listeners
@@ -42,6 +44,11 @@ class MainActivity : BaseActivity() {
             val intent = Intent(this, MethodActivity::class.java)
             startActivity(intent)
         }
+        accountButton.setOnClickListener {
+            val intent = Intent(this,AccountActivity::class.java)
+            startActivity(intent)
+        }
+
         // Optionally, request camera permission if needed
         if (!allPermissionGranted()) {
             requestCameraPermission()

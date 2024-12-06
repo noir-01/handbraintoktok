@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/main_background">
+
+    <ImageButton
+        android:id="@+id/button_back"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_gravity="start|top"
+        android:background="@drawable/btn_back"
+        android:layout_marginBottom="20dp"
+        android:contentDescription="back button" />
+
+    <!-- 연락처 연동 버튼 -->
+    <ImageButton
+        android:id="@+id/linkButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/btn_account_link" />
+    <!-- 연락처 연동 해제 버튼 -->
+    <ImageButton
+        android:id="@+id/unlinkButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/btn_account_unlink" />
+    <!-- 계정 탈퇴 버튼 -->
+    <ImageButton
+        android:id="@+id/deactivateButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/btn_account_deactivate" />
+</LinearLayout>
