@@ -4,6 +4,7 @@ import com.example.handbrainserver.music.dto.UserDto;
 import com.example.handbrainserver.music.entity.User;
 import com.example.handbrainserver.music.repository.UserRepository;
 import com.example.handbrainserver.music.util.CryptoUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,6 +40,10 @@ public class UserService {
         return userRepository.existsById(userId);
     }
 
+    @Transactional
+    public void quit(Long userId){
+        userRepository.deleteById(userId);
+    }
     public UserDto getUserById(Long userId){
         return UserDto.from(userRepository.findById(userId).get());
     }
