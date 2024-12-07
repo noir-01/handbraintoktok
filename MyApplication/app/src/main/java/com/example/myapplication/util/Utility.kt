@@ -5,6 +5,103 @@ import android.content.SharedPreferences
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.myapplication.R
+import java.time.LocalDate
+
+/*
+fun ClosedFloatingPointRange<Double>.random(): Double {
+    return start + Math.random() * (endInclusive - start)
+}
+
+data class GameRecord(val date: String, val gameType: String, val reactionTime: Double)
+{
+    fun getStartDateAsLocalDate(): String {
+        return date // date를 직접 반환하거나 LocalDate로 변환
+    }
+}
+
+
+
+object DummyData {
+    val userRecords = mutableListOf<GameRecord>()
+
+    init {
+        generateDummyData()
+    }
+
+    private fun generateDummyData() {
+        val gameTypes = listOf("COPY", "RSP", "CALC", "RANDOM")
+        val startDate = LocalDate.of(2023, 4, 1) // 4월 1일부터 시작
+        val endDate = LocalDate.of(2023, 11, 30) // 11월 30일까지
+
+        var currentDate = startDate
+        while (!currentDate.isAfter(endDate)) {
+            gameTypes.forEach { gameType ->
+                userRecords.add(
+                    GameRecord(
+                        date = currentDate.toString(),
+                        gameType = gameType,
+                        reactionTime = (0.4..0.7).random() // 0.4초 ~ 0.7초 랜덤 값
+                    )
+                )
+            }
+            currentDate = currentDate.plusDays(1)
+        }
+    }
+
+    // 특정 게임의 기간별 데이터를 필터링
+    fun getDailyRecords(gameType: String): List<GameRecord> {
+        val endDate = LocalDate.now()
+        val startDate = endDate.minusDays(6) // 최근 7일
+        return userRecords.filter {
+            it.gameType == gameType && LocalDate.parse(it.date) in startDate..endDate
+        }
+    }
+
+
+    fun getWeeklyRecords(gameType: String): List<GameRecord> {
+        val currentDate = LocalDate.now()
+        val weeks = (0 until 4).map { week ->
+            val startOfWeek = currentDate.minusWeeks(week.toLong()).with(java.time.DayOfWeek.MONDAY)
+            val endOfWeek = startOfWeek.plusDays(6)
+            Pair(startOfWeek, endOfWeek)
+        }
+
+        return weeks.mapNotNull { (start, end) ->
+            val recordsInWeek = userRecords.filter {
+                it.gameType == gameType && LocalDate.parse(it.date) in start..end
+            }
+            recordsInWeek.averageBy { it.reactionTime }
+        }
+    }
+
+
+    fun getMonthlyRecords(gameType: String): List<GameRecord> {
+        val currentDate = LocalDate.now()
+        val months = (0 until 3).map { month ->
+            currentDate.minusMonths(month.toLong())
+        }
+
+        return months.mapNotNull { month ->
+            val startOfMonth = month.withDayOfMonth(1)
+            val endOfMonth = month.withDayOfMonth(month.lengthOfMonth())
+            val recordsInMonth = userRecords.filter {
+                it.gameType == gameType && LocalDate.parse(it.date) in startOfMonth..endOfMonth
+            }
+            recordsInMonth.averageBy { it.reactionTime }
+        }
+    }
+
+
+    private fun List<GameRecord>.averageBy(selector: (GameRecord) -> Double): GameRecord? {
+        val average = this.map(selector).averageOrNull() ?: return null
+        return this.first().copy(reactionTime = average)
+    }
+
+    private fun List<Double>.averageOrNull(): Double? =
+        if (isEmpty()) null else average()
+
+
+*/
 
 object SettingUtil{
 
@@ -27,7 +124,31 @@ object SettingUtil{
         getPreferences(context).edit().putInt("soundVolume", volume).apply()
         SettingsLiveData.updateSoundVolume(volume)
     }
+
+    // 나이 계산
+    fun calculateAge(birthYear: Int): Int {
+        val currentYear = LocalDate.now().year
+        return currentYear - birthYear
+    }
+
+    // 나이대
+    fun getAgeGroup(birthYear: Int): String {
+        val age = calculateAge(birthYear)
+        return when (age / 10) {
+            2 -> "20대"
+            3 -> "30대"
+            4 -> "40대"
+            5 -> "50대"
+            6 -> "60대"
+            7 -> "70대"
+            8 -> "80대"
+            9 -> "90대"
+            else -> "기타"
+        }
+    }
+
 }
+
 
 object SettingsLiveData{
 

@@ -6,6 +6,11 @@ import android.os.Bundle
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.example.myapplication.util.dataClass.DummyData
+import android.util.Log
+
+
+import com.example.myapplication.util.SettingUtil
 import com.example.myapplication.util.dataClass.RandomGameHistoryDto
 import com.example.myapplication.util.network.RetrofitClient
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +34,77 @@ class RecordActivity : AppCompatActivity(){
     private lateinit var monthlyList: List<RandomGameHistoryDto>
     private lateinit var chart: LineChart
 
+    private fun generateWeeklyData(dailyList: List<RandomGameHistoryDto>): List<RandomGameHistoryDto> {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val today = LocalDate.now()
+
+        return (0 until 4).map { weekOffset ->
+            val weekStart = today.minusWeeks(weekOffset.toLong()).with(java.time.DayOfWeek.MONDAY)
+            val weekEnd = weekStart.plusDays(6)
+
+            val records = dailyList.filter {
+                val date = LocalDate.parse(it.startDate, formatter)
+                date in weekStart..weekEnd
+            }
+
+            RandomGameHistoryDto(
+                startDate = weekStart.format(formatter),
+                averageReactionTime = if (records.isNotEmpty()) {
+                    records.map { it.averageReactionTime }.average().toFloat()
+                } else {
+                    0f
+                }
+            )
+        }
+    }
+
+    private fun generateMonthlyData(dailyList: List<RandomGameHistoryDto>): List<RandomGameHistoryDto> {
+        val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        val today = LocalDate.now()
+
+        return (0 until 3).map { monthOffset ->
+            val monthStart = today.minusMonths(monthOffset.toLong()).withDayOfMonth(1)
+            val monthEnd = monthStart.withDayOfMonth(monthStart.lengthOfMonth())
+
+            val records = dailyList.filter {
+                val date = LocalDate.parse(it.startDate, formatter)
+                date in monthStart..monthEnd
+            }
+
+            RandomGameHistoryDto(
+                startDate = monthStart.format(formatter),
+                averageReactionTime = if (records.isNotEmpty()) {
+                    records.map { it.averageReactionTime }.average().toFloat()
+                } else {
+                    0f
+                }
+            )
+        }
+    }
+    private fun generateAverageReactionByDecade(gameType: String): Map<String, Float> {
+        val groupedByDecade = DummyData.dummyGameRecords.mapValues { (_, games) ->
+            games[gameType] ?: emptyList()
+        }
+        Log.d("RecordActivity", "Grouped By Decade for $gameType: $groupedByDecade")
+
+        return groupedByDecade.mapValues { (decade, records) ->
+            if (records.isNotEmpty()) {
+                val average = records.map { it.averageReactionTime }.average().toFloat()
+                Log.d("RecordActivity", "Decade: $decade, Average Reaction Time: $average")
+                average
+            } else {
+                0f
+            }
+        }
+    }
+
+
+
+
+
+
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.record)
@@ -42,33 +118,140 @@ class RecordActivity : AppCompatActivity(){
         val dailyButton: ImageButton = findViewById(R.id.dailyButton)
         val weeklyButton: ImageButton = findViewById(R.id.weeklyButton)
         val monthlyButton: ImageButton = findViewById(R.id.monthlyButton)
-        val recordRhythmButton: ImageButton = findViewById(R.id.recordRhythm)
+        val recordRandomButton: ImageButton = findViewById(R.id.recordRandom)
         val recordMimicButton: ImageButton = findViewById(R.id.recordMimic)
         val recordRspButton: ImageButton = findViewById(R.id.recordRsp)
         val recordCalculatorButton: ImageButton = findViewById(R.id.recordCalculator)
 
-        recordRhythmButton.setOnClickListener {
-            // 리듬 게임 기록 보여주기
-        }
+        recordRandomButton.setOnClickListener {
+            CoroutineScope(Dispatchers.IO).launch {
 
-        recordMimicButton.setOnClickListener {
-            // 따라하기 게임 기록 보여주기
+                val gameType="RANDOM"
+                Log.d("RecordActivity", "Game Type: $gameType")
+                Log.d("RecordActivity", "Dummy Game Records: ${DummyData.dummyGameRecords}")
+
+                // 사용자를 1970년대로 가정
+                val userDecadeAverage = generateAverageReactionByDecade(gameType)["1970~1979년생"] ?: 0f
+                Log.d("DummyData", "Dummy Game Records: ${DummyData.dummyGameRecords}")
+
+
+                dailyList = apiService.getRandomHistory(gameType,"DAILY")
+                weeklyList = apiService.getRandomHistory(gameType,"WEEKLY")
+                monthlyList = apiService.getRandomHistory(gameType,"MONTHLY")
+                val today = LocalDate.now()
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                dailyList = (0 until 14).map { daysAgo ->
+                    RandomGameHistoryDto(
+                        startDate = today.minusDays(daysAgo.toLong()).format(formatter),
+                        averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
+                    )
+                }
+                //Weekly List 생성
+                weeklyList = generateWeeklyData(dailyList)
+
+                // Monthly List 생성
+                monthlyList = generateMonthlyData(dailyList)
+
+                withContext(Dispatchers.Main) {
+                    Log.d("RecordActivity", "Setup chart completed with userDecadeAverage")
+                    setupChart(chart, dailyList, "나의 일간 평균 반응 속도", userDecadeAverage)
+                    Log.d("RecordActivity", "Chart setup completed")
+                }
+
+            }
         }
 
         recordRspButton.setOnClickListener {
-            // 가위바위보 게임 기록 보여주기
+            CoroutineScope(Dispatchers.IO).launch {
+                val gameType="RSP"
+                val userDecadeAverage = generateAverageReactionByDecade(gameType)["1970~1979년생"] ?: 0f
+                dailyList = apiService.getRandomHistory(gameType,"DAILY")
+                weeklyList = apiService.getRandomHistory(gameType,"WEEKLY")
+                monthlyList = apiService.getRandomHistory(gameType,"MONTHLY")
+                val today = LocalDate.now()
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                dailyList = (0 until 14).map { daysAgo ->
+                    RandomGameHistoryDto(
+                        startDate = today.minusDays(daysAgo.toLong()).format(formatter),
+                        averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
+                    )
+                }
+                //Weekly List 생성
+                weeklyList = generateWeeklyData(dailyList)
+
+                // Monthly List 생성
+                monthlyList = generateMonthlyData(dailyList)
+
+                withContext(Dispatchers.Main) {
+
+                    setupChart(chart, dailyList, "나의 일간 평균 반응 속도", userDecadeAverage)
+                }
+            }
         }
 
+
         recordCalculatorButton.setOnClickListener{
-            // 계산하기 게임 기록 보여주기
+            CoroutineScope(Dispatchers.IO).launch {
+                val gameType="CALC"
+                val userDecadeAverage = generateAverageReactionByDecade(gameType)["1970~1979년생"] ?: 0f
+                dailyList = apiService.getRandomHistory(gameType,"DAILY")
+                weeklyList = apiService.getRandomHistory(gameType,"WEEKLY")
+                monthlyList = apiService.getRandomHistory(gameType,"MONTHLY")
+                val today = LocalDate.now()
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                dailyList = (0 until 14).map { daysAgo ->
+                    RandomGameHistoryDto(
+                        startDate = today.minusDays(daysAgo.toLong()).format(formatter),
+                        averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
+                    )
+                }
+                //Weekly List 생성
+                weeklyList = generateWeeklyData(dailyList)
+
+                // Monthly List 생성
+                monthlyList = generateMonthlyData(dailyList)
+
+                withContext(Dispatchers.Main) {
+
+                    setupChart(chart, dailyList, "나의 일간 평균 반응 속도", userDecadeAverage)
+                }
+            }
         }
+
+        recordMimicButton.setOnClickListener {
+            CoroutineScope(Dispatchers.IO).launch {
+                val gameType="COPY"
+                val userDecadeAverage = generateAverageReactionByDecade(gameType)["1970~1979년생"] ?: 0f
+                dailyList = apiService.getRandomHistory(gameType,"DAILY")
+                weeklyList = apiService.getRandomHistory(gameType,"WEEKLY")
+                monthlyList = apiService.getRandomHistory(gameType,"MONTHLY")
+                val today = LocalDate.now()
+                val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+                dailyList = (0 until 14).map { daysAgo ->
+                    RandomGameHistoryDto(
+                        startDate = today.minusDays(daysAgo.toLong()).format(formatter),
+                        averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
+                    )
+                }
+                //Weekly List 생성
+                weeklyList = generateWeeklyData(dailyList)
+
+                // Monthly List 생성
+                monthlyList = generateMonthlyData(dailyList)
+
+                withContext(Dispatchers.Main) {
+
+                    setupChart(chart, dailyList, "나의 일간 평균 반응 속도", userDecadeAverage)
+                }
+            }
+        }
+
 
 
         // 뒤로가기 버튼 클릭 이벤트
         backButton.setOnClickListener {
             finish() // 현재 액티비티 종료
         }
-
         // 버튼 클릭 이벤트 설정
         dailyButton.setOnClickListener {
             showDailyData()
@@ -81,10 +264,11 @@ class RecordActivity : AppCompatActivity(){
         monthlyButton.setOnClickListener {
             showMonthlyData()
         }
+        // RPS,CALC,RANDOM
         CoroutineScope(Dispatchers.IO).launch{
-            dailyList = apiService.getRandomHistory("COPY","DAILY")
-            weeklyList = apiService.getRandomHistory("COPY","WEEKLY")
-            monthlyList = apiService.getRandomHistory("COPY","MONTHLY")
+            dailyList = apiService.getRandomHistory("RANDOM","DAILY")
+            weeklyList = apiService.getRandomHistory("RANDOM","WEEKLY")
+            monthlyList = apiService.getRandomHistory("RANDOM","MONTHLY")
             val today = LocalDate.now()
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
             dailyList = (0 until 14).map { daysAgo ->
@@ -93,6 +277,9 @@ class RecordActivity : AppCompatActivity(){
                     averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
                 )
             }
+
+            weeklyList = generateWeeklyData(dailyList)
+            monthlyList = generateMonthlyData(dailyList)
 
             withContext(Dispatchers.Main){
                 setupChart(chart, dailyList, "Daily Average Reaction Time")
@@ -104,9 +291,7 @@ class RecordActivity : AppCompatActivity(){
         chart.setDrawGridBackground(false)
         chart.renderer = object : LineChartRenderer(chart, chart.animator, chart.viewPortHandler) {
             override fun drawData(c: Canvas?) {
-                // 배경을 먼저 그립니다
                 drawBackgroundColors(c)
-                // 그런 다음 데이터를 그립니다
                 super.drawData(c)
             }
 
@@ -156,15 +341,20 @@ class RecordActivity : AppCompatActivity(){
     }
 
 
-    fun setupChart(chart: LineChart, dataList: List<RandomGameHistoryDto>, label: String) {
+    fun setupChart(chart: LineChart,
+                   dataList: List<RandomGameHistoryDto>,
+                   label: String,
+                   userDecadeAverage: Float? = null
+    ) {
         if (dataList.isEmpty()) {
             chart.clear()
             chart.data = null
             chart.invalidate()
             return
         }
-        val entries = mutableListOf<Entry>()
 
+        // 게임기록 데이터셋
+        val entries = mutableListOf<Entry>()
         // Prepare entries for the chart (x-axis: day/week/month, y-axis: averageReactionTime)
         dataList.forEachIndexed { index, history ->
             entries.add(Entry(index.toFloat(), history.averageReactionTime))
@@ -172,14 +362,18 @@ class RecordActivity : AppCompatActivity(){
 
         // Create a dataset
         val dataSet = LineDataSet(entries, label).apply {
-            color = resources.getColor(R.color.red) // You can customize the line color
+            color = ContextCompat.getColor(this@RecordActivity, R.color.origin_red)
             valueTextColor = resources.getColor(R.color.black) // Customize the text color
-            lineWidth=4f // 선 두께
-
+            lineWidth = 4f // 선 두께
             // Customize the circle (data points)
             setDrawCircles(true) // 점 표시
             setCircleColor(ContextCompat.getColor(this@RecordActivity, R.color.black)) // 점 색상
-            setCircleHoleColor(ContextCompat.getColor(this@RecordActivity, R.color.black)) // 점 내부 색상
+            setCircleHoleColor(
+                ContextCompat.getColor(
+                    this@RecordActivity,
+                    R.color.black
+                )
+            ) // 점 내부 색상
             circleRadius = 5f // 점의 반지름
             setDrawCircleHole(false) // 점 내부에 빈 공간 없음
             valueTextSize = 10f // 텍스트 크기
@@ -189,13 +383,30 @@ class RecordActivity : AppCompatActivity(){
             valueTextSize = 10f // 텍스트 크기
         }
 
+        // 연령대 평균 데이터셋 생성
+        val averageEntries = mutableListOf<Entry>()
+        if (userDecadeAverage != null) {
+            dataList.forEachIndexed { index, _ ->
+                averageEntries.add(Entry(index.toFloat(), userDecadeAverage))
+            }
+        }
+        Log.d("RecordActivity", "Average Entries: $averageEntries")
 
+        // 연령대 평균 데이터셋 생성
+        val averageDataSet = LineDataSet(averageEntries, "내 연령대 평균").apply {
+            color = ContextCompat.getColor(this@RecordActivity, R.color.blue) // 선 색상을 파란색으로 변경
+            lineWidth = 3f // 선 두께 조정
+            setDrawCircles(true) // 데이터 포인트를 표시
+            setCircleColor(ContextCompat.getColor(this@RecordActivity, R.color.blue)) // 점 색상 파란색
+            setDrawCircleHole(false) // 원 내부를 채움
+            valueTextSize = 0f // 데이터 값(초) 표시하지 않음
+        }
 
 
 
 
         // Set up the data for the chart
-        val lineData = LineData(dataSet)
+        val lineData = LineData(dataSet,averageDataSet)
         chart.data = lineData
 
         // Customize the chart appearance
@@ -211,10 +422,20 @@ class RecordActivity : AppCompatActivity(){
                 position = XAxis.XAxisPosition.BOTTOM
                 valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
-                        return when (dataList.size) {
-                            in 1..30 -> "Day ${dataList[value.toInt()].getStartDateAsLocalDate()}"
-                            in 1..12 -> "Week ${dataList[value.toInt()].getStartDateAsLocalDate()}"
-                            else -> "Month ${dataList[value.toInt()].getStartDateAsLocalDate()}"
+                        val index = value.toInt()
+                        return if (index in dataList.indices){
+                            "Day ${dataList[index].getStartDateAsLocalDate()}"
+                            /*
+                            when (dataList.size) {
+                                in 1..30 -> "Day ${dataList[value.toInt()].getStartDateAsLocalDate()}"
+                                in 1..12 -> "Week ${dataList[value.toInt()].getStartDateAsLocalDate()}"
+                                else -> "Month ${dataList[value.toInt()].getStartDateAsLocalDate()}"
+                            }
+
+                             */
+                        }
+                        else{
+                            " " // 유효하지 않을 경우 빈 문자열 반환
                         }
                     }
                 }
@@ -224,25 +445,25 @@ class RecordActivity : AppCompatActivity(){
                 axisMaximum = 3f // Max value for the Y-axis (assuming your Y values are in 0-3 range)
             }
             axisRight.isEnabled = false
+            chart.invalidate()
             // Add background color regions
             setBackgroundColors(chart)
             invalidate() // Refresh the chart
         }
     }
-//
+    //
     // Use this function for daily, weekly, and monthly buttons
     fun showDailyData() {
-        setupChart(chart, dailyList, "Daily Average Reaction Time")
+        setupChart(chart, dailyList, "일간 평균 반응 속도")
     }
 
     fun showWeeklyData() {
-        setupChart(chart, weeklyList, "Weekly Average Reaction Time")
+        setupChart(chart, weeklyList, "주간 평균 반응 속도")
     }
 
     fun showMonthlyData() {
-        setupChart(chart, monthlyList, "Monthly Average Reaction Time")
+        setupChart(chart, monthlyList, "월간 평균 반응 속도")
     }
-
 
 
 }
