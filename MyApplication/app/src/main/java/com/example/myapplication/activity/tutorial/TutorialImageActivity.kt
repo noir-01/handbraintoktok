@@ -1,5 +1,6 @@
 package com.example.myapplication.activity.tutorial
 
+import android.app.Activity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
@@ -16,6 +17,8 @@ class TutorialImageActivity: AppCompatActivity()  {
         setContentView(R.layout.activity_tutorial_image)
         images = mutableListOf<Int>()
         val mode = intent.getStringExtra("MODE")
+        val firstTutorial = intent.getBooleanExtra("FIRST",false)
+
         when(mode){
             "RHYTHM"->{
                 images = mutableListOf(
@@ -23,6 +26,7 @@ class TutorialImageActivity: AppCompatActivity()  {
                     R.drawable.tutorial_rhythm_2,
                     R.drawable.tutorial_rhythm_3,
                 )
+                if(firstTutorial) images.add(R.drawable.tutorial_rhythm_4)
             }
             "DOGGY"->{
                 images = mutableListOf(
@@ -59,6 +63,9 @@ class TutorialImageActivity: AppCompatActivity()  {
                 nextButton.visibility= View.GONE
                 beforeButton.visibility= View.GONE
                 tutorialImageView.visibility= View.GONE
+                if(firstTutorial){
+                    setResult(Activity.RESULT_OK)
+                }
                 finish()
             }
         }
