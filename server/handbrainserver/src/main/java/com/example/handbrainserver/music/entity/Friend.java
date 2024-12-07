@@ -25,9 +25,14 @@ public class Friend {
 
     @Column(name = "friend_id", nullable = false)
     private Long friendId;
+    
+    //연락처 연동 해제 시 상대에게 안보이게 해야 함
+    private Boolean visible;
 
     public Friend(Long userId, Long friendId){
         this.userId = userId;
         this.friendId = friendId;
+        //기본적으로 true로 설정
+        this.visible=true;
     }
 }

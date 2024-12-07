@@ -23,6 +23,9 @@
     <color name="light_yellow_transparent">#99FFFF00</color>
     <color name="very_light_yellow_transparent">#33FFFF00</color>
     <color name="blue">#000DFF</color>
+    <color name="dark_green">#32CD32</color>
+    <color name="dark_red">#DC143C</color>
+
 
 
 

@@ -57,7 +57,7 @@ class RegisterActivity : AppCompatActivity() {
         val phoneEditText = findViewById<EditText>(R.id.phoneEditText)
         val verifyButton: ImageButton = findViewById(R.id.verifyButton)
         val otpEditText = findViewById<EditText>(R.id.otpEditText)
-        val startButton = findViewById<Button>(R.id.startButton)
+        val startButton = findViewById<ImageButton>(R.id.startButton)
         val nameText = findViewById<EditText>(R.id.nameEditText)
         val labelYear = findViewById<TextView>(R.id.labelYear)
         val yearPicker = findViewById<NumberPicker>(R.id.yearPicker)
@@ -69,6 +69,8 @@ class RegisterActivity : AppCompatActivity() {
             labelYear.visibility=View.GONE
             yearPicker.visibility=View.GONE
         }
+        startButton.isEnabled=false
+        startButton.alpha=0.5f
 
         val serverDomain = getString(R.string.server_domain)
 
@@ -86,6 +88,7 @@ class RegisterActivity : AppCompatActivity() {
 
                 override fun onFinish() {
                     verifyButton.isEnabled = true
+                    verifyButton.alpha=1.0f
                     //verifyButton.text = "인증번호 전송"
                 }
             }
@@ -115,6 +118,7 @@ class RegisterActivity : AppCompatActivity() {
             birthYear=newVal
             //시작 버튼 활성화
             startButton.isEnabled = true
+            startButton.alpha=1.0f
         }
 
 
@@ -123,6 +127,7 @@ class RegisterActivity : AppCompatActivity() {
             val phoneNumber = phoneEditText.text.toString()
             // 버튼 비활성화
             verifyButton.isEnabled = false
+            verifyButton.alpha=0.3f
 
             //비동기로 버튼 비활성화
             CoroutineScope(Dispatchers.Main).launch{
@@ -143,7 +148,8 @@ class RegisterActivity : AppCompatActivity() {
             otpEditText.isEnabled = true
             //Auth에선 바로 활성화
             if(mode=="Auth"){
-                startButton.isEnabled = true  
+                startButton.isEnabled = true
+                startButton.alpha=1.0f
             }
         }
 
