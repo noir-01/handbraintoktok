@@ -33,6 +33,13 @@ interface ApiService {
         @Query("period") period:String
     ): List<RandomGameHistoryDto>
 
+    @GET("/history/random/get/average")
+    suspend fun getRandomHistoryAverageByGameType(
+        @Query("gameType") gameType: String,
+        @Query("age") age: String
+    ):Response<Map<String,Any>>
+
+
     @GET("/history/rhythm/get/{musicId}/{difficulty}")
     suspend fun getRhythmMyRank(@Path("musicId") musicId: Int, @Path("difficulty") difficulty:String): Response<Map<String,Any>>
 
