@@ -153,7 +153,7 @@ class AccountActivity : AppCompatActivity() {
                     startActivity(intent)
                     finish()
                 }else{
-                    Toast.makeText(this@AccountActivity, "요류 발생", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AccountActivity, "오류 발생", Toast.LENGTH_SHORT).show()
                 }
             }
         }
