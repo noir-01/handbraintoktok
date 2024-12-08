@@ -33,6 +33,9 @@ class RecordActivity : AppCompatActivity(){
     private lateinit var weeklyList: List<RandomGameHistoryDto>
     private lateinit var monthlyList: List<RandomGameHistoryDto>
     private lateinit var chart: LineChart
+    val apiService = RetrofitClient.apiService
+    val averageEntries = mutableListOf<Entry>()
+    var userDecadeAverage = 0f
 
     private fun generateWeeklyData(dailyList: List<RandomGameHistoryDto>): List<RandomGameHistoryDto> {
         val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
@@ -109,7 +112,6 @@ class RecordActivity : AppCompatActivity(){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.record)
 
-        val apiService = RetrofitClient.apiService
         chart = findViewById(R.id.chart)
 
 
@@ -130,27 +132,34 @@ class RecordActivity : AppCompatActivity(){
                 Log.d("RecordActivity", "Game Type: $gameType")
                 Log.d("RecordActivity", "Dummy Game Records: ${DummyData.dummyGameRecords}")
 
-                // 사용자를 1970년대로 가정
-                val userDecadeAverage = generateAverageReactionByDecade(gameType)["1970~1979년생"] ?: 0f
+                //내 연령대 평균 가져오기
+                val response = apiService.getRandomHistoryAverageByGameType("RANDOM","me")
+                if(response.isSuccessful){
+                    userDecadeAverage = response.body()?.get("result").toString().toFloat()/1000f
+                }
+
+
                 Log.d("DummyData", "Dummy Game Records: ${DummyData.dummyGameRecords}")
 
 
                 dailyList = apiService.getRandomHistory(gameType,"DAILY")
                 weeklyList = apiService.getRandomHistory(gameType,"WEEKLY")
                 monthlyList = apiService.getRandomHistory(gameType,"MONTHLY")
+                //내 평균
+
                 val today = LocalDate.now()
                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                dailyList = (0 until 14).map { daysAgo ->
-                    RandomGameHistoryDto(
-                        startDate = today.minusDays(daysAgo.toLong()).format(formatter),
-                        averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
-                    )
-                }
-                //Weekly List 생성
-                weeklyList = generateWeeklyData(dailyList)
-
-                // Monthly List 생성
-                monthlyList = generateMonthlyData(dailyList)
+//                dailyList = (0 until 14).map { daysAgo ->
+//                    RandomGameHistoryDto(
+//                        startDate = today.minusDays(daysAgo.toLong()).format(formatter),
+//                        averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
+//                    )
+//                }
+//                //Weekly List 생성
+//                weeklyList = generateWeeklyData(dailyList)
+//
+//                // Monthly List 생성
+//                monthlyList = generateMonthlyData(dailyList)
 
                 withContext(Dispatchers.Main) {
                     Log.d("RecordActivity", "Setup chart completed with userDecadeAverage")
@@ -164,26 +173,31 @@ class RecordActivity : AppCompatActivity(){
         recordRspButton.setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch {
                 val gameType="RSP"
-                val userDecadeAverage = generateAverageReactionByDecade(gameType)["1970~1979년생"] ?: 0f
+                //내 연령대 평균 가져오기
+                val response = apiService.getRandomHistoryAverageByGameType("RSP","me")
+                if(response.isSuccessful){
+                    userDecadeAverage = response.body()?.get("result").toString().toFloat()/1000f
+                    Log.d("recordActivity","$userDecadeAverage")
+                }
+//                val userDecadeAverage = generateAverageReactionByDecade(gameType)["1970~1979년생"] ?: 0f
                 dailyList = apiService.getRandomHistory(gameType,"DAILY")
                 weeklyList = apiService.getRandomHistory(gameType,"WEEKLY")
                 monthlyList = apiService.getRandomHistory(gameType,"MONTHLY")
                 val today = LocalDate.now()
                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                dailyList = (0 until 14).map { daysAgo ->
-                    RandomGameHistoryDto(
-                        startDate = today.minusDays(daysAgo.toLong()).format(formatter),
-                        averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
-                    )
-                }
-                //Weekly List 생성
-                weeklyList = generateWeeklyData(dailyList)
-
-                // Monthly List 생성
-                monthlyList = generateMonthlyData(dailyList)
+//                dailyList = (0 until 14).map { daysAgo ->
+//                    RandomGameHistoryDto(
+//                        startDate = today.minusDays(daysAgo.toLong()).format(formatter),
+//                        averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
+//                    )
+//                }
+//                //Weekly List 생성
+//                weeklyList = generateWeeklyData(dailyList)
+//
+//                // Monthly List 생성
+//                monthlyList = generateMonthlyData(dailyList)
 
                 withContext(Dispatchers.Main) {
-
                     setupChart(chart, dailyList, "나의 일간 평균 반응 속도", userDecadeAverage)
                 }
             }
@@ -193,23 +207,30 @@ class RecordActivity : AppCompatActivity(){
         recordCalculatorButton.setOnClickListener{
             CoroutineScope(Dispatchers.IO).launch {
                 val gameType="CALC"
-                val userDecadeAverage = generateAverageReactionByDecade(gameType)["1970~1979년생"] ?: 0f
+//                val userDecadeAverage = generateAverageReactionByDecade(gameType)["1970~1979년생"] ?: 0f
+                //내 연령대 평균 가져오기
+                val response = apiService.getRandomHistoryAverageByGameType("CALC","me")
+                if(response.isSuccessful){
+                    userDecadeAverage = response.body()?.get("result").toString().toFloat()/1000f
+                    Log.d("recordActivity","$userDecadeAverage")
+                }
+
                 dailyList = apiService.getRandomHistory(gameType,"DAILY")
                 weeklyList = apiService.getRandomHistory(gameType,"WEEKLY")
                 monthlyList = apiService.getRandomHistory(gameType,"MONTHLY")
                 val today = LocalDate.now()
                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                dailyList = (0 until 14).map { daysAgo ->
-                    RandomGameHistoryDto(
-                        startDate = today.minusDays(daysAgo.toLong()).format(formatter),
-                        averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
-                    )
-                }
-                //Weekly List 생성
-                weeklyList = generateWeeklyData(dailyList)
-
-                // Monthly List 생성
-                monthlyList = generateMonthlyData(dailyList)
+//                dailyList = (0 until 14).map { daysAgo ->
+//                    RandomGameHistoryDto(
+//                        startDate = today.minusDays(daysAgo.toLong()).format(formatter),
+//                        averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
+//                    )
+//                }
+//                //Weekly List 생성
+//                weeklyList = generateWeeklyData(dailyList)
+//
+//                // Monthly List 생성
+//                monthlyList = generateMonthlyData(dailyList)
 
                 withContext(Dispatchers.Main) {
 
@@ -221,23 +242,29 @@ class RecordActivity : AppCompatActivity(){
         recordMimicButton.setOnClickListener {
             CoroutineScope(Dispatchers.IO).launch {
                 val gameType="COPY"
-                val userDecadeAverage = generateAverageReactionByDecade(gameType)["1970~1979년생"] ?: 0f
+//                val userDecadeAverage = generateAverageReactionByDecade(gameType)["1970~1979년생"] ?: 0f
+                //내 연령대 평균 가져오기
+                val response = apiService.getRandomHistoryAverageByGameType("COPY","me")
+                if(response.isSuccessful){
+                    userDecadeAverage = response.body()?.get("result").toString().toFloat()/1000f
+                    Log.d("recordActivity","$userDecadeAverage")
+                }
                 dailyList = apiService.getRandomHistory(gameType,"DAILY")
                 weeklyList = apiService.getRandomHistory(gameType,"WEEKLY")
                 monthlyList = apiService.getRandomHistory(gameType,"MONTHLY")
                 val today = LocalDate.now()
                 val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-                dailyList = (0 until 14).map { daysAgo ->
-                    RandomGameHistoryDto(
-                        startDate = today.minusDays(daysAgo.toLong()).format(formatter),
-                        averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
-                    )
-                }
-                //Weekly List 생성
-                weeklyList = generateWeeklyData(dailyList)
-
-                // Monthly List 생성
-                monthlyList = generateMonthlyData(dailyList)
+//                dailyList = (0 until 14).map { daysAgo ->
+//                    RandomGameHistoryDto(
+//                        startDate = today.minusDays(daysAgo.toLong()).format(formatter),
+//                        averageReactionTime = (1..2).random() + (0..99).random() / 100f // 1.00 ~ 2.99 사이의 랜덤 값
+//                    )
+//                }
+//                //Weekly List 생성
+//                weeklyList = generateWeeklyData(dailyList)
+//
+//                // Monthly List 생성
+//                monthlyList = generateMonthlyData(dailyList)
 
                 withContext(Dispatchers.Main) {
 
@@ -245,8 +272,9 @@ class RecordActivity : AppCompatActivity(){
                 }
             }
         }
-
-
+        
+        //첫 진입 시 랜덤게임 기록 보여주기
+        recordRandomButton.performClick()
 
         // 뒤로가기 버튼 클릭 이벤트
         backButton.setOnClickListener {
@@ -357,7 +385,8 @@ class RecordActivity : AppCompatActivity(){
         val entries = mutableListOf<Entry>()
         // Prepare entries for the chart (x-axis: day/week/month, y-axis: averageReactionTime)
         dataList.forEachIndexed { index, history ->
-            entries.add(Entry(index.toFloat(), history.averageReactionTime))
+            entries.add(Entry(index.toFloat(), history.averageReactionTime/1000))
+            Log.d("recordActivity","${history.averageReactionTime/1000}")
         }
 
         // Create a dataset
@@ -383,7 +412,7 @@ class RecordActivity : AppCompatActivity(){
             valueTextSize = 10f // 텍스트 크기
         }
 
-        // 연령대 평균 데이터셋 생성
+
         val averageEntries = mutableListOf<Entry>()
         if (userDecadeAverage != null) {
             dataList.forEachIndexed { index, _ ->
@@ -401,8 +430,6 @@ class RecordActivity : AppCompatActivity(){
             setDrawCircleHole(false) // 원 내부를 채움
             valueTextSize = 0f // 데이터 값(초) 표시하지 않음
         }
-
-
 
 
         // Set up the data for the chart
@@ -454,16 +481,48 @@ class RecordActivity : AppCompatActivity(){
     //
     // Use this function for daily, weekly, and monthly buttons
     fun showDailyData() {
-        setupChart(chart, dailyList, "일간 평균 반응 속도")
+        setupChart(chart, dailyList, "일간 평균 반응 속도",userDecadeAverage)
     }
 
     fun showWeeklyData() {
-        setupChart(chart, weeklyList, "주간 평균 반응 속도")
+        setupChart(chart, weeklyList, "주간 평균 반응 속도",userDecadeAverage)
     }
 
     fun showMonthlyData() {
-        setupChart(chart, monthlyList, "월간 평균 반응 속도")
+        setupChart(chart, monthlyList, "월간 평균 반응 속도",userDecadeAverage)
     }
 
-
+//    fun loadGameData(gameType: String) {
+//        var userAverageReactionTime = 0f
+//        CoroutineScope(Dispatchers.IO).launch {
+//            // 서버에서 데이터 로드
+//            dailyList = apiService.getRandomHistory(gameType, "DAILY")
+//            weeklyList = apiService.getRandomHistory(gameType, "WEEKLY")
+//            monthlyList = apiService.getRandomHistory(gameType, "MONTHLY")
+//            // 연령대 평균 데이터
+//            val response = apiService.getRandomHistoryAverageByGameType(gameType, "me")
+//            if (response.isSuccessful) {
+//                userAverageReactionTime = response.body()?.get("result")?.toString()?.toFloat() ?: 0f
+//
+//                // 각 리스트에 대해 연령대 평균 데이터를 업데이트
+//                updateAverageEntries(dailyList, userAverageReactionTime)
+//                updateAverageEntries(weeklyList, userAverageReactionTime)
+//                updateAverageEntries(monthlyList, userAverageReactionTime)
+//            }
+//
+//            withContext(Dispatchers.Main) {
+//                // 기본 데이터를 Daily로 설정
+//                showDailyData()
+//            }
+//        }
+//    }
+//    fun updateAverageEntries(gameData: List<RandomGameHistoryDto>, averageReactionTime: Float) {
+//        // 기존 averageEntries를 초기화
+//        val entries = mutableListOf<Entry>()
+//        gameData.forEachIndexed { index, _ ->
+//            entries.add(Entry(index.toFloat(), averageReactionTime))
+//        }
+//        averageEntries.clear()
+//        averageEntries.addAll(entries)
+//    }
 }
