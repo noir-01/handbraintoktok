@@ -310,7 +310,7 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
                         val inferenceTime = resultBundle.inferenceTime
                         val height = resultBundle.inputImageHeight
                         val width = resultBundle.inputImageWidth
-                        Log.d("HandActivity", "time: $inferenceTime, resol: $width*$height")
+                        //Log.d("HandActivity", "time: $inferenceTime, resol: $width*$height")
 
                         val predictedIndices = mutableListOf(-1,-1)
 
