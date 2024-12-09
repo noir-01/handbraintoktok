@@ -66,6 +66,7 @@ import android.view.animation.AlphaAnimation
 import android.view.animation.AnimationSet
 import android.view.animation.LinearInterpolator
 import android.widget.ImageButton
+import androidx.activity.OnBackPressedCallback
 
 class RhythmGameStartActivity: AppCompatActivity() {
     //mp3 보내줄 로컬 서버
@@ -132,7 +133,6 @@ class RhythmGameStartActivity: AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_rhythm_game_start)
-
         if (allPermissionsGranted()) {
             initializeMediaPipe()
         } else {
@@ -140,6 +140,15 @@ class RhythmGameStartActivity: AppCompatActivity() {
                 this, arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE
             )
         }
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                // 대기 중인 Runnable 제거
+                handler.removeCallbacks(checkRunnable)
+                // 기본 동작 수행 (이 액티비티 종료)
+                finish()
+            }
+        })
+
         previewView = findViewById(R.id.rhythmGameCameraView)
 
         leftHandImageView = findViewById(R.id.leftHandImageView)
@@ -266,7 +275,6 @@ class RhythmGameStartActivity: AppCompatActivity() {
         }
         webView.loadUrl("file:///android_asset/index2.html")
     }
-
     private val checkRunnable = object : Runnable {
         override fun run() {
             val currentTime = System.currentTimeMillis() / 1000.0 // 현재 시간 (초 단위)
@@ -544,6 +552,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
         mediaPlayer?.release()  // 액티비티 종료 시 MediaPlayer 해제
         server.stop()
         webView.evaluateJavascript("pauseAudio();", null)
+        handler.removeCallbacks(checkRunnable)
     }
 
     private fun initializeMediaPipe() {
