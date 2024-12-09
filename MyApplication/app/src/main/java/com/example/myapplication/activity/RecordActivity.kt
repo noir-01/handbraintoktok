@@ -318,11 +318,11 @@ class RecordActivity : AppCompatActivity(){
             }
         }
         //첫 진입 시 랜덤게임 기록 보여주기
-        recordRandomButton.post {
+        recordRandomButton.postDelayed({
             recordRandomButton.performClick()
-        }
-        chart.notifyDataSetChanged()
-        chart.invalidate()
+            chart.notifyDataSetChanged()
+            chart.invalidate()
+        }, 500)
     }
 
     fun setBackgroundColors(chart: LineChart,threshold: Float) {
