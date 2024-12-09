@@ -17,7 +17,7 @@ public class AdminService {
         this.passwordEncoder = passwordEncoder;
         this.adminRepository = adminRepository;
     }
-    private void saveAdminToDatabase(String username, String rawPassword) {
+    public void saveAdminToDatabase(String username, String rawPassword) {
         // admin 테이블에 암호화된 비밀번호 저장 (예: JPA, JDBC 사용)
         // 예시로 가상의 코드로 설명
         String encryptedPassword = passwordEncoder.encode(rawPassword);
@@ -25,7 +25,7 @@ public class AdminService {
         adminRepository.save(admin);
     }
 
-    public boolean checkPassword(String rawPassword, String storedEncryptedPassword) {
+    private boolean checkPassword(String rawPassword, String storedEncryptedPassword) {
         return passwordEncoder.matches(rawPassword, storedEncryptedPassword);
     }
     
