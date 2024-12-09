@@ -90,4 +90,23 @@ public class UserController {
         }
     }
 
+    @PostMapping("/friend/unlink")
+    public ResponseEntity<?> unlink(@RequestHeader("Authorization") String token){
+        String processedToken = token.replace("Bearer ", ""); // Bearer 제거
+        Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
+        friendService.unlinkContact(userId);
+        return ResponseEntity.ok(Map.of("status","unlink"));
+    }
+
+    @PostMapping("/user/deactivate")
+    public ResponseEntity<?> deactivateAccount(@RequestHeader("Authorization") String token){
+        String processedToken = token.replace("Bearer ", ""); // Bearer 제거
+        Long userId = Long.parseLong(jwtUtil.extractUserId(processedToken));
+
+        friendService.quit(userId);
+        userService.quit(userId);
+        return ResponseEntity.ok(Map.of("status","quit"));
+    }
+
+
 }

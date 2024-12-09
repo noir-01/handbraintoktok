@@ -1,11 +1,15 @@
 package com.example.myapplication
 
+import android.Manifest
 import android.app.ActivityOptions
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.myapplication.util.network.RetrofitClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,9 +19,22 @@ import kotlinx.coroutines.withContext
 class RegisterOrNotActivity : AppCompatActivity() {
     val tokenManager = RetrofitClient.getTokenManager()
     val apiService = RetrofitClient.apiService
+    private val CAMERA_REQUEST_CODE=1001
+
+    private fun allPermissionsGranted(): Boolean {
+        return ContextCompat.checkSelfPermission(
+            this, Manifest.permission.CAMERA
+        ) == PackageManager.PERMISSION_GRANTED
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        if (!allPermissionsGranted()) {
+            ActivityCompat.requestPermissions(
+                this, arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE
+            )
+        }
+
 
         //토큰이 있으면 로그인 시도, 성공 시 메인화면으로 바로 이동
         if(tokenManager.getToken()!=null){

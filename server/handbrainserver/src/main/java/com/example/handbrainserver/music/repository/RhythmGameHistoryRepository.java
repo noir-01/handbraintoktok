@@ -55,7 +55,7 @@ public interface RhythmGameHistoryRepository extends JpaRepository<RhythmGameHis
             "AND r.user_id IN (" +
             "    SELECT f.friend_id " +
             "    FROM friend f " +
-            "    WHERE f.user_id = :userId" +
+            "    WHERE f.user_id = :userId AND f.visible=true" +
             ")", nativeQuery = true)
     Integer findUserRankAmongFriends(
             @Param("userId") Long userId,

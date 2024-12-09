@@ -41,6 +41,7 @@ public class FriendService {
                 .map(user -> new Friend(userId, user.getId()))
                 .collect(Collectors.toList());
         friendRepository.saveAll(newFriends);
+        friendRepository.updateVisibilityToTrue(userId);
         
         if (matchedUsers == null) {
             return 0;
@@ -48,9 +49,17 @@ public class FriendService {
         return matchedUsers.size();
     }
     public List<Long> getFriendIds(Long userId) {
-        List<Friend> friends = friendRepository.findByUserId(userId);
+        List<Friend> friends = friendRepository.findByUserIdAndVisibleTrue(userId);
         return friends.stream()
                 .map(friend -> friend.getUserId().equals(userId) ? friend.getFriendId() : friend.getUserId())
                 .collect(Collectors.toList());
+    }
+
+    public void unlinkContact(Long userId){
+        friendRepository.updateVisibilityToFalse(userId);
+        friendRepository.deleteByUserId(userId);
+    }
+    public void quit(Long userId){
+        friendRepository.quitByUserId(userId);
     }
 }

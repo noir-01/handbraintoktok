@@ -33,6 +33,13 @@ interface ApiService {
         @Query("period") period:String
     ): List<RandomGameHistoryDto>
 
+    @GET("/history/random/get/average")
+    suspend fun getRandomHistoryAverageByGameType(
+        @Query("gameType") gameType: String,
+        @Query("age") age: String
+    ):Response<Map<String,Any>>
+
+
     @GET("/history/rhythm/get/{musicId}/{difficulty}")
     suspend fun getRhythmMyRank(@Path("musicId") musicId: Int, @Path("difficulty") difficulty:String): Response<Map<String,Any>>
 
@@ -53,6 +60,14 @@ interface ApiService {
     // Response<200>,{"message" : "success"}
     @POST("/sms/send")
     suspend fun sendSms(@Body numDto: NumDto): Response<Unit>
+    
+    //연동 해제
+    @POST("/friend/unlink")
+    suspend fun unlink(): Response<Map<String,Any>>
+    
+    //계정 탈퇴
+    @POST("/user/deactivate")
+    suspend fun deactivate(): Response<Map<String,Any>>
 
     /* 응답 꼴
     * Response<200>, {"token"  : "...."}

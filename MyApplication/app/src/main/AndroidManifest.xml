@@ -34,6 +34,18 @@
         android:theme="@style/Theme.AppCompat.Light.NoActionBar"
         tools:targetApi="31">
         <activity
+            android:name=".activity.AccountActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.tutorial.TutorialImageActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.tutorial.TutorialGameActivity"
+            android:exported="false" />
+        <activity
+            android:name=".activity.tutorial.TutorialActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.game.GameResultActivity"
             android:exported="false" />
         <activity
@@ -62,9 +74,6 @@
             android:exported="false" />
         <activity
             android:name=".activity.game.RhythmGameStartActivity"
-            android:exported="false" />
-        <activity
-            android:name=".TutorialActivity"
             android:exported="false" />
         <activity
             android:name=".GameoptionActivity"

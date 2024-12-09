@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.MainActivity
 import com.example.myapplication.R
+import com.example.myapplication.activity.tutorial.TutorialActivity
 import com.example.myapplication.util.network.RetrofitClient
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -47,7 +48,7 @@ class AddFriendActivity: AppCompatActivity() {
             findViewById<Button>(R.id.btn_no).setOnClickListener {
                 //아니오 버튼: isContactSyncDone=true로 변경 후 메인으로 이동
                 sharedPreferences.edit().putBoolean("isContactSyncDone", true).apply()
-                moveToMain()
+                moveToTutorial()
             }
 
             findViewById<Button>(R.id.btn_yes).setOnClickListener {
@@ -97,7 +98,7 @@ class AddFriendActivity: AppCompatActivity() {
                     Toast.makeText(this@AddFriendActivity, "연동 실패: $errorMessage", Toast.LENGTH_LONG).show()
                 }
                 sharedPreferences.edit().putBoolean("isContactSyncDone", true).apply()
-                moveToMain()
+                moveToTutorial()
             }
         }
     }
@@ -132,9 +133,18 @@ class AddFriendActivity: AppCompatActivity() {
         return contactNumbers.toList()
     }
     private fun moveToMain(){
+        Log.d("moveToTut?","Main")
         lifecycleScope.launch {
             delay(1000)
             val intent = Intent(this@AddFriendActivity, MainActivity::class.java)
+            startActivity(intent)
+        }
+    }
+    private fun moveToTutorial(){
+        Log.d("moveToTut?","Tut")
+        lifecycleScope.launch {
+            delay(1000)
+            val intent = Intent(this@AddFriendActivity, TutorialActivity::class.java)
             startActivity(intent)
         }
     }

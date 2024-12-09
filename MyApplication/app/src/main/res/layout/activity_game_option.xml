@@ -35,6 +35,7 @@
 
     <!-- ScrollView for game buttons -->
     <ScrollView
+        android:id="@+id/scrollView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
@@ -45,18 +46,6 @@
             android:padding="16dp">
 
             <!-- Game Buttons -->
-            <ImageButton
-                android:id="@+id/button_puppy_game"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="@drawable/btn_puppy_game"
-                android:contentDescription="puppy_game"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.15"
-                app:layout_constraintDimensionRatio="2:1"
-                android:layout_marginTop="20dp"/>
 
             <ImageButton
                 android:id="@+id/button_rhythm_game"
@@ -64,7 +53,6 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/btn_rhythm_game"
                 android:contentDescription="rhythm game button"
-                app:layout_constraintTop_toBottomOf="@id/button_puppy_game"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.15"
@@ -123,9 +111,20 @@
                 app:layout_constraintDimensionRatio="2:1"
                 android:layout_marginTop="20dp"/>
 
+            <ImageButton
+                android:id="@+id/button_puppy_game"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/btn_puppy_game"
+                android:contentDescription="puppy_game button"
+                app:layout_constraintTop_toBottomOf="@id/button_calc_game"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.15"
+                app:layout_constraintDimensionRatio="2:1"
+                android:layout_marginTop="20dp"/>
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-
-
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
