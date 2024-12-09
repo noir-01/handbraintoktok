@@ -106,7 +106,7 @@ public class UserController {
         friendService.quit(userId);
         userService.quit(userId);
         return ResponseEntity.ok(Map.of("status","quit"));
-
     }
+
 
 }
