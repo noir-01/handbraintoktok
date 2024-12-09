@@ -20,6 +20,9 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.LocalTime;
 import java.util.List;
+import org.springframework.ui.Model;
+import jakarta.servlet.http.HttpSession;
+import java.util.Map;
 
 @Controller
 public class MusicController {
@@ -32,20 +35,22 @@ public class MusicController {
     }
 
     @GetMapping("/admin/upload")
-    public String uploadMusic(){
+    public String uploadMusic(HttpSession session, Model model){
+        String token = (String) session.getAttribute("token");
+        model.addAttribute("token", token);
         return "musicUpload";
     }
 
     @CrossOrigin(origins = "https://handbraintoktok.duckdns.org:8080")
     @PostMapping("/admin/upload")
-    public ResponseEntity<String> uploadMusic(@RequestParam("title") String title,
+    public ResponseEntity<?> uploadMusic(@RequestParam("title") String title,
                                               @RequestParam("artist") String artist,
                                               @RequestParam("duration") String duration,
                                               @RequestParam("file") MultipartFile file) {
         try {
             // 파일 확장자 확인
             if (!file.getOriginalFilename().endsWith(".mp3")) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Only .mp3 files are allowed.");
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("error","Only .mp3 files are allowed."));
             }
 
             // 파일 저장 경로 설정
@@ -58,11 +63,11 @@ public class MusicController {
             Long id = musicService.saveMusic(musicDto);
 
 
-            return ResponseEntity.ok("Music uploaded successfully.");
+            return ResponseEntity.ok(Map.of("success:","Music uploaded successfully."));
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error saving file.");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error","Error saving file."));
         }
     }
 }
