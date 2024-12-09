@@ -1,13 +1,16 @@
 package com.example.myapplication
 
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
+import android.graphics.Typeface
 import android.os.Bundle
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.example.myapplication.util.dataClass.DummyData
 import android.util.Log
+import androidx.core.content.res.ResourcesCompat
 
 
 import com.example.myapplication.util.SettingUtil
@@ -20,12 +23,16 @@ import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.charts.LineChart
+import com.github.mikephil.charting.components.LimitLine
 import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.renderer.LineChartRenderer
 import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 
 class RecordActivity : AppCompatActivity(){
@@ -163,7 +170,7 @@ class RecordActivity : AppCompatActivity(){
 
                 withContext(Dispatchers.Main) {
                     Log.d("RecordActivity", "Setup chart completed with userDecadeAverage")
-                    setupChart(chart, dailyList, "나의 일간 평균 반응 속도", userDecadeAverage)
+                    setupChart(chart, dailyList, "내 반응속도", userDecadeAverage)
                     Log.d("RecordActivity", "Chart setup completed")
                 }
 
@@ -198,7 +205,7 @@ class RecordActivity : AppCompatActivity(){
 //                monthlyList = generateMonthlyData(dailyList)
 
                 withContext(Dispatchers.Main) {
-                    setupChart(chart, dailyList, "나의 일간 평균 반응 속도", userDecadeAverage)
+                    setupChart(chart, dailyList, "내 반응속도", userDecadeAverage)
                 }
             }
         }
@@ -234,7 +241,7 @@ class RecordActivity : AppCompatActivity(){
 
                 withContext(Dispatchers.Main) {
 
-                    setupChart(chart, dailyList, "나의 일간 평균 반응 속도", userDecadeAverage)
+                    setupChart(chart, dailyList, "내 반응속도", userDecadeAverage)
                 }
             }
         }
@@ -268,13 +275,10 @@ class RecordActivity : AppCompatActivity(){
 
                 withContext(Dispatchers.Main) {
 
-                    setupChart(chart, dailyList, "나의 일간 평균 반응 속도", userDecadeAverage)
+                    setupChart(chart, dailyList, "내 반응속도", userDecadeAverage)
                 }
             }
         }
-        
-        //첫 진입 시 랜덤게임 기록 보여주기
-        recordRandomButton.performClick()
 
         // 뒤로가기 버튼 클릭 이벤트
         backButton.setOnClickListener {
@@ -313,58 +317,95 @@ class RecordActivity : AppCompatActivity(){
                 setupChart(chart, dailyList, "Daily Average Reaction Time")
             }
         }
+        //첫 진입 시 랜덤게임 기록 보여주기
+        recordRandomButton.postDelayed({
+            recordRandomButton.performClick()
+            chart.notifyDataSetChanged()
+            chart.invalidate()
+        }, 500)
     }
 
-    fun setBackgroundColors(chart: LineChart) {
+    fun setBackgroundColors(chart: LineChart,threshold: Float) {
         chart.setDrawGridBackground(false)
         chart.renderer = object : LineChartRenderer(chart, chart.animator, chart.viewPortHandler) {
             override fun drawData(c: Canvas?) {
-                drawBackgroundColors(c)
+                drawBackgroundColors(c,threshold)
                 super.drawData(c)
             }
 
-            private fun drawBackgroundColors(c: Canvas?) {
-                if (c != null) {
-                    val viewPort = chart.viewPortHandler.contentRect
+//            private fun drawBackgroundColors(c: Canvas?) {
+//                if (c != null) {
+//                    val viewPort = chart.viewPortHandler.contentRect
+//
+//                    // Define the color regions based on Y values
+//                    val totalHeight = viewPort.height()
+//                    val redHeight = totalHeight / 3
+//                    val yellowHeight = totalHeight / 3 * 2
+//
+//                    val paint = Paint()
+//
+//                    // Draw red region
+//                    paint.color = resources.getColor(R.color.red)
+//                    c.drawRect(
+//                        viewPort.left,
+//                        viewPort.bottom - redHeight,
+//                        viewPort.right,
+//                        viewPort.bottom,
+//                        paint
+//                    )
+//
+//                    // Draw yellow region
+//                    paint.color = resources.getColor(R.color.yellow)
+//                    c.drawRect(
+//                        viewPort.left,
+//                        viewPort.bottom - yellowHeight,
+//                        viewPort.right,
+//                        viewPort.bottom - redHeight,
+//                        paint
+//                    )
+//
+//                    // Draw green region
+//                    paint.color = resources.getColor(R.color.green)
+//                    c.drawRect(
+//                        viewPort.left,
+//                        viewPort.top,
+//                        viewPort.right,
+//                        viewPort.bottom - yellowHeight,
+//                        paint
+//                    )
+//                }
+//            }
+fun drawBackgroundColors(c: Canvas?, threshold: Float) {
+    if (c != null) {
+        val viewPort = chart.viewPortHandler.contentRect
+        val yAxis = chart.axisLeft
 
-                    // Define the color regions based on Y values
-                    val totalHeight = viewPort.height()
-                    val redHeight = totalHeight / 3
-                    val yellowHeight = totalHeight / 3 * 2
+        val paint = Paint()
+        val transformer = chart.getTransformer(YAxis.AxisDependency.LEFT)
+        // Y축 값을 화면의 픽셀 좌표로 변환
+        val thresholdY = transformer.getPixelForValues(0f, threshold).y.toFloat()
 
-                    val paint = Paint()
+        // Draw red region (above threshold)
+        paint.color = resources.getColor(R.color.yellow)
+        c.drawRect(
+            viewPort.left,
+            viewPort.top, // 차트 위쪽
+            viewPort.right,
+            thresholdY, // threshold 값 위치
+            paint
+        )
 
-                    // Draw red region
-                    paint.color = resources.getColor(R.color.red)
-                    c.drawRect(
-                        viewPort.left,
-                        viewPort.bottom - redHeight,
-                        viewPort.right,
-                        viewPort.bottom,
-                        paint
-                    )
-
-                    // Draw yellow region
-                    paint.color = resources.getColor(R.color.yellow)
-                    c.drawRect(
-                        viewPort.left,
-                        viewPort.bottom - yellowHeight,
-                        viewPort.right,
-                        viewPort.bottom - redHeight,
-                        paint
-                    )
-
-                    // Draw green region
-                    paint.color = resources.getColor(R.color.green)
-                    c.drawRect(
-                        viewPort.left,
-                        viewPort.top,
-                        viewPort.right,
-                        viewPort.bottom - yellowHeight,
-                        paint
-                    )
-                }
-            }
+        // Draw green region (below threshold)
+        paint.color = resources.getColor(R.color.green)
+        c.drawRect(
+            viewPort.left,
+            thresholdY, // threshold 값 위치
+            viewPort.right,
+            viewPort.bottom, // 차트 아래쪽
+            paint
+        )
+    }
+}
         }
     }
 
@@ -380,17 +421,23 @@ class RecordActivity : AppCompatActivity(){
             chart.invalidate()
             return
         }
-
+        val customTypeface = ResourcesCompat.getFont(this, R.font.sb_aggro)
         // 게임기록 데이터셋
         val entries = mutableListOf<Entry>()
         // Prepare entries for the chart (x-axis: day/week/month, y-axis: averageReactionTime)
         dataList.forEachIndexed { index, history ->
             entries.add(Entry(index.toFloat(), history.averageReactionTime/1000))
-            Log.d("recordActivity","${history.averageReactionTime/1000}")
         }
 
         // Create a dataset
         val dataSet = LineDataSet(entries, label).apply {
+            valueTextSize = 12f
+            valueFormatter = object : ValueFormatter() {
+                override fun getFormattedValue(value: Float): String {
+                    return String.format("%.2f", value) // 소수점 둘째 자리까지 포맷
+                }
+            }
+            valueTypeface=customTypeface
             color = ContextCompat.getColor(this@RecordActivity, R.color.origin_red)
             valueTextColor = resources.getColor(R.color.black) // Customize the text color
             lineWidth = 4f // 선 두께
@@ -405,11 +452,10 @@ class RecordActivity : AppCompatActivity(){
             ) // 점 내부 색상
             circleRadius = 5f // 점의 반지름
             setDrawCircleHole(false) // 점 내부에 빈 공간 없음
-            valueTextSize = 10f // 텍스트 크기
 
             // Customize value labels (optional)
             valueTextColor = resources.getColor(R.color.black) // 텍스트 색상
-            valueTextSize = 10f // 텍스트 크기
+            valueTextSize = 15f // 텍스트 크기
         }
 
 
@@ -422,7 +468,7 @@ class RecordActivity : AppCompatActivity(){
         Log.d("RecordActivity", "Average Entries: $averageEntries")
 
         // 연령대 평균 데이터셋 생성
-        val averageDataSet = LineDataSet(averageEntries, "내 연령대 평균").apply {
+        val averageDataSet = LineDataSet(averageEntries, "내 연령대 평균 반응속도").apply {
             color = ContextCompat.getColor(this@RecordActivity, R.color.blue) // 선 색상을 파란색으로 변경
             lineWidth = 3f // 선 두께 조정
             setDrawCircles(true) // 데이터 포인트를 표시
@@ -435,7 +481,11 @@ class RecordActivity : AppCompatActivity(){
         // Set up the data for the chart
         val lineData = LineData(dataSet,averageDataSet)
         chart.data = lineData
-
+        chart.legend.apply {
+            textSize = 20f // 범례 텍스트 크기 변경
+            typeface = customTypeface
+            textColor = ContextCompat.getColor(this@RecordActivity, R.color.black) // 텍스트 색상 (옵션)
+        }
         // Customize the chart appearance
         chart.apply {
 //            description.isEnabled = false
@@ -444,22 +494,15 @@ class RecordActivity : AppCompatActivity(){
             setScaleEnabled(false) // 확대/축소 비활성화
             setPinchZoom(false) // 핀치 줌 비활성화
             isDoubleTapToZoomEnabled = false // 더블 탭 줌 비활성화
-
             xAxis.apply {
                 position = XAxis.XAxisPosition.BOTTOM
+                textSize=13f
+                typeface = customTypeface
                 valueFormatter = object : ValueFormatter() {
                     override fun getFormattedValue(value: Float): String {
                         val index = value.toInt()
                         return if (index in dataList.indices){
-                            "Day ${dataList[index].getStartDateAsLocalDate()}"
-                            /*
-                            when (dataList.size) {
-                                in 1..30 -> "Day ${dataList[value.toInt()].getStartDateAsLocalDate()}"
-                                in 1..12 -> "Week ${dataList[value.toInt()].getStartDateAsLocalDate()}"
-                                else -> "Month ${dataList[value.toInt()].getStartDateAsLocalDate()}"
-                            }
-
-                             */
+                            dataList[index].getStartDateAsLocalDate().format(DateTimeFormatter.ofPattern("MM-dd"))
                         }
                         else{
                             " " // 유효하지 않을 경우 빈 문자열 반환
@@ -468,61 +511,29 @@ class RecordActivity : AppCompatActivity(){
                 }
             }
             axisLeft.apply {
+                textSize=13f
+                typeface = customTypeface
                 axisMinimum = 0f
-                axisMaximum = 3f // Max value for the Y-axis (assuming your Y values are in 0-3 range)
+                axisMaximum = 5f // Max value for the Y-axis (assuming your Y values are in 0-3 range)
             }
             axisRight.isEnabled = false
             chart.invalidate()
             // Add background color regions
-            setBackgroundColors(chart)
+            setBackgroundColors(chart,userDecadeAverage?:0f)
             invalidate() // Refresh the chart
         }
     }
     //
     // Use this function for daily, weekly, and monthly buttons
     fun showDailyData() {
-        setupChart(chart, dailyList, "일간 평균 반응 속도",userDecadeAverage)
+        setupChart(chart, dailyList, "내 반응속도",userDecadeAverage)
     }
 
     fun showWeeklyData() {
-        setupChart(chart, weeklyList, "주간 평균 반응 속도",userDecadeAverage)
+        setupChart(chart, weeklyList, "내 반응속도",userDecadeAverage)
     }
 
     fun showMonthlyData() {
-        setupChart(chart, monthlyList, "월간 평균 반응 속도",userDecadeAverage)
+        setupChart(chart, monthlyList, "내 반응속도",userDecadeAverage)
     }
-
-//    fun loadGameData(gameType: String) {
-//        var userAverageReactionTime = 0f
-//        CoroutineScope(Dispatchers.IO).launch {
-//            // 서버에서 데이터 로드
-//            dailyList = apiService.getRandomHistory(gameType, "DAILY")
-//            weeklyList = apiService.getRandomHistory(gameType, "WEEKLY")
-//            monthlyList = apiService.getRandomHistory(gameType, "MONTHLY")
-//            // 연령대 평균 데이터
-//            val response = apiService.getRandomHistoryAverageByGameType(gameType, "me")
-//            if (response.isSuccessful) {
-//                userAverageReactionTime = response.body()?.get("result")?.toString()?.toFloat() ?: 0f
-//
-//                // 각 리스트에 대해 연령대 평균 데이터를 업데이트
-//                updateAverageEntries(dailyList, userAverageReactionTime)
-//                updateAverageEntries(weeklyList, userAverageReactionTime)
-//                updateAverageEntries(monthlyList, userAverageReactionTime)
-//            }
-//
-//            withContext(Dispatchers.Main) {
-//                // 기본 데이터를 Daily로 설정
-//                showDailyData()
-//            }
-//        }
-//    }
-//    fun updateAverageEntries(gameData: List<RandomGameHistoryDto>, averageReactionTime: Float) {
-//        // 기존 averageEntries를 초기화
-//        val entries = mutableListOf<Entry>()
-//        gameData.forEachIndexed { index, _ ->
-//            entries.add(Entry(index.toFloat(), averageReactionTime))
-//        }
-//        averageEntries.clear()
-//        averageEntries.addAll(entries)
-//    }
 }

@@ -34,6 +34,7 @@ import com.example.myapplication.util.network.WebSocketClient
 import com.example.myapplication.util.mediapipe.gestureLabels
 import com.example.myapplication.util.network.RetrofitClient
 import com.google.mediapipe.tasks.vision.core.RunningMode
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -66,7 +67,9 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
     private var countDownJob: Job?=null
     val tokenManager = RetrofitClient.getTokenManager()
     var socketInitMessage = tokenManager.getToken() + ","
-    private var isTutorial = false
+    private var isStartClicked = false
+
+    private var countdownCompletionDeferred: CompletableDeferred<Unit>? = null
 
 
     //websocket interface
@@ -89,14 +92,15 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
                         delay(1500)
                         checkImageView.visibility = View.GONE
                     }
-                    if (countDownJob?.isActive == true) {
-                        Log.d("job","waiting")
-                        countDownJob?.join()
-                    }
+//                    if (countDownJob?.isActive == true) {
+//                        Log.d("job","waiting")
+//                        countDownJob?.join()
+//                    }
+                    countdownCompletionDeferred?.await()
                     handleNextProblem(problemInfo)
+                    isFirstProb=false
+                    startTime = System.currentTimeMillis()
                 }
-                isFirstProb=false
-                startTime = System.currentTimeMillis()
             }else if (message.startsWith("end,")) {
                 val avgReactionTime = message.substringAfter("end,").toIntOrNull()
 
@@ -120,7 +124,13 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game_start)
-        
+
+        countdownCompletionDeferred = CompletableDeferred()
+
+        val serverDomain = getString(R.string.server_domain)
+        webSocketClient = WebSocketClient("wss://$serverDomain/ws", this@GameStartActivity)
+
+
         //gameOptionActivity에서 putExtra로 전달
         val mode = intent.getStringExtra("MODE")
         //게임 모드를 initMessage에 붙여서 전송(COPY/RSP/CALC/RANDOM)
@@ -169,40 +179,73 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
         }
     }
     private fun showPopupThenWebsocketConnect(){
-        CoroutineScope(Dispatchers.Main).launch {
-            showPopup {
-                val serverDomain = getString(R.string.server_domain)
-                webSocketClient = WebSocketClient("wss://$serverDomain/ws", this@GameStartActivity)
+        val serverDomain = getString(R.string.server_domain)
+        //webSocketClient = WebSocketClient("wss://$serverDomain/ws", this@GameStartActivity)
 
-                // WebSocket 연결은 IO 스레드에서 실행
-                CoroutineScope(Dispatchers.IO).launch {
-                    delay(500)
-                    webSocketClient.connect()  // WebSocket 연결
-                    delay(500)
-                    webSocketClient.sendMessage(socketInitMessage)  // 메시지 전송
-                }
-            }
+        // WebSocket 연결은 IO 스레드에서 실행
+        CoroutineScope(Dispatchers.IO).launch {
+            delay(500)
+            webSocketClient.connect()  // WebSocket 연결
+            delay(500)
+            webSocketClient.sendMessage(socketInitMessage)  // 메시지 전송
+        }
+        CoroutineScope(Dispatchers.Main).launch {
+            showPopup {}
         }
     }
-    private fun showPopup(onComplete: () -> Unit) {
-        val alertDialog = AlertDialog.Builder(this)
-            .setTitle("Game Start")
-            .setMessage("핸드폰을 흔들리지 않게 세워주세요.")
-            .setPositiveButton("확인") { _, _ ->
-                CoroutineScope(Dispatchers.Main).launch {
-                    startCountdown()
-                    onComplete() // 카운트다운 완료 후에 호출
-                }
-            }
+//    private fun showPopup(onComplete: () -> Unit) {
+//        val alertDialog = AlertDialog.Builder(this)
+//            .setTitle("게임 시작")
+//            .setCancelable(false)
+//            .setMessage("핸드폰을 흔들리지 않게 세워주세요.")
+//            .setPositiveButton("확인") { _, _ ->
+//                CoroutineScope(Dispatchers.Main).launch {
+//                    startCountdown()
+//                    onComplete() // 카운트다운 완료 후에 호출
+//                }
+//            }
+//            .create()
+//        alertDialog.setOnShowListener {
+//            val positiveButton: Button = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
+//            val params = positiveButton.layoutParams as LinearLayout.LayoutParams
+//            params.width = LinearLayout.LayoutParams.MATCH_PARENT
+//            params.gravity = Gravity.CENTER
+//            positiveButton.layoutParams = params
+//        }
+//        alertDialog.show()
+//    }
+
+    private fun showPopup(onComplete: () -> Unit){
+        val dialogView = layoutInflater.inflate(R.layout.dialog_custom_account, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
             .create()
-        alertDialog.setOnShowListener {
-            val positiveButton: Button = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
-            val params = positiveButton.layoutParams as LinearLayout.LayoutParams
-            params.width = LinearLayout.LayoutParams.MATCH_PARENT
-            params.gravity = Gravity.CENTER
-            positiveButton.layoutParams = params
+
+        //취소 동작 X
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+
+        val textView = dialogView.findViewById<TextView>(R.id.dialog_message)
+        textView.text="핸드폰을\n흔들리지 않게\n세워주세요"
+        val buttonNo = dialogView.findViewById<Button>(R.id.button_no)
+        val buttonYes = dialogView.findViewById<Button>(R.id.button_yes)
+        // 아니오 버튼 숨기기
+        buttonNo.visibility = View.GONE
+        // 예 버튼의 위치 수정(가운데로)
+        val params = buttonYes.layoutParams as LinearLayout.LayoutParams
+        params.gravity = Gravity.CENTER
+        params.width = LinearLayout.LayoutParams.WRAP_CONTENT
+        buttonYes.layoutParams = params
+
+        // 예 버튼 클릭 시 동작
+        buttonYes.setOnClickListener {
+            CoroutineScope(Dispatchers.Main).launch {
+                startCountdown()
+                onComplete()
+                dialog.dismiss()
+            }
         }
-        alertDialog.show()
+        dialog.show()
     }
 
     private fun startCountdown() {
@@ -217,25 +260,30 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
         var currentIndex = 0
 
         countDownJob = CoroutineScope(Dispatchers.Main).launch {
-            while (currentIndex < countdownImages.size) {
-                // 이미지 업데이트
-                countdownImageView.setImageResource(countdownImages[currentIndex])
-                countdownImageView.bringToFront()
+            try{
+                while (currentIndex < countdownImages.size) {
+                    // 이미지 업데이트
+                    countdownImageView.setImageResource(countdownImages[currentIndex])
+                    countdownImageView.bringToFront()
 
-                playCountdownSound(R.raw.countdown)
+                    playCountdownSound(R.raw.countdown)
 
-                currentIndex++
-                delay(1000L) // 1초 대기
+                    currentIndex++
+                    delay(1000L) // 1초 대기
+                }
+                // 카운트다운 완료 처리
+                countdownImageView.setImageResource(R.drawable.start)
+                countdownImageView.visibility = View.VISIBLE
+                playCountdownSound(R.raw.start_sound)
+
+                // 1초 후 게임 이미지를 숨김
+                delay(1000L)
+                countdownImageView.visibility = View.GONE
+            }finally {
+                countdownCompletionDeferred?.complete(Unit)
             }
-            // 카운트다운 완료 처리
-            countdownImageView.setImageResource(R.drawable.start)
-            countdownImageView.visibility = View.VISIBLE
-            playCountdownSound(R.raw.start_sound)
-
-            // 1초 후 게임 이미지를 숨김
-            delay(1000L)
-            countdownImageView.visibility = View.GONE
         }
+
     }
 
     private fun playCountdownSound(res: Int) {

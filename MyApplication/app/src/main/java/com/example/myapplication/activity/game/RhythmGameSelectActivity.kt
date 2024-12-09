@@ -4,6 +4,7 @@ import android.app.ActionBar
 import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
+import android.media.Image
 import android.os.Bundle
 import androidx.camera.view.PreviewView
 import android.util.Log
@@ -74,6 +75,11 @@ class RhythmGameSelectActivity : BaseActivity(){
         musicAdapter = MusicAdapter(musics = listOf()) { music ->
             selectedMusic = music // 선택된 음악의 ID 저장,
             showRankingDialog(this, music.id)
+        }
+
+        val backButton:ImageButton = findViewById(R.id.button_back)
+        backButton.setOnClickListener {
+            finish()
         }
 
 

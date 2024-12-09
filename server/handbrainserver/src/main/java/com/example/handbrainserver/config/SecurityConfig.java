@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -15,6 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.multipart.support.MultipartFilter;
+import org.springframework.http.HttpMethod;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +25,10 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig{
+    @Bean
+    public PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -35,13 +42,13 @@ public class SecurityConfig{
                 }))
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(
-                                "/login","/register", "/admin/upload",
-                                "/music/getMusicList", "/music/download/{musicId}", "/admin",
-                                "/music/{musicId}/getBeatList",
+                                "/login","/register", "/admin/login",
                                 "/ws", "/sms/**"
                         ).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/admin/upload").permitAll()
                         .anyRequest().authenticated()
                 )
+                //토큰 방식 이용: csrf 필요 없음
                 .csrf(csrf -> csrf
                         .disable()
                 )
