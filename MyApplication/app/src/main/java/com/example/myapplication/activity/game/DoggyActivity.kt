@@ -10,7 +10,9 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.R
 import android.app.Dialog
 import android.content.Intent
+import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.widget.GridLayout
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -19,8 +21,11 @@ import android.widget.Toast
 import org.json.JSONObject
 import java.io.File
 import kotlin.random.Random
+import kotlinx.coroutines.*
 
 class DoggyActivity : AppCompatActivity() {
+
+    private var isPaused = false;
 
     private lateinit var dogImage: ImageView
     private lateinit var bgmPlayer: MediaPlayer
@@ -49,10 +54,13 @@ class DoggyActivity : AppCompatActivity() {
 
     private var lastAction: ActionType? = null
 
+
+
     // 데이터 파일 이름
     private val fileName = "pet_status.json"
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_doggy)
 
@@ -151,6 +159,16 @@ class DoggyActivity : AppCompatActivity() {
 
         }
 
+        if(hunger % 5 == 0){
+            val temp = Random.nextInt(2);
+            if(temp == 0) {
+                showMessage("할일을 하면 먹이를 받아요")
+            } else{
+                showMessage("가방에서 장난감을 꺼내 놀아주세요")
+            }
+
+        }
+
     }
     private fun initBGM() {
         // MediaPlayer 초기화
@@ -228,13 +246,17 @@ class DoggyActivity : AppCompatActivity() {
 
         // "사용하기" 버튼 동작 설정
         dialog.findViewById<Button>(R.id.useButton).setOnClickListener {
+            val parentView = findViewById<ViewGroup>(R.id.rootLayout)
+            var itemImageRes: Int? = null
+
             when (selectedItem) {
                 "ball" -> {
                     if (ballCount > 0) {
                         ballCount -= 1
-                        happiness = (happiness + 3).coerceAtMost(100)
+                        happiness = (happiness + 9).coerceAtMost(100)
                         ballCountText.text = ballCount.toString()
                         showMessage("공을 사용했습니다!")
+                        itemImageRes = R.drawable.ball
                     } else {
                         showMessage("공이 부족합니다!")
                     }
@@ -242,9 +264,10 @@ class DoggyActivity : AppCompatActivity() {
                 "boomerang" -> {
                     if (boomerangCount > 0) {
                         boomerangCount -= 1
-                        happiness = (happiness + 5).coerceAtMost(100)
+                        happiness = (happiness + 7).coerceAtMost(100)
                         boomerangCountText.text = boomerangCount.toString()
                         showMessage("부메랑을 사용했습니다!")
+                        itemImageRes = R.drawable.boomerang
                     } else {
                         showMessage("부메랑이 부족합니다!")
                     }
@@ -255,6 +278,7 @@ class DoggyActivity : AppCompatActivity() {
                         happiness = (happiness + 3).coerceAtMost(100)
                         shampooCountText.text = shampooCount.toString()
                         showMessage("샴푸를 사용했습니다!")
+                        itemImageRes = R.drawable.shampoo
                     } else {
                         showMessage("샴푸가 부족합니다!")
                     }
@@ -265,6 +289,7 @@ class DoggyActivity : AppCompatActivity() {
                         happiness=(happiness + 3).coerceAtMost(100)
                         vitaminCountText.text=vitaminCount.toString()
                         showMessage("비타민을 사용했습니다!")
+                        itemImageRes = R.drawable.vitamin
                     } else {
                         showMessage("비타민이 부족합니다!")
                     }
@@ -272,9 +297,10 @@ class DoggyActivity : AppCompatActivity() {
                 "water" -> {
                     if (waterCount > 0) {
                         waterCount -= 1
-                        happiness = (happiness + 1).coerceAtMost(100)
+                        happiness = (happiness + 5).coerceAtMost(100)
                         waterCountText.text = waterCount.toString()
                         showMessage("물을 사용했습니다!")
+                        itemImageRes = R.drawable.water
                     } else {
                         showMessage("물이 부족합니다!")
                     }
@@ -283,9 +309,15 @@ class DoggyActivity : AppCompatActivity() {
                     Toast.makeText(this, "사용할 아이템을 선택하세요!", Toast.LENGTH_SHORT).show()
                 }
             }
+
+            itemImageRes?.let {
+                resId -> dropItemAtRandomPosition(parentView, resId)
+            }
+
             toyUsing.start()
             dialog.dismiss()
             updateUI()
+            saveState()
         }
 
 
@@ -295,6 +327,130 @@ class DoggyActivity : AppCompatActivity() {
             dialog.dismiss() }
 
         dialog.show()
+    }
+
+    private fun dropItemAtRandomPosition(parentView: ViewGroup, itemRes: Int){
+        val itemView = ImageView(this)
+        itemView.setImageResource(itemRes)
+        itemView.layoutParams = ViewGroup.LayoutParams(200, 200)    //아이템 크기 조정
+
+        //부모 뷰 크기 가져옴
+        val parentWidth = parentView.width
+        val parentHeight = parentView.height
+
+        var randomX: Int
+        var randomY: Int
+
+        val width = resources.displayMetrics.widthPixels
+        val height = resources.displayMetrics.heightPixels
+
+        while(true){
+            randomX = ((width * 0.1).toInt()..(width * 0.7).toInt()).random()
+            randomY = ((height * 0.3).toInt()..(height * 0.7).toInt()).random()
+            if(_isPossibleToGo(randomX.toFloat(), randomY.toFloat())){
+                break
+            }
+        }
+        itemView.x = randomX.toFloat()
+        itemView.y = randomY.toFloat()
+
+        //부모 뷰에 추가
+        parentView.addView(itemView)
+
+        Handler(Looper.getMainLooper()).postDelayed({
+            _goToHere((randomX + 150).toFloat(), (randomY + 200).toFloat())
+            Handler(Looper.getMainLooper()).postDelayed({
+                showMessage("행복도가 올라갔어요!")
+            }, 2000L)
+        }, 1000L)
+
+        itemView.animate()
+            .alpha(1f)
+            .setDuration(3000L)
+            .withEndAction {
+                parentView.removeView(itemView)
+            }
+
+    }
+
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        if (event != null) {
+            // 화면 좌표계 기준 터치 좌표 가져오기
+            val coordX = event.rawX
+            val coordY = event.rawY
+
+            if (_isPossibleToGo(coordX, coordY) && hunger > 30 && happiness > 30) {
+                _goToHere(coordX, coordY)
+            }
+        }
+
+        return super.onTouchEvent(event)
+    }
+
+    private fun _goToHere(x:Float, y:Float){
+
+        val displayMetrics = resources.displayMetrics
+        val screenWidth = displayMetrics.widthPixels
+        val screenHeight = displayMetrics.heightPixels
+
+        // 현재 강아지 위치 가져오기
+        val currentX = dogImage.x
+        val currentY = dogImage.y
+
+        val minX = screenWidth * 0.05
+        val maxX = screenWidth * 0.95
+        val maxY = screenHeight * 0.75
+        val minY = screenHeight * 0.25
+
+        isPaused = true
+
+        // 강아지 방향 전환
+        if (x < currentX) {
+            dogImage.scaleX = -1f // 왼쪽으로 이동
+        } else {
+            dogImage.scaleX = 1f // 오른쪽으로 이동
+        }
+
+        // 화면 Y 좌표를 기준으로 강아지 크기 조정
+        val normalizedY = ((y - minY).coerceIn(0.0, maxY - minY)) / (maxY - minY)
+        val scale = 0.5f + 0.5f * normalizedY // 최소 0.5, 최대 1.0
+
+        // 현재 동작 정지
+        stopMoveMent()
+
+        // 강아지 애니메이션 취소 및 새로운 동작 설정
+        dogImage.animate().cancel()
+        AnimationUtils.startAnimation(dogImage, ActionType.RUN)
+
+        // 강아지 이동 애니메이션
+        dogImage.animate()
+            .x(x - dogImage.width / 2) // 중앙 보정
+            .y(y - dogImage.height)
+            .scaleX(dogImage.scaleX) // 방향 유지
+            .scaleY(scale.toFloat()) // 크기 변화
+            .setDuration(1000L)
+            .withEndAction {
+                isPaused = false // 이동 종료 후 동작 재개
+            }
+            .start()
+    }
+
+
+    private fun _isPossibleToGo(x:Float, y:Float): Boolean {
+        val displayMetrics = resources.displayMetrics
+        val screenWidth = displayMetrics.widthPixels
+        val screenHeight = displayMetrics.heightPixels
+
+        if(x > screenWidth * 0.7 && y < screenHeight * 0.35){
+            return false;
+        }
+
+        if(x < screenWidth * 0.1 || x > screenWidth * 0.9 || y < screenHeight * 0.25 || y > screenHeight * 0.75){
+            return false;
+        }
+
+        return true;
+
     }
 
     private fun animateCloud(cloudView: ImageView, time: Long) {
@@ -336,10 +492,10 @@ class DoggyActivity : AppCompatActivity() {
         messageView.text = message
         messageView.visibility = View.VISIBLE
 
-        // 1초 후 메시지 숨기기
+        // 3초 후 메시지 숨기기
         Handler(Looper.getMainLooper()).postDelayed({
             messageView.visibility = View.GONE
-        }, 3000)
+        }, 3000L)
     }
 
 //    private fun toggleSlotSelection(slotView: View) {
@@ -381,13 +537,15 @@ class DoggyActivity : AppCompatActivity() {
             // 리듬게임 1회 실행
         }
 
-        btnClose.setOnClickListener {git
+        btnClose.setOnClickListener {
             // 닫기 버튼 클릭 시 팝업 닫기
             dialog.dismiss()
         }
 
         dialog.show()
     }
+
+
 
     private fun updateUI() {
         findViewById<TextView>(R.id.hungerText).text = "배고픔: $hunger/100"
@@ -448,15 +606,25 @@ class DoggyActivity : AppCompatActivity() {
         }
     }
 
-    private fun startActionLoop(){
-        handler.post(object : Runnable{
-            override fun run(){
-                val randomAction = getRandomAction()
-                performAction(randomAction)
-                val nextDelay = randomAction.delay
-                handler.postDelayed(this, nextDelay)
+    private fun startActionLoop() {
+        val actionLoopRunnable = object : Runnable {
+            override fun run() {
+                if (!isPaused) {
+                    val randomAction = getRandomAction() // 랜덤 액션 가져오기
+                    performAction(randomAction) // 액션 수행
+                    val nextDelay = randomAction.delay // 다음 딜레이 가져오기
+
+                    // 다음 루프 호출 예약
+                    handler.postDelayed(this, nextDelay)
+                } else {
+                    // `isPaused`가 true일 경우 다시 루프 재시작 시점에서 실행
+                    handler.postDelayed(this, 1400L)
+                }
             }
-        })
+        }
+
+        // 초기 루프 시작
+        handler.post(actionLoopRunnable)
     }
 
     private fun getRandomAction(): ActionType {
@@ -473,18 +641,35 @@ class DoggyActivity : AppCompatActivity() {
         weightedActions.add(ActionType.SIT)
         weightedActions.add(ActionType.SNIFF)
         weightedActions.add(ActionType.SNIFF_AND_WALK)
-        if(hunger < 30){
-            val temp = Random.nextInt(2);
-            if(temp == 0) {
-                return ActionType.IDLE1;
-            } else{
-                return ActionType.IDLE2;
+
+        CoroutineScope(Dispatchers.Main).launch {
+            //배고픔 30미만이면 가만히 있음.
+            if(hunger < 30){
+                if(Random.nextInt(2)==0){
+                    showMessage("배가 고파요!\n먹이를 주세요!")
+                    delay(3000L)
+                }
+                else{
+                    showMessage("할일을 끝내면\n먹이를 얻을 수 있어요.")
+                    delay(3000L)
+                }
+                val temp = Random.nextInt(2);
+                if(temp == 0) {
+                    performAction(ActionType.IDLE1)
+                } else{
+                    performAction(ActionType.IDLE1)
+                }
+                return@launch
             }
-        };
-        if(happiness < 30){
-            dogImage.visibility = View.INVISIBLE;
-        } else{
-            dogImage.visibility = View.VISIBLE;
+            //행복도 30 미만이면 집에 들어가서 안보임
+            if(happiness < 30){
+                showMessage("우울해...집으로 들어갔어요.\n가방 속 장난감으로 놀아주세요")
+                delay(3000L)
+                dogImage.visibility = View.INVISIBLE;
+            } else{
+                dogImage.visibility = View.VISIBLE;
+            }
+            return@launch
         }
 
         // 리스트에서 랜덤으로 ActionType 선택
@@ -521,19 +706,17 @@ class DoggyActivity : AppCompatActivity() {
                 moveDog(actionType.delay)
             }
             ActionType.SIT -> {
+                //SIT 애니메이션은 2초동안 지속됨
                 AnimationUtils.startAnimation(dogImage, ActionType.SIT)
-
+                handler.postDelayed({
+                    // 2초 딜레이 줌
+                }, 2000L)
                 // SIT 애니메이션의 지속 시간은 애니메이션 자체에 정의됨
                 val animationDuration = Random.nextLong(2000L, 10000L)  // 2초에서 10초 사이의 랜덤 시간
 
                 dogImage.postDelayed({
                     // SIT 애니메이션이 종료된 후, 랜덤한 시간동안 '가만히' 있는 상태로 설정
-                    val idleDuration = Random.nextLong(2000L, 5000L)  // 2초에서 5초 사이의 랜덤 시간
-                    handler.postDelayed({
-                        // 가만히 있는 동안, IDLE 상태로 전환
-                        val idleAction = if (Random.nextBoolean()) ActionType.IDLE1 else ActionType.IDLE2
-                        AnimationUtils.startAnimation(dogImage, idleAction)
-                    }, idleDuration)
+                    AnimationUtils.stopAnimation(dogImage)
                 }, animationDuration)
             }
 
@@ -636,6 +819,11 @@ class DoggyActivity : AppCompatActivity() {
             .scaleY(scale) // 크기 변화
             .setDuration(duration)
             .start()
+    }
+    private fun delay(duration: Long){
+        Handler(Looper.getMainLooper()).postDelayed({
+            //딜레이 주는 코드
+        }, duration)
     }
 
     private fun stopMoveMent(){
