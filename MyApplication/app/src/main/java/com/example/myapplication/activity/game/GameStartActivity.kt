@@ -304,6 +304,7 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
                     if (it.isPlaying) {
                         it.stop()
                     }
+                    it.release()
                 }
                 super.finish()
             }
@@ -311,16 +312,23 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
 
 
     }
-    override fun onBackPressed() {
-        super.onBackPressed()
-        mediaPlayer?.release()
-        mediaPlayer = null
-    }
+//    override fun onBackPressed() {
+//        super.onBackPressed()
+//        mediaPlayer?.release()
+//        mediaPlayer = null
+//        finish()
+//    }
 
     override fun onDestroy() {
         super.onDestroy()
-        mediaPlayer?.release()
-        mediaPlayer = null
+        mediaPlayer?.let {
+            if (it.isPlaying) {
+                it.stop()
+            }
+            it.release()  // UI 스레드에서 호출
+        }
+        mediaPlayer = null  // 안전하게 참조 해제
+        countDownJob?.cancel()  // 카운트다운 job을 취소
     }
 
     override fun onRequestPermissionsResult(

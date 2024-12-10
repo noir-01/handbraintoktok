@@ -2,8 +2,12 @@ package com.example.myapplication
 
 import android.Manifest
 import android.app.ActivityOptions
+import android.app.AlertDialog
+import android.app.Dialog
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -15,26 +19,91 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import android.provider.Settings
+import android.widget.TextView
 
 class RegisterOrNotActivity : AppCompatActivity() {
     val tokenManager = RetrofitClient.getTokenManager()
     val apiService = RetrofitClient.apiService
-    private val CAMERA_REQUEST_CODE=1001
 
-    private fun allPermissionsGranted(): Boolean {
-        return ContextCompat.checkSelfPermission(
-            this, Manifest.permission.CAMERA
-        ) == PackageManager.PERMISSION_GRANTED
+    companion object {
+        private const val PERMISSIONS_REQUEST_CODE = 100
+        private val REQUIRED_PERMISSIONS = arrayOf(
+            Manifest.permission.CAMERA,
+        )
+    }
+
+    private fun checkPermissions() {
+        // 모든 필수 권한이 승인되었는지 확인
+        val deniedPermissions = REQUIRED_PERMISSIONS.filter { permission ->
+            ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED
+        }
+
+        // 거부된 권한이 있다면 권한 요청
+        if (deniedPermissions.isNotEmpty()) {
+            ActivityCompat.requestPermissions(
+                this,
+                deniedPermissions.toTypedArray(),
+                PERMISSIONS_REQUEST_CODE
+            )
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        if (requestCode == PERMISSIONS_REQUEST_CODE) {
+            // 모든 권한이 승인되었는지 확인
+            val allPermissionsGranted = grantResults.all { it == PackageManager.PERMISSION_GRANTED }
+
+            if (allPermissionsGranted) {
+                // 모든 권한 승인됨 - 앱 정상 진행
+            } else {
+                // 일부 또는 모든 권한 거부됨
+                showPermissionDeniedDialog()
+            }
+        }
+    }
+
+    private fun showPermissionDeniedDialog() {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_custom_account, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        val textView = dialogView.findViewById<TextView>(R.id.dialog_message)
+
+        val buttonYes = dialogView.findViewById<Button>(R.id.button_yes)
+
+        val buttonNo = dialogView.findViewById<Button>(R.id.button_no)
+
+        textView.text = "게임을 하기 위해\n권한이 필요합니다."
+        buttonYes.text = "설정"
+        buttonNo.text = "종료"
+
+        buttonYes.setOnClickListener {
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+            val uri: Uri = Uri.fromParts("package", packageName, null)
+            intent.data = uri
+            startActivity(intent)
+            dialog.dismiss()
+            finish()
+        }
+        buttonNo.setOnClickListener {
+            dialog.dismiss()
+            finish()
+        }
+        dialog.show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (!allPermissionsGranted()) {
-            ActivityCompat.requestPermissions(
-                this, arrayOf(Manifest.permission.CAMERA), CAMERA_REQUEST_CODE
-            )
-        }
-
+        checkPermissions()
 
         //토큰이 있으면 로그인 시도, 성공 시 메인화면으로 바로 이동
         if(tokenManager.getToken()!=null){
