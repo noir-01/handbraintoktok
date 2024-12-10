@@ -39,8 +39,12 @@ public class HistoryDto {
         private LocalDate date;
 
         public static RhythmGameHistoryDto from(RhythmGameHistory rhythmGameHistory){
+            UserDto userDto = UserDto.from(rhythmGameHistory.getUser());
+            //개인정보 가리고 보내기
+            userDto.setBirthYear(0);
+            userDto.setPhoneNumberHashed("");
             return new RhythmGameHistoryDto(
-                    UserDto.from(rhythmGameHistory.getUser()),
+                    userDto,
                     rhythmGameHistory.getMusic().getId(),
                     rhythmGameHistory.getCombo(),
                     rhythmGameHistory.getScore(),
