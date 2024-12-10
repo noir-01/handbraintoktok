@@ -8,10 +8,12 @@ import android.os.CountDownTimer
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
+import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.NumberPicker
 import android.widget.TextView
 import android.widget.Toast
@@ -129,6 +131,33 @@ class RegisterActivity : AppCompatActivity() {
             verifyButton.isEnabled = false
             verifyButton.alpha=0.3f
 
+            val dialogView = layoutInflater.inflate(R.layout.dialog_custom_account, null)
+            val dialog = android.app.AlertDialog.Builder(this)
+                .setView(dialogView)
+                .setCancelable(false)
+                .create()
+
+            val textView = dialogView.findViewById<TextView>(R.id.dialog_message)
+            val buttonYes = dialogView.findViewById<Button>(R.id.button_yes)
+            val buttonNo = dialogView.findViewById<Button>(R.id.button_no)
+
+            textView.text = "인증번호가\n전송되었습니다."
+            buttonYes.text = "확인"
+            buttonNo.text = "종료"
+
+            buttonNo.visibility = View.GONE
+            // 예 버튼의 위치 수정(가운데로)
+            val params = buttonYes.layoutParams as LinearLayout.LayoutParams
+            params.gravity = Gravity.CENTER
+            params.width = LinearLayout.LayoutParams.WRAP_CONTENT
+            buttonYes.layoutParams = params
+            buttonYes.setOnClickListener {
+                CoroutineScope(Dispatchers.Main).launch {
+                    dialog.dismiss()
+                }
+            }
+            dialog.show()
+
             //비동기로 버튼 비활성화
             CoroutineScope(Dispatchers.Main).launch{
                 val timerJob = launch { startTimer() }
@@ -137,9 +166,7 @@ class RegisterActivity : AppCompatActivity() {
             CoroutineScope(Dispatchers.IO).launch {
                 val response = apiService.sendSms(NumDto(phoneNumber))
                 withContext(Dispatchers.Main) {
-                    if (response.isSuccessful) {
-                        Toast.makeText(this@RegisterActivity, "인증번호 전송됨", Toast.LENGTH_SHORT).show()
-                    } else {
+                    if (!response.isSuccessful) {
                         Toast.makeText(this@RegisterActivity, "전송 실패", Toast.LENGTH_SHORT).show()
                     }
                 }
