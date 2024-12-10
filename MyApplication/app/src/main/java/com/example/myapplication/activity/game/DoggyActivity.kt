@@ -10,9 +10,11 @@ import androidx.appcompat.app.AppCompatActivity
 import com.example.myapplication.R
 import android.app.Dialog
 import android.content.Intent
+import android.graphics.Color
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.CheckBox
 import android.widget.GridLayout
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -22,6 +24,8 @@ import org.json.JSONObject
 import java.io.File
 import kotlin.random.Random
 import kotlinx.coroutines.*
+import com.google.gson.Gson
+import java.util.Calendar
 
 class DoggyActivity : AppCompatActivity() {
 
@@ -63,6 +67,8 @@ class DoggyActivity : AppCompatActivity() {
 
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_doggy)
+
+        saveLastLoginTime()
 
         dogImage = findViewById(R.id.dog)
 
@@ -513,28 +519,83 @@ class DoggyActivity : AppCompatActivity() {
         val dialog = Dialog(this)
         dialog.setContentView(R.layout.activity_popup_mission)
 
-        // 팝업 내 버튼 초기화
-        val btnHandGesture = dialog.findViewById<Button>(R.id.btnHandGesture)
-        val btnRhythmGame = dialog.findViewById<Button>(R.id.btnRhythmGame)
-        val btnClose = dialog.findViewById<Button>(R.id.btnClose)
-
-        // 버튼 클릭 이벤트 설정
-        btnHandGesture.setOnClickListener {
-            //음악 끄기
-            bgmPlayer.stop()
-            // 손동작 따라하기 동작
-            val intent = Intent(this,GameStartActivity::class.java)
-            intent.putExtra("MODE", "COPY")
-            startActivity(intent)
-            food = (food + 3).coerceAtMost(10)
-            saveState()
-            updateUI()
-            dialog.dismiss()
+        val sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        //날짜 지났으면 미션 수행 상태 모두 false로 적용
+        if(isDayOver()){
+            val missionState = mapOf(
+                "doggy_mission_copy" to false,
+                "doggy_mission_rsp" to false,
+                "doggy_mission_calc" to false,
+                "doggy_mission_rhythm" to false
+            )
+            for ((key, value) in missionState) {
+                editor.putBoolean(key, value)  // String 타입 값 저장
+            }
+            editor.apply()
         }
 
+        // 팝업 내 버튼 초기화
+        val btnHandGesture = dialog.findViewById<Button>(R.id.btnHandGesture)
+        val btnRsp = dialog.findViewById<Button>(R.id.btnRsp)
+        val btnCalc = dialog.findViewById<Button>(R.id.btnCalc)
+        val btnRhythmGame = dialog.findViewById<Button>(R.id.btnRhythmGame)
+
+        val btnClose = dialog.findViewById<Button>(R.id.btnClose)
+
+        val copyCheckBox = dialog.findViewById<CheckBox>(R.id.checkBoxHandGesture)
+        val rspCheckBox = dialog.findViewById<CheckBox>(R.id.checkBoxRsp)
+        val calcCheckBox = dialog.findViewById<CheckBox>(R.id.checkBoxCalc)
+        val rhythmCheckBox = dialog.findViewById<CheckBox>(R.id.checkBoxRhythmGame)
+
+        //리스트로 접근
+        val buttonList = listOf(btnHandGesture,btnRsp,btnCalc,btnRhythmGame)
+        val boxList = listOf(copyCheckBox,rspCheckBox,calcCheckBox,rhythmCheckBox)
+        val modeList = listOf("COPY","RSP","CALC")
+        val missionKeys = listOf("doggy_mission_copy","doggy_mission_rsp","doggy_mission_calc","doggy_mission_rhythm")
+        val completeStateList = missionKeys.map { sharedPreferences.getBoolean(it, false) }
+
+        //저장된 값에 따라 체크박스 상태 변경
+        for(i in buttonList.indices){
+            //체크박스 비활성화
+             boxList[i].isEnabled=false
+            //완료된 상태라면 색상 gray로, 체크박스 표시
+            if(completeStateList[i]){
+                buttonList[i].setTextColor(Color.GRAY)
+                boxList[i].isChecked = true
+            }else{
+                buttonList[i].setTextColor(Color.BLACK)
+                boxList[i].isChecked = false
+            }
+        }
+        //버튼 클릭 이벤트 설정 (따라하기, 가위바위보, 계산하기)
+        for(i in modeList.indices){
+            buttonList[i].setOnClickListener {
+                bgmPlayer.stop()
+                // 손동작 따라하기 동작
+                val intent = Intent(this,GameStartActivity::class.java)
+                intent.putExtra("MODE", modeList[i])
+                startActivity(intent)
+                food = (food + 3).coerceAtMost(10)
+                saveState()
+                updateUI()
+                //preferences에 완료 표시
+                editor.putBoolean(missionKeys[i],true)
+                editor.apply()
+                dialog.dismiss()
+            }
+        }
+
+        //리듬게임 버튼
         btnRhythmGame.setOnClickListener {
             bgmPlayer.stop()
             // 리듬게임 1회 실행
+            val intent = Intent(this,RhythmGameSelectActivity::class.java)
+            startActivity(intent)
+
+            //preferences에 완료 표시
+            editor.putBoolean("doggy_mission_rhythm",true)
+            editor.apply()
         }
 
         btnClose.setOnClickListener {
@@ -830,10 +891,44 @@ class DoggyActivity : AppCompatActivity() {
         dogImage.animate().cancel()
     }
 
+    private fun saveLastLoginTime() {
+        val sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        val currentTimeMillis = System.currentTimeMillis() // 현재 시간 밀리초로 저장
+        editor.putLong("last_login_time", currentTimeMillis)
+        editor.apply()
+    }
+
+    private fun isDayOver(): Boolean {
+        val sharedPreferences = getSharedPreferences("AppPreferences", MODE_PRIVATE)
+        val lastLoginTime = sharedPreferences.getLong("last_login_time", 0)
+
+        // 마지막 로그인 시간이 없으면 true 반환 (첫 접속)
+        if (lastLoginTime == 0L) return true
+        val lastLoginCalendar = Calendar.getInstance().apply {
+            timeInMillis = lastLoginTime
+        }
+        val currentCalendar = Calendar.getInstance()
+        // 년, 월, 일 비교
+        return !(lastLoginCalendar.get(Calendar.YEAR) == currentCalendar.get(Calendar.YEAR) &&
+                lastLoginCalendar.get(Calendar.MONTH) == currentCalendar.get(Calendar.MONTH) &&
+                lastLoginCalendar.get(Calendar.DAY_OF_MONTH) == currentCalendar.get(Calendar.DAY_OF_MONTH))
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 음악 다시 재생하기
+        if (!bgmPlayer.isPlaying) {
+            bgmPlayer = MediaPlayer.create(this, R.raw.bgm)
+            bgmPlayer.isLooping = true // 무한 반복 설정
+            bgmPlayer.start() // 음악 재생
+        }
+    }
 
     override fun onDestroy() {
         super.onDestroy()
         handler.removeCallbacksAndMessages(null)
+        bgmPlayer.release()
     }
 
 }
