@@ -176,24 +176,36 @@ class TutorialGameActivity: AppCompatActivity() {
         }
     }
 
-    private fun showPopup(onComplete: () -> Unit) {
-        val alertDialog = AlertDialog.Builder(this)
-            .setTitle("Game Start")
-            .setMessage("핸드폰을 흔들리지 않게 세워주세요.")
-            .setPositiveButton("확인") { _, _ ->
-                CoroutineScope(Dispatchers.Main).launch {
-                    onComplete() // 카운트다운 완료 후에 호출
-                }
-            }
+    private fun showPopup(onComplete: () -> Unit){
+        val dialogView = layoutInflater.inflate(R.layout.dialog_custom_account, null)
+        val dialog = AlertDialog.Builder(this)
+            .setView(dialogView)
             .create()
-        alertDialog.setOnShowListener {
-            val positiveButton: Button = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE)
-            val params = positiveButton.layoutParams as LinearLayout.LayoutParams
-            params.width = LinearLayout.LayoutParams.MATCH_PARENT
-            params.gravity = Gravity.CENTER
-            positiveButton.layoutParams = params
+
+        //취소 동작 X
+        dialog.setCancelable(false)
+        dialog.setCanceledOnTouchOutside(false)
+
+        val textView = dialogView.findViewById<TextView>(R.id.dialog_message)
+        textView.text="핸드폰을\n흔들리지 않게\n세워주세요"
+        val buttonNo = dialogView.findViewById<Button>(R.id.button_no)
+        val buttonYes = dialogView.findViewById<Button>(R.id.button_yes)
+        // 아니오 버튼 숨기기
+        buttonNo.visibility = View.GONE
+        // 예 버튼의 위치 수정(가운데로)
+        val params = buttonYes.layoutParams as LinearLayout.LayoutParams
+        params.gravity = Gravity.CENTER
+        params.width = LinearLayout.LayoutParams.WRAP_CONTENT
+        buttonYes.layoutParams = params
+
+        // 예 버튼 클릭 시 동작
+        buttonYes.setOnClickListener {
+            CoroutineScope(Dispatchers.Main).launch {
+                onComplete()
+                dialog.dismiss()
+            }
         }
-        alertDialog.show()
+        dialog.show()
     }
 
     fun isAnswerAndCheckAndNext(answer1:Int, answer2: Int){
