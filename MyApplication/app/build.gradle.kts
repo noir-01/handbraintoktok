@@ -134,6 +134,8 @@ dependencies {
 
     // KNN Library
     implementation("com.github.haifengl:smile-core:2.5.3")
+    implementation("com.github.haifengl:smile-kotlin:2.6.0")
+    implementation("com.github.haifengl:smile-data:2.6.0")
 
     // HTTP client
     implementation("com.squareup.okhttp3:okhttp:4.10.0")

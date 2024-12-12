@@ -67,6 +67,7 @@ import android.view.animation.AnimationSet
 import android.view.animation.LinearInterpolator
 import android.widget.ImageButton
 import androidx.activity.OnBackPressedCallback
+import com.example.myapplication.util.mediapipe.GestureRecogObj
 
 class RhythmGameStartActivity: AppCompatActivity() {
     //mp3 보내줄 로컬 서버
@@ -77,7 +78,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
 
     private val CAMERA_REQUEST_CODE = 1001
     private lateinit var previewView: PreviewView
-    private lateinit var gestureRecognition: GestureRecognition
+    //private lateinit var gestureRecognition: GestureRecognition
     private lateinit var handLandmarkerHelper: HandLandMarkHelper
 
     private val delayTime = 0.3f
@@ -557,7 +558,7 @@ class RhythmGameStartActivity: AppCompatActivity() {
 
     private fun initializeMediaPipe() {
         lifecycleScope.launch(Dispatchers.Default) {
-            gestureRecognition = GestureRecognition(this@RhythmGameStartActivity)
+            //gestureRecognition = GestureRecognition(this@RhythmGameStartActivity)
             handLandmarkerHelper = HandLandMarkHelper(
                 context = this@RhythmGameStartActivity,
                 runningMode = RunningMode.LIVE_STREAM,
@@ -578,7 +579,8 @@ class RhythmGameStartActivity: AppCompatActivity() {
                             if (result.landmarks().isNotEmpty()) {
                                 for (idx in result.landmarks().indices) {
                                     val handedness = result.handedness()[idx][0]
-                                    val predictedIndex = gestureRecognition.predictByResult(result, idx)
+                                    //val predictedIndex = gestureRecognition.predictByResult(result, idx)
+                                    val predictedIndex = GestureRecogObj.predictByResult(result, idx)
                                     if(predictedIndex==2){
                                         rightHandIndex=2
                                         leftHandIndex=2

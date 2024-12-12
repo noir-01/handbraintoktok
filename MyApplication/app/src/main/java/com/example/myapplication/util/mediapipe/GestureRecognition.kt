@@ -95,50 +95,6 @@ class GestureRecognition(private val context: Context, private val numNeighbors:
         val predictions = knnModel.predict(arrayOf(angles.map { it.toDouble() }.toDoubleArray()))
         return predictions[0] // 예측된 인덱스를 반환
     }
-
-    fun calcAngles(result: HandLandmarkerResult): FloatArray {
-        val joint = Array(21) { FloatArray(3) }
-        // Calculate angles using dot product and arccos
-        val angleIndices1 = arrayOf(0, 1, 2, 4, 5, 6, 8, 9, 10, 12, 13, 14, 16, 17, 18)
-        val angleIndices2 = arrayOf(1, 2, 3, 5, 6, 7, 9, 10, 11, 13, 14, 15, 17, 18, 19)
-        val angles = FloatArray(angleIndices1.size)
-
-        // Compute vectors between specific joints (v1 and v2)
-        val indices1 = arrayOf(0, 1, 2, 3, 0, 5, 6, 7, 0, 9, 10, 11, 0, 13, 14, 15, 0, 17, 18, 19)
-        val indices2 = arrayOf(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20)
-
-        for (res in result.landmarks()) {
-            for (i in res.indices) {
-                // Store x, y, z coordinates for each landmark in the joint array
-                joint[i][0] = res[i].x()
-                joint[i][1] = res[i].y()
-                joint[i][2] = res[i].z()
-            }
-
-            val vectors = Array(indices1.size) { FloatArray(3) }
-
-            for (i in indices1.indices) {
-                // Calculate v = v2 - v1
-                for (j in 0..2) {
-                    vectors[i][j] = joint[indices2[i]][j] - joint[indices1[i]][j]
-                }
-
-                // Normalize the vectors
-                val norm = sqrt(vectors[i].map { it * it }.sum())
-                for (j in 0..2) {
-                    vectors[i][j] /= norm
-                }
-            }
-
-            for (i in angleIndices1.indices) {
-                val dotProduct =
-                    (0..2).map { j -> vectors[angleIndices1[i]][j] * vectors[angleIndices2[i]][j] }
-                        .sum()
-                angles[i] = Math.toDegrees(acos(dotProduct).toDouble()).toFloat()
-            }
-        }
-        return angles
-    }
 }
 
 
