@@ -34,6 +34,7 @@ import androidx.lifecycle.lifecycleScope
 import com.example.myapplication.R
 import com.example.myapplication.activity.game.GameResultActivity
 import com.example.myapplication.util.ResourceUtils.imageResources
+import com.example.myapplication.util.mediapipe.GestureRecogObj
 import com.example.myapplication.util.mediapipe.GestureRecognition
 import com.example.myapplication.util.mediapipe.HandLandMarkHelper
 import com.example.myapplication.util.mediapipe.gestureLabels
@@ -61,7 +62,7 @@ class TutorialGameActivity: AppCompatActivity() {
     private  lateinit var gameImageRightView: ImageView
 
     private var mediaPlayer: MediaPlayer? = null
-    private lateinit var gestureRecognition: GestureRecognition
+    //private lateinit var gestureRecognition: GestureRecognition
     private lateinit var handLandmarkerHelper: HandLandMarkHelper
     private var probNum = 0
     private var countDownJob: Job?=null
@@ -319,7 +320,7 @@ class TutorialGameActivity: AppCompatActivity() {
 
     private fun initializeMediaPipe() {
         lifecycleScope.launch(Dispatchers.Default) {
-            gestureRecognition = GestureRecognition(this@TutorialGameActivity)
+            //gestureRecognition = GestureRecognition(this@TutorialGameActivity)
             handLandmarkerHelper = HandLandMarkHelper(
                 context = this@TutorialGameActivity,
                 runningMode = RunningMode.LIVE_STREAM,
@@ -332,7 +333,7 @@ class TutorialGameActivity: AppCompatActivity() {
                         val inferenceTime = resultBundle.inferenceTime
                         val height = resultBundle.inputImageHeight
                         val width = resultBundle.inputImageWidth
-                        Log.d("HandActivity", "time: $inferenceTime, resol: $width*$height")
+                        //Log.d("HandActivity", "time: $inferenceTime, resol: $width*$height")
 
                         val predictedIndices = mutableListOf(-1,-1)
 
@@ -340,9 +341,9 @@ class TutorialGameActivity: AppCompatActivity() {
                             if (result.landmarks().isNotEmpty()) {
                                 for (idx in result.landmarks().indices) {
                                     val handedness = result.handedness()[idx][0]
-                                    val predictedIndex = gestureRecognition.predictByResult(result, idx)
+                                    val predictedIndex = GestureRecogObj.predictByResult(result, idx)
                                     if (predictedIndex >= 0 && predictedIndex <= gestureLabels.size) {
-                                        Log.d("HandActivity", "Predicted index: " + gestureLabels[predictedIndex])
+                                        //Log.d("HandActivity", "Predicted index: " + gestureLabels[predictedIndex])
                                         if (handedness.categoryName() == "Left") {
                                             predictedIndices[1] = predictedIndex
                                         } else if (handedness.categoryName() == "Right") {

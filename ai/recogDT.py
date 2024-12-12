@@ -3,7 +3,7 @@ import mediapipe as mp
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.neighbors import KNeighborsClassifier
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 import time
 from gestureLabel import gesture
@@ -86,12 +86,13 @@ y = data.iloc[:, -1].values    # 레이블 데이터(제스처)
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # KNN 모델 학습 (K=5)
-knn_model = KNeighborsClassifier(n_neighbors=3)
-knn_model.fit(X_train, y_train)
+#knn_model = KNeighborsClassifier(n_neighbors=3)
+myModel = RandomForestClassifier(n_estimators=100, random_state=42)
+myModel.fit(X_train, y_train)
 
 # 테스트 정확도 출력
 now = time.time()
-y_pred = knn_model.predict(X_test)
+y_pred = myModel.predict(X_test)
 print("time: ", time.time()-now)
 print(f'Accuracy: {accuracy_score(y_test, y_pred)}')
 
@@ -122,7 +123,7 @@ while True:
 
             #features = np.hstack((angle,dist))  # 각도와 거리 데이터를 결합
             features = np.hstack((angle))
-            predicted_label = knn_model.predict([features])[0]
+            predicted_label = myModel.predict([features])[0]
             print("time: ",time.time()-start)
 
             #thumb up(3)인 경우 보정

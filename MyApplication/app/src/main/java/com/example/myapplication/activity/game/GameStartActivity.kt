@@ -32,6 +32,8 @@ import com.example.myapplication.util.mediapipe.HandLandMarkHelper
 import com.example.myapplication.util.ResourceUtils.imageResources
 import com.example.myapplication.util.network.WebSocketClient
 import com.example.myapplication.util.mediapipe.gestureLabels
+//import com.example.myapplication.util.mediapipe.GestureRecognitionSingleton
+import com.example.myapplication.util.mediapipe.GestureRecogObj
 import com.example.myapplication.util.network.RetrofitClient
 import com.google.mediapipe.tasks.vision.core.RunningMode
 import kotlinx.coroutines.CompletableDeferred
@@ -353,7 +355,7 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
 
     private fun initializeMediaPipe() {
         lifecycleScope.launch(Dispatchers.Default) {
-            gestureRecognition = GestureRecognition(this@GameStartActivity)
+            //gestureRecognition = GestureRecognition(this@GameStartActivity)
             handLandmarkerHelper = HandLandMarkHelper(
                 context = this@GameStartActivity,
                 runningMode = RunningMode.LIVE_STREAM,
@@ -366,7 +368,7 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
                         val inferenceTime = resultBundle.inferenceTime
                         val height = resultBundle.inputImageHeight
                         val width = resultBundle.inputImageWidth
-                        //Log.d("HandActivity", "time: $inferenceTime, resol: $width*$height")
+                        Log.d("HandActivity", "time: $inferenceTime, resol: $width*$height")
 
                         val predictedIndices = mutableListOf(-1,-1)
 
@@ -374,9 +376,13 @@ class GameStartActivity : BaseActivity(), WebSocketClient.WebSocketCallback {
                             if (result.landmarks().isNotEmpty()) {
                                 for (idx in result.landmarks().indices) {
                                     val handedness = result.handedness()[idx][0]
-                                    val predictedIndex = gestureRecognition.predictByResult(result, idx)
+                                    //val predictedIndex = gestureRecognition.predictByResult(result, idx)
+                                    //val predictedIndex = GestureRecognitionSingleton.predictByResult(result,idx)
+                                    val predictedIndex = GestureRecogObj.predictByResult(result,idx)
+                                    Log.d("HandActivity", "$predictedIndex")
                                     if (predictedIndex >= 0 && predictedIndex <= gestureLabels.size) {
-                                        Log.d("HandActivity", "Predicted index: " + gestureLabels[predictedIndex])
+                                        //Log.d("HandActivity", "Predicted index: " + gestureLabels[predictedIndex])
+                                        //Log.d("HandActivity", "$predictedIdx2")
                                         if (handedness.categoryName() == "Left") {
                                             predictedIndices[1] = predictedIndex
                                         } else if (handedness.categoryName() == "Right") {
