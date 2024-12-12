@@ -13,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.handbrainserver.music.util.JwtUtil;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -30,6 +31,9 @@ public class MusicController {
     private String uploadDir;
     private final MusicService musicService;
     @Autowired
+    private JwtUtil jwtUtil;
+
+    @Autowired
     public MusicController(MusicService musicService) {
         this.musicService = musicService;
     }
@@ -38,7 +42,24 @@ public class MusicController {
     public String uploadMusic(HttpSession session, Model model){
         String token = (String) session.getAttribute("token");
         model.addAttribute("token", token);
+        //토큰 없으면 돌려보내기
+        if(token==null || jwtUtil.isTokenExpired(token)){
+            return "login";
+        }
+        List<MusicDto> musicList = musicService.getAllMusic();
+        //musicList 담기
+        model.addAttribute("musicList", musicList);
+
         return "musicUpload";
+    }
+    @PostMapping("/music/delete/{musicId}")
+    public ResponseEntity<?> deleteMusic(HttpSession session, @PathVariable("musicId") Long musicId){
+        try{
+            musicService.deleteMusic(musicId);
+            return ResponseEntity.ok(Map.of("success:","Music deleted successfully."));
+        }catch(Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of("error","server error"));
+        }
     }
 
     @CrossOrigin(origins = "https://handbraintoktok.duckdns.org:8080")

@@ -8,9 +8,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import com.example.handbrainserver.music.entity.RhythmGameHistory;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 @Getter @Setter
@@ -26,6 +28,9 @@ public class Music {
     private String filePath;
     @Lob
     private String beatList;
+
+    @OneToMany(mappedBy = "music", cascade = CascadeType.ALL)
+    private List<RhythmGameHistory> gameHistories = new ArrayList<>();
 
     // Convert JSON back to List<Float> after reading from the database
     public List<Float> getBeatTime() {
