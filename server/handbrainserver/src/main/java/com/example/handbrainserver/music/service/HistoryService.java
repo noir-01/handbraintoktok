@@ -157,7 +157,10 @@ public class HistoryService {
                 difficulty.name(),
                 startOfWeek, endOfWeek
         );
-        if(ranking!=null)
+        Boolean isExist = rhythmGameHistoryRepo.existsByUserIdAndMusicIdAndDifficultyAndDateRange(
+            userId,musicId,difficulty,startOfWeek,endOfWeek
+        );
+        if(ranking!=null && isExist)
             return ranking;
         else return -1;
     }

@@ -64,4 +64,13 @@ public interface RhythmGameHistoryRepository extends JpaRepository<RhythmGameHis
             @Param("startOfWeek") LocalDate startOfWeek,
             @Param("endOfWeek") LocalDate endOfWeek
     );
+    @Query("SELECT COUNT(r) > 0 FROM RhythmGameHistory r WHERE r.user.id = :userId " +
+           "AND r.music.id = :musicId AND r.difficulty = :difficulty " +
+           "AND r.date BETWEEN :startOfWeek AND :endOfWeek")
+    boolean existsByUserIdAndMusicIdAndDifficultyAndDateRange(
+            @Param("userId") Long userId,
+            @Param("musicId") Long musicId,
+            @Param("difficulty") Difficulty difficulty,
+            @Param("startOfWeek") LocalDate startOfWeek,
+            @Param("endOfWeek") LocalDate endOfWeek);
 }
