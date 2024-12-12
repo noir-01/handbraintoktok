@@ -6,6 +6,7 @@ import com.example.handbrainserver.music.repository.MusicRepository;
 import com.example.handbrainserver.music.util.BeatExtractor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,5 +44,10 @@ public class MusicService {
     public List<Float> getBeatListById(Long musicId){
         Optional<Music> music = musicRepository.findById(musicId);
         return music.map(Music::getBeatTime).orElse(null);
+    }
+
+    @Transactional
+    public void deleteMusic(Long musicId){
+        musicRepository.deleteById(musicId);
     }
 }

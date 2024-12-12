@@ -27,7 +27,6 @@ public class AdminController {
 
     @PostMapping("/login")
     public String login(HttpSession session, @RequestParam String userId, @RequestParam String password, Model model) {
-        // 여기서 adminService에서 비밀번호를 검증하는 로직이 들어가야 합니다.
         boolean isAuthenticated = adminService.adminLogin(userId, password);
 
         if (isAuthenticated) {
