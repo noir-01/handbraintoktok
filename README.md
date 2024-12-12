@@ -9,9 +9,9 @@
  <img src="https://img.shields.io/badge/Android-3DDC84?style=for-the-badge&logo=Android&logoColor=white"> <img src="https://img.shields.io/badge/Kotlin-7F52FF?style=for-the-badge&logo=Kotlin&logoColor=white"> <img src="https://img.shields.io/badge/MediaPipe-0097A7?style=for-the-badge&logo=MediaPipe&logoColor=white">
 
 ## 요구 사항
-- >=Android 8.0 (SDK 26)
+- `>=Android 8.0 (SDK 26)`
 ## 개발 환경
-- Windows11, Android 14 (SDK 34)
+- `Windows11, Android 14 (SDK 34)`
 
 ## 사용 방법
   
