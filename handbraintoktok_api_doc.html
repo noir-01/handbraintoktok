@@ -1,0 +1,2578 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>손뇌톡톡</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/monokai-sublime.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script>
+        hljs.configure({
+            tabReplace: '    ',
+        });
+        hljs.initHighlightingOnLoad();
+    </script>
+    <style>body {
+    position: relative;
+}
+
+h1 {
+    margin-top: 5px;
+}
+
+h1, h2, h3, h4 {
+    color: #2b2b2b;
+}
+
+h2:after {
+    content: ' ';
+}
+
+h5 {
+    font-weight: bold;
+}
+
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    display: none;
+    position: absolute;
+    margin-left: 8px;
+}
+
+h1:hover a, h2:hover a, h3:hover a, h4:hover a, h5:hover a, h6:hover a {
+    color: #a5a5a5;
+    display: initial;
+}
+
+.nav.nav-tabs > li > a {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.tab-content {
+    padding-top: 8px;
+}
+
+.table {
+    margin-bottom: 8px;
+}
+
+pre {
+    border-radius: 0px;
+    border: none;
+}
+
+pre code {
+    margin: -9.5px;
+}
+
+.request {
+    margin-top: 12px;
+    margin-bottom: 24px;
+}
+
+.response-text-sample {
+    padding: 0px !important;
+}
+
+.response-text-sample pre {
+    margin-bottom: 0px;
+}
+
+
+#sidebar-wrapper {
+    z-index: 1000;
+    position: fixed;
+    left: 250px;
+    width: 250px;
+    height: 100%;
+    margin-left: -250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #2b2b2b;
+    padding-top: 20px;
+}
+
+#sidebar-wrapper ul {
+    width: 250px;
+}
+
+#sidebar-wrapper ul li {
+    margin-right: 10px;
+}
+
+#sidebar-wrapper ul li a:hover {
+    background: inherit;
+    text-decoration: none;
+}
+
+#sidebar-wrapper ul li a {
+    display: block;
+    color: #ECF0F1;
+    padding: 6px 15px;
+}
+
+#sidebar-wrapper ul li ul {
+    padding-left: 25px;
+}
+
+#sidebar-wrapper ul li ul li a {
+    padding: 1px 0px;
+}
+
+#sidebar-wrapper ul li a:hover,
+#sidebar-wrapper ul li a:focus {
+    color: #e0c46c;
+    border-right: solid 1px #e0c46c;
+}
+
+#sidebar-wrapper ul li.active > a {
+    color: #e0c46c;
+    border-right: solid 3px #e0c46c;
+}
+
+#sidebar-wrapper ul li:not(.active) ul {
+    display: none;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    position: absolute;
+    padding: 15px 15px 15px 250px;
+}
+</style>
+</head>
+<body data-spy="scroll" data-target=".scrollspy">
+<div id="sidebar-wrapper">
+    <div class="scrollspy">
+    <ul id="main-menu" data-spy="affix" class="nav">
+        <li>
+            <a href="#doc-general-notes">General notes</a>
+        </li>
+        
+        <li>
+            <a href="#doc-api-detail">API detail</a>
+        </li>
+        
+        
+        
+        <li>
+            <a href="#folder-user">User</a>
+            <ul>
+                
+                <li>
+                    <a href="#request-user-">인증번호 전송</a>
+                </li>
+                
+                <li>
+                    <a href="#request-user-">회원가입</a>
+                </li>
+                
+                <li>
+                    <a href="#request-user-">회원인증</a>
+                </li>
+                
+                <li>
+                    <a href="#request-user-">로그인</a>
+                </li>
+                
+                <li>
+                    <a href="#request-user-">내 이름</a>
+                </li>
+                
+                <li>
+                    <a href="#request-user-">연락처 연동</a>
+                </li>
+                
+                <li>
+                    <a href="#request-user-">연락처 연동 해제</a>
+                </li>
+                
+                <li>
+                    <a href="#request-user-">탈퇴</a>
+                </li>
+                
+            </ul>
+        </li>
+        
+        
+        <li>
+            <a href="#folder-admin">Admin</a>
+            <ul>
+                
+                <li>
+                    <a href="#request-admin-">관리자 로그인</a>
+                </li>
+                
+            </ul>
+        </li>
+        
+        
+        <li>
+            <a href="#folder-history">History</a>
+            <ul>
+                
+                <li>
+                    <a href="#request-history-">일반게임 기록 업로드</a>
+                </li>
+                
+                <li>
+                    <a href="#request-history-">일반게임 기록 조회</a>
+                </li>
+                
+                <li>
+                    <a href="#request-history-">일반게임 연령대 평균 기록 조회</a>
+                </li>
+                
+                <li>
+                    <a href="#request-history-">리듬게임 기록 업로드</a>
+                </li>
+                
+                <li>
+                    <a href="#request-history-">리듬게임 순위 조회</a>
+                </li>
+                
+                <li>
+                    <a href="#request-history-">리듬게임 내 순위 조회</a>
+                </li>
+                
+            </ul>
+        </li>
+        
+        
+        <li>
+            <a href="#folder-music">Music</a>
+            <ul>
+                
+                <li>
+                    <a href="#request-music-">음악 업로드(관리자)</a>
+                </li>
+                
+                <li>
+                    <a href="#request-music-">음악 다운로드</a>
+                </li>
+                
+                <li>
+                    <a href="#request-music-">음악 목록 조회</a>
+                </li>
+                
+                <li>
+                    <a href="#request-music-">비트 리스트 얻기</a>
+                </li>
+                
+            </ul>
+        </li>
+        
+    </ul>
+</div>
+
+</div>
+<div id="page-content-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>손뇌톡톡</h1>
+
+                <h2 id="doc-general-notes">
+                    General notes
+                    <a href="#doc-general-notes"><i class="glyphicon glyphicon-link"></i></a>
+                </h2>
+
+                
+
+                
+
+                <h2 id="doc-api-detail">
+                    API detail
+                    <a href="#doc-api-detail"><i class="glyphicon glyphicon-link"></i></a>
+                </h2>
+
+                
+
+
+                
+                
+                <div class="endpoints-group">
+                    <h3 id="folder-user">
+                        User
+                        <a href="#folder-user"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div><p>User 관련 API</p>
+</div>
+
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-user-">
+                            인증번호 전송
+                            <a href="#request-user-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-user--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-user--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-user--example-curl">
+                                    <pre><code class="hljs curl">curl -X POST -d '{
+    "phoneNumber": "{{myPhone}}"
+}' "{{baseUrl}}/sms/send"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-user--example-http">
+                                    <pre><code class="hljs http">POST %7B%7BbaseUrl%7D%7D/sms/send HTTP/1.1
+Host: 
+
+{
+    "phoneNumber": "{{myPhone}}"
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-user--responses-2252cd16-6543-4c47-8f4a-f00aca3973f9" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-user--responses-2252cd16-6543-4c47-8f4a-f00aca3973f9">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Set-Cookie</th><td>JSESSIONID=4B71148C8D3074019D131AB5BA355A39; Path=/; Secure; HttpOnly</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:24:08 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>{
+    "message": "success"
+}</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-user-">
+                            회원가입
+                            <a href="#request-user-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-user--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-user--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-user--example-curl">
+                                    <pre><code class="hljs curl">curl -X POST -d '{
+    "phoneNumber":"{{myPhone}}",
+    "code":"898436",
+    "name":"KSH",
+    "birthYear":2001
+}' "{{baseUrl}}/sms/verify/register"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-user--example-http">
+                                    <pre><code class="hljs http">POST %7B%7BbaseUrl%7D%7D/sms/verify/register HTTP/1.1
+Host: 
+
+{
+    "phoneNumber":"{{myPhone}}",
+    "code":"898436",
+    "name":"KSH",
+    "birthYear":2001
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-user--responses-c0e6b8f3-e7f9-48e6-94a3-838698466587" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-user--responses-c0e6b8f3-e7f9-48e6-94a3-838698466587">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:29:31 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>{
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MiIsImlhdCI6MTczMzg0ODE3MSwiZXhwIjoxNzQ5Njg3NjkxfQ.ZWLlwBP73MleC3cSFYv3wCe7umU2mktxIxISzfRz1R8"
+}</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-user-">
+                            회원인증
+                            <a href="#request-user-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-user--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-user--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-user--example-curl">
+                                    <pre><code class="hljs curl">curl -X POST -d '{
+    "phoneNumber":"{{myPhone}}",
+    "code":"code"
+}' "{{baseUrl}}/sms/verify/refresh"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-user--example-http">
+                                    <pre><code class="hljs http">POST %7B%7BbaseUrl%7D%7D/sms/verify/refresh HTTP/1.1
+Host: 
+
+{
+    "phoneNumber":"{{myPhone}}",
+    "code":"code"
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-user--responses-928ee6a5-40c1-459f-8966-b2012d2da985" data-toggle="tab">
+                                        
+                                            회원인증실패
+                                        
+                                    </a>
+                                </li>
+                                
+                                <li role="presentation">
+                                    <a href="#request-user--responses-52d442b6-f5bc-4a85-b212-382afab95de6" data-toggle="tab">
+                                        
+                                            회원인증성공
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-user--responses-928ee6a5-40c1-459f-8966-b2012d2da985">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>401 Unauthorized</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Set-Cookie</th><td>JSESSIONID=B0AE421CD212FDF5C4626A943E70CDAA; Path=/; Secure; HttpOnly</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:27:22 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>{
+    "status": "인증번호 틀림"
+}</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                                <div class="tab-pane" id="request-user--responses-52d442b6-f5bc-4a85-b212-382afab95de6">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:28:04 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>{
+    "token": "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI0MSIsImlhdCI6MTczMzg0ODA4NCwiZXhwIjoxNzQ5Njg3NjA0fQ.MvcEYK0X4iOxm3vqMkfQ-5wzlGrlyxujKBpW18Jy1bU"
+}</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-user-">
+                            로그인
+                            <a href="#request-user-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div><p>Gets information about the authenticated user.</p>
+</div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-user--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-user--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-user--example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "{{baseUrl}}/login/token"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-user--example-http">
+                                    <pre><code class="hljs http">POST %7B%7BbaseUrl%7D%7D/login/token HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-user--responses-7ad7ea7b-ec51-4876-af19-c16e0d76acae" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-user--responses-7ad7ea7b-ec51-4876-af19-c16e0d76acae">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:28:33 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>{
+    "state": "success"
+}</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-user-">
+                            내 이름
+                            <a href="#request-user-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-user--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-user--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-user--example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "{{baseUrl}}/get/myname"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-user--example-http">
+                                    <pre><code class="hljs http">GET %7B%7BbaseUrl%7D%7D/get/myname HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-user--responses-169b4775-3d9f-46f0-aa67-45cbed5c32f3" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-user--responses-169b4775-3d9f-46f0-aa67-45cbed5c32f3">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:28:51 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>{
+    "name": "KSH"
+}</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-user-">
+                            연락처 연동
+                            <a href="#request-user-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-user--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-user--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-user--example-curl">
+                                    <pre><code class="hljs curl">curl -X POST -d '[
+    "01098765432",
+    "01012345678"
+]' "{{baseUrl}}/friend/upload"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-user--example-http">
+                                    <pre><code class="hljs http">POST %7B%7BbaseUrl%7D%7D/friend/upload HTTP/1.1
+Host: 
+
+[
+    "01098765432",
+    "01012345678"
+]</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-user--responses-1a2d2280-b4a6-4920-8b5b-eca9c28be250" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-user--responses-1a2d2280-b4a6-4920-8b5b-eca9c28be250">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:29:01 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>{
+    "status": "success",
+    "friendNum": 0
+}</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-user-">
+                            연락처 연동 해제
+                            <a href="#request-user-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-user--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-user--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-user--example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "{{baseUrl}}/friend/unlink"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-user--example-http">
+                                    <pre><code class="hljs http">POST %7B%7BbaseUrl%7D%7D/friend/unlink HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-user--responses-2b9dd72d-8287-433d-9263-dc95572cb73e" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-user--responses-2b9dd72d-8287-433d-9263-dc95572cb73e">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:29:07 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>{
+    "status": "unlink"
+}</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-user-">
+                            탈퇴
+                            <a href="#request-user-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-user--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-user--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-user--example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "{{baseUrl}}/user/deactivate"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-user--example-http">
+                                    <pre><code class="hljs http">POST %7B%7BbaseUrl%7D%7D/user/deactivate HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-user--responses-e43b93bb-931a-4d36-bf94-ce75ca3df895" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-user--responses-e43b93bb-931a-4d36-bf94-ce75ca3df895">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:29:13 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>{
+    "status": "quit"
+}</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+
+                </div>
+                
+                
+                <div class="endpoints-group">
+                    <h3 id="folder-admin">
+                        Admin
+                        <a href="#folder-admin"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div></div>
+
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-admin-">
+                            관리자 로그인
+                            <a href="#request-admin-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-admin--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-admin--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-admin--example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "{{baseUrl}}/admin/login"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-admin--example-http">
+                                    <pre><code class="hljs http">POST %7B%7BbaseUrl%7D%7D/admin/login HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+
+                </div>
+                
+                
+                <div class="endpoints-group">
+                    <h3 id="folder-history">
+                        History
+                        <a href="#folder-history"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div></div>
+
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-history-">
+                            일반게임 기록 업로드
+                            <a href="#request-history-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-history--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-history--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-history--example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "{{baseUrl}}/history/random/upload?gameType=RANDOM&reactionTime=1350&date=2024-12-11"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-history--example-http">
+                                    <pre><code class="hljs http">POST %7B%7BbaseUrl%7D%7D/history/random/upload?gameType=RANDOM&reactionTime=1350&date=2024-12-11 HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-history--responses-9f84f396-6ff1-4bac-bdad-c78edc0df327" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-history--responses-9f84f396-6ff1-4bac-bdad-c78edc0df327">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>text/plain;charset=UTF-8</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Length</th><td>7</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:30:17 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-history-">
+                            일반게임 기록 조회
+                            <a href="#request-history-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-history--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-history--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-history--example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "{{baseUrl}}/history/random/get?gameType=RANDOM&period=DAILY"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-history--example-http">
+                                    <pre><code class="hljs http">GET %7B%7BbaseUrl%7D%7D/history/random/get?gameType=RANDOM&period=DAILY HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-history--responses-c9da0442-73e3-4d93-b934-7540621afbc2" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-history--responses-c9da0442-73e3-4d93-b934-7540621afbc2">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:30:41 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>[
+    {
+        "startDate": "2024-11-12",
+        "averageReactionTime": 1700
+    },
+    {
+        "startDate": "2024-11-16",
+        "averageReactionTime": 1450
+    },
+    {
+        "startDate": "2024-11-25",
+        "averageReactionTime": 1700
+    },
+    {
+        "startDate": "2024-11-26",
+        "averageReactionTime": 1450
+    },
+    {
+        "startDate": "2024-12-11",
+        "averageReactionTime": 1350
+    }
+]</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-history-">
+                            일반게임 연령대 평균 기록 조회
+                            <a href="#request-history-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-history--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-history--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-history--example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "{{baseUrl}}/history/random/get/average?gameType=RANDOM&age=not"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-history--example-http">
+                                    <pre><code class="hljs http">GET %7B%7BbaseUrl%7D%7D/history/random/get/average?gameType=RANDOM&age=not HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-history--responses-dbaf8b53-417d-4e2a-accd-3db4be028459" data-toggle="tab">
+                                        
+                                            내 연령대 평균
+                                        
+                                    </a>
+                                </li>
+                                
+                                <li role="presentation">
+                                    <a href="#request-history--responses-0955b729-f5e1-4c20-8ed4-ce8d65eecfd1" data-toggle="tab">
+                                        
+                                            전체 연령대 평균
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-history--responses-dbaf8b53-417d-4e2a-accd-3db4be028459">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:30:50 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>{
+    "result": 1689.1606
+}</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                                <div class="tab-pane" id="request-history--responses-0955b729-f5e1-4c20-8ed4-ce8d65eecfd1">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:31:14 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>{
+    "result": 1766.9474
+}</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-history-">
+                            리듬게임 기록 업로드
+                            <a href="#request-history-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-history--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-history--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-history--example-curl">
+                                    <pre><code class="hljs curl">curl -X POST -d '{
+    "musicId":1,
+    "difficulty":"EASY",
+    "combo":10,
+    "score":500
+}' "{{baseUrl}}/history/rhythm/upload"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-history--example-http">
+                                    <pre><code class="hljs http">POST %7B%7BbaseUrl%7D%7D/history/rhythm/upload HTTP/1.1
+Host: 
+
+{
+    "musicId":1,
+    "difficulty":"EASY",
+    "combo":10,
+    "score":500
+}</code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-history--responses-4fb57c24-3ec4-46b4-9de4-fed5500e3ffa" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-history--responses-4fb57c24-3ec4-46b4-9de4-fed5500e3ffa">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>text/plain;charset=UTF-8</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Length</th><td>7</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:31:38 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-history-">
+                            리듬게임 순위 조회
+                            <a href="#request-history-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-history--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-history--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-history--example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "{{baseUrl}}/history/rhythm/get/{{musicId}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-history--example-http">
+                                    <pre><code class="hljs http">GET %7B%7BbaseUrl%7D%7D/history/rhythm/get/%7B%7BmusicId%7D%7D HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-history--responses-b61d6cde-84ea-4abe-b12f-4853578c6683" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-history--responses-b61d6cde-84ea-4abe-b12f-4853578c6683">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:32:24 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>[
+    {
+        "userDto": {
+            "userId": 28,
+            "name": "jyh",
+            "phoneNumberHashed": "",
+            "birthYear": 0
+        },
+        "musicId": 1,
+        "combo": 0,
+        "score": 700,
+        "difficulty": "NORMAL",
+        "date": "2024-12-09"
+    },
+    {
+        "userDto": {
+            "userId": 28,
+            "name": "jyh",
+            "phoneNumberHashed": "",
+            "birthYear": 0
+        },
+        "musicId": 1,
+        "combo": 0,
+        "score": 700,
+        "difficulty": "EASY",
+        "date": "2024-12-09"
+    },
+    {
+        "userDto": {
+            "userId": 28,
+            "name": "jyh",
+            "phoneNumberHashed": "",
+            "birthYear": 0
+        },
+        "musicId": 1,
+        "combo": 0,
+        "score": 700,
+        "difficulty": "HARD",
+        "date": "2024-12-09"
+    },
+    {
+        "userDto": {
+            "userId": 27,
+            "name": "123456",
+            "phoneNumberHashed": "",
+            "birthYear": 0
+        },
+        "musicId": 1,
+        "combo": 0,
+        "score": 600,
+        "difficulty": "NORMAL",
+        "date": "2024-12-09"
+    },
+    {
+        "userDto": {
+            "userId": 27,
+            "name": "123456",
+            "phoneNumberHashed": "",
+            "birthYear": 0
+        },
+        "musicId": 1,
+        "combo": 0,
+        "score": 600,
+        "difficulty": "EASY",
+        "date": "2024-12-09"
+    },
+    {
+        "userDto": {
+            "userId": 27,
+            "name": "123456",
+            "phoneNumberHashed": "",
+            "birthYear": 0
+        },
+        "musicId": 1,
+        "combo": 0,
+        "score": 600,
+        "difficulty": "HARD",
+        "date": "2024-12-09"
+    },
+    {
+        "userDto": {
+            "userId": 42,
+            "name": "KSH",
+            "phoneNumberHashed": "",
+            "birthYear": 0
+        },
+        "musicId": 1,
+        "combo": 10,
+        "score": 500,
+        "difficulty": "EASY",
+        "date": "2024-12-11"
+    }
+]</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-history-">
+                            리듬게임 내 순위 조회
+                            <a href="#request-history-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-history--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-history--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-history--example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "{{baseUrl}}/history/rhythm/get/{{musicId}}/EASY"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-history--example-http">
+                                    <pre><code class="hljs http">GET %7B%7BbaseUrl%7D%7D/history/rhythm/get/%7B%7BmusicId%7D%7D/EASY HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-history--responses-25a3b97e-a2ce-4162-9c87-447988b78dfe" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-history--responses-25a3b97e-a2ce-4162-9c87-447988b78dfe">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:32:30 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>{
+    "status": "success",
+    "ranking": 3
+}</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+
+                </div>
+                
+                
+                <div class="endpoints-group">
+                    <h3 id="folder-music">
+                        Music
+                        <a href="#folder-music"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div></div>
+
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-music-">
+                            음악 업로드(관리자)
+                            <a href="#request-music-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-music--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-music--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-music--example-curl">
+                                    <pre><code class="hljs curl">curl -X POST "{{baseUrl}}/admin/upload?artist&duration&file"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-music--example-http">
+                                    <pre><code class="hljs http">POST %7B%7BbaseUrl%7D%7D/admin/upload?artist&duration&file HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-music-">
+                            음악 다운로드
+                            <a href="#request-music-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-music--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-music--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-music--example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "{{baseUrl}}/music/download/{{baseUrl}}"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-music--example-http">
+                                    <pre><code class="hljs http">GET %7B%7BbaseUrl%7D%7D/music/download/%7B%7BbaseUrl%7D%7D HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-music-">
+                            음악 목록 조회
+                            <a href="#request-music-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-music--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-music--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-music--example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "{{baseUrl}}/music/getMusicList"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-music--example-http">
+                                    <pre><code class="hljs http">GET %7B%7BbaseUrl%7D%7D/music/getMusicList HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-music--responses-b160ecad-b188-4db7-b382-986a009d98b4" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-music--responses-b160ecad-b188-4db7-b382-986a009d98b4">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:32:41 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>[
+    {
+        "id": 1,
+        "title": "ETA",
+        "artist": "New Jeans",
+        "duration": "00:02:51",
+        "filePath": null
+    },
+    {
+        "id": 8,
+        "title": "abcd",
+        "artist": "abcd",
+        "duration": "00:02:30",
+        "filePath": null
+    },
+    {
+        "id": 31,
+        "title": "작은 별",
+        "artist": "동요",
+        "duration": "00:00:31",
+        "filePath": null
+    },
+    {
+        "id": 32,
+        "title": "작은 별 2",
+        "artist": "동요",
+        "duration": "00:00:31",
+        "filePath": null
+    }
+]</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+                    
+                    <div class="request">
+
+                        <h4 id="request-music-">
+                            비트 리스트 얻기
+                            <a href="#request-music-"><i class="glyphicon glyphicon-link"></i></a>
+                        </h4>
+
+                        <div></div>
+
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#request-music--example-curl" data-toggle="tab">Curl</a></li>
+                                <li role="presentation"><a href="#request-music--example-http" data-toggle="tab">HTTP</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active" id="request-music--example-curl">
+                                    <pre><code class="hljs curl">curl -X GET "{{baseUrl}}/music/{{musicId}}/getBeatList"</code></pre>
+                                </div>
+                                <div class="tab-pane" id="request-music--example-http">
+                                    <pre><code class="hljs http">GET %7B%7BbaseUrl%7D%7D/music/%7B%7BmusicId%7D%7D/getBeatList HTTP/1.1
+Host: </code></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div>
+                            <ul class="nav nav-tabs" role="tablist">
+                                
+                                <li role="presentation" class="active">
+                                    <a href="#request-music--responses-4702ddcf-00cf-4065-9cb2-0e4098644850" data-toggle="tab">
+                                        
+                                            Response
+                                        
+                                    </a>
+                                </li>
+                                
+                            </ul>
+                            <div class="tab-content">
+                                
+                                <div class="tab-pane active" id="request-music--responses-4702ddcf-00cf-4065-9cb2-0e4098644850">
+                                    <table class="table table-bordered">
+                                        <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Origin</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Method</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Vary</th><td>Access-Control-Request-Headers</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Content-Type-Options</th><td>nosniff</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-XSS-Protection</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Cache-Control</th><td>no-cache, no-store, max-age=0, must-revalidate</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Pragma</th><td>no-cache</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Expires</th><td>0</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Strict-Transport-Security</th><td>max-age=31536000 ; includeSubDomains</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">X-Frame-Options</th><td>DENY</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Content-Type</th><td>application/json</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Transfer-Encoding</th><td>chunked</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Date</th><td>Tue, 10 Dec 2024 16:32:49 GMT</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Keep-Alive</th><td>timeout=60</td></tr>
+                                        
+                                        <tr><th style="width: 20%;">Connection</th><td>keep-alive</td></tr>
+                                        
+                                        
+                                            
+                                            <tr><td class="response-text-sample" colspan="2">
+                                                <pre><code>[
+    0.37151927,
+    0.83591837,
+    1.2770975,
+    1.7182766,
+    2.1594558,
+    2.6006348,
+    3.065034,
+    3.4829931,
+    3.9473922,
+    4.3885713,
+    4.8529706,
+    5.27093,
+    5.7121086,
+    6.153288,
+    6.617687,
+    7.0356464,
+    7.5000453,
+    7.9412246,
+    8.382403,
+    8.823583,
+    9.264762,
+    9.705941,
+    10.170341,
+    10.611519,
+    11.052698,
+    11.493877,
+    11.958277,
+    12.399456,
+    12.817415,
+    13.2585945,
+    13.722993,
+    14.164172,
+    14.605351,
+    15.046531,
+    15.51093,
+    15.952108,
+    16.370068,
+    16.834467,
+    17.275646,
+    17.716825,
+    18.158005,
+    18.599184,
+    19.063583,
+    19.504763,
+    19.945942,
+    20.38712,
+    20.828299,
+    21.269478,
+    21.710657,
+    22.151836,
+    22.616236,
+    23.057415,
+    23.498594,
+    23.939774,
+    24.380953,
+    24.822132,
+    25.263311,
+    25.70449,
+    26.168888,
+    26.610067,
+    27.051247,
+    27.492426,
+    27.933605,
+    28.374784,
+    28.815964,
+    29.257143,
+    29.721542,
+    30.162722,
+    30.6039,
+    31.04508,
+    31.486258,
+    31.927437,
+    32.368618,
+    32.809795,
+    33.274197,
+    33.715374,
+    34.156555,
+    34.597733,
+    35.03891,
+    35.48009,
+    35.94449,
+    36.38567,
+    36.826847,
+    37.26803,
+    37.732426,
+    38.173607,
+    38.614784,
+    39.055965,
+    39.497143,
+    39.93832,
+    40.3795,
+    40.82068,
+    41.26186,
+    41.726257,
+    42.16744,
+    42.608616,
+    43.049797,
+    43.490974,
+    43.932156,
+    44.373333,
+    44.814514,
+    45.27891,
+    45.72009,
+    46.16127,
+    46.602448,
+    47.06685,
+    47.484806,
+    47.949207,
+    48.390385,
+    48.831566,
+    49.272743,
+    49.713924,
+    50.1551,
+    50.596283,
+    51.06068,
+    51.501858,
+    51.94304,
+    52.384216,
+    52.825397,
+    53.266575,
+    53.707756,
+    54.148933,
+    54.613335,
+    55.054512,
+    55.495693,
+    55.93687,
+    56.37805,
+    56.81923,
+    57.260406,
+    57.724808,
+    58.165985,
+    58.607166,
+    59.048344,
+    59.489525,
+    59.953922,
+    60.371883,
+    60.83628,
+    61.277462,
+    61.71864,
+    62.159817,
+    62.600998,
+    63.042175,
+    63.483356,
+    63.924534,
+    64.38893,
+    64.83012,
+    65.27129,
+    65.71247,
+    66.15365,
+    66.61805,
+    67.05923,
+    67.500404,
+    67.94159,
+    68.38277,
+    68.84717,
+    69.26512,
+    69.70631,
+    70.1707,
+    70.611885,
+    71.05306,
+    71.49424,
+    71.93542,
+    72.39982,
+    72.840996,
+    73.25896,
+    73.72336,
+    74.164536,
+    74.60571,
+    75.04689,
+    75.488075,
+    75.95247,
+    76.393654,
+    76.81161,
+    77.27601,
+    77.717186,
+    78.15837,
+    78.59955,
+    79.040726,
+    79.50513,
+    79.92308,
+    80.364265,
+    80.82866,
+    81.269844,
+    81.71102,
+    82.1522,
+    82.593376,
+    83.05778,
+    83.498955,
+    83.94014,
+    84.38132,
+    84.822495,
+    85.26367,
+    85.70485,
+    86.146034,
+    86.61043,
+    87.05161,
+    87.49279,
+    87.93397,
+    88.375145,
+    88.81633,
+    89.25751,
+    89.72191,
+    90.163086,
+    90.60426,
+    91.04544,
+    91.48662,
+    91.9278,
+    92.36898,
+    92.83338,
+    93.27456,
+    93.71574,
+    94.15691,
+    94.621315,
+    95.06249,
+    95.50367,
+    95.944855,
+    96.38603,
+    96.82721,
+    97.26839,
+    97.70957,
+    98.15075,
+    98.61515,
+    99.05633,
+    99.497505,
+    99.93868,
+    100.37987,
+    100.821045,
+    101.26222,
+    101.7034,
+    102.1678,
+    102.60898,
+    103.050156,
+    103.49134,
+    103.955734,
+    104.373695,
+    104.8381,
+    105.279274,
+    105.72045,
+    106.16164,
+    106.60281,
+    107.04399,
+    107.48517,
+    107.94957,
+    108.39075,
+    108.80871,
+    109.27311,
+    109.71429,
+    110.155464,
+    110.59664,
+    111.03783,
+    111.50222,
+    111.943405,
+    112.38458,
+    112.82576,
+    113.26694,
+    113.708115,
+    114.172516,
+    114.61369,
+    115.05488,
+    115.496056,
+    115.93723,
+    116.37841,
+    116.84281,
+    117.26077,
+    117.72517,
+    118.16635,
+    118.60753,
+    119.048706,
+    119.48988,
+    119.93107,
+    120.39546,
+    120.83665,
+    121.277824,
+    121.719,
+    122.16018,
+    122.601364,
+    123.04254,
+    123.506935,
+    123.94812,
+    124.3893,
+    124.830475,
+    125.27165,
+    125.73605,
+    126.154015,
+    126.59519,
+    127.05959,
+    127.50077,
+    127.94195,
+    128.38313,
+    128.82431,
+    129.28871,
+    129.72989,
+    130.14784,
+    130.61224,
+    131.05342,
+    131.4946,
+    131.93578,
+    132.37697,
+    132.84135,
+    133.28255,
+    133.7005,
+    134.1649,
+    134.60608,
+    135.04726,
+    135.51166,
+    135.95284,
+    136.39401,
+    136.83519,
+    137.27637,
+    137.71754,
+    138.18195,
+    138.59991,
+    139.06432,
+    139.5055,
+    139.94667,
+    140.38785,
+    140.82903,
+    141.2702,
+    141.7346,
+    142.15256,
+    142.61696,
+    143.05814,
+    143.52254,
+    143.9405,
+    144.38168,
+    144.82286,
+    145.28726,
+    145.70522,
+    146.16962,
+    146.6108,
+    147.05197,
+    147.49315,
+    147.93433,
+    148.3755,
+    148.8399,
+    149.25787
+]</code></pre>
+                                            </td></tr>
+                                            
+                                        
+                                    </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                        
+
+                        <hr>
+                    </div>
+                    
+
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("table:not(.table)").addClass('table table-bordered');
+    });
+</script>
+</body>
+</html>
