@@ -1,7 +1,8 @@
 # 손뇌톡톡: 치매 예방 손동작 게임
  손동작 인식 기반 인지 기능 훈련 Android 게임
  
-
+### 보고서
+https://docs.google.com/document/d/1JVWPIcj_U1MwifIY-yTwBrBQt9R0ksFx/edit?usp=drivesdk&ouid=102213538155044127622&rtpof=true&sd=true
  
  ### ✔️Back-end
  <img src="https://img.shields.io/badge/springboot-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"> <img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white"> <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=Redis&logoColor=white"> <img src="https://img.shields.io/badge/Amazon%20EC2-FF9900?style=for-the-badge&logo=Amazon%20EC2&logoColor=white"> 
